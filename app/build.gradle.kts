@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrainsKotlinSerialization)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -62,6 +64,11 @@ dependencies {
     //Supabase
     implementation(platform(libs.supabase.bom))
     implementation(libs.postgrest.kt)
+
+    //DI
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation)
+    ksp(libs.hilt.compiler)
 
     //Testing
     testImplementation(libs.junit)
