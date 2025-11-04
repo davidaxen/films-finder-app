@@ -16,6 +16,7 @@ kotlinSerialization = "1.9.0"
 hilt = "2.57.2"
 ksp = "2.3.0"
 hilt-navigation = "1.3.0"
+retrofit = "3.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,12 +36,15 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
-supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"}
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt"}
 hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation"}
+retrofit = {module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit"}
+retrofit-adapter = {module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit"}
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
+supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
