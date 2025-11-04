@@ -1,6 +1,5 @@
 package com.darvi.filmhunter.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -13,21 +12,27 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
-    secondary = DarkSecondary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
     background = DarkBackground,
     surface = DarkSurface,
     onBackground = DarkOnBackground,
-    onSurface = DarkOnSurface,
+    onSurface = DarkOnBackground,
+    onSurfaceVariant = DarkOnSurfaceVariant,
     error = DarkError
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = LightPrimary,
-    secondary = LightSecondary,
+    onPrimary = LightOnPrimary,
+    primaryContainer = LightPrimaryContainer,
+    onPrimaryContainer = LightOnPrimaryContainer,
     background = LightBackground,
     surface = LightSurface,
     onBackground = LightOnBackground,
-    onSurface = LightOnSurface,
+    onSurface = LightOnBackground,
+    onSurfaceVariant = LightOnSurfaceVariant,
     error = LightError
 )
 
@@ -35,7 +40,7 @@ private val LightColorScheme = lightColorScheme(
 fun FilmHunterTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
