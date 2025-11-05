@@ -6,7 +6,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.darvi.filmhunter.presentation.auth.login.LoginScreen
 import com.darvi.filmhunter.presentation.auth.register.RegisterScreen
+import com.darvi.filmhunter.presentation.core.navigation.bottomnav.favGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.homeGraph
+import com.darvi.filmhunter.presentation.core.navigation.bottomnav.profileGraph
 
 fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation<AppGraph.Auth>(startDestination = AuthRoutes.Login) {
@@ -28,7 +30,7 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
 fun NavGraphBuilder.mainGraph(navController: NavController) {
     navigation<AppGraph.Main>(startDestination = MainGraph.Home) {
         homeGraph(navController)
-//        favGraph()
-//        profileGraph()
+        favGraph(navController)
+        profileGraph(navController)
     }
 }

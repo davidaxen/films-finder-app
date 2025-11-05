@@ -21,3 +21,11 @@ interface MainGraph {
 interface HomeRoutes {
     @Serializable object HomeList
 }
+
+interface FavRoutes {
+    @Serializable object Main
+}
+
+interface ProfileRoutes {
+    @Serializable object Main
+}
