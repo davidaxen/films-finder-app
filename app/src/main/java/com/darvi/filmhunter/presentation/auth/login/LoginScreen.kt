@@ -49,13 +49,10 @@ fun LoginScreen(
 
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
-    val colors = MaterialTheme.colorScheme
-    val typography = MaterialTheme.typography
-
     Scaffold { padding ->
         Column(
             modifier = Modifier
-                .background(colors.background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
                 .padding(horizontal = 16.dp)
                 .fillMaxSize(),
@@ -67,8 +64,8 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
                 text = stringResource(id = R.string.login_title),
-                style = typography.headlineSmall,
-                color = colors.onBackground,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             FilmHunterTextField(
@@ -121,7 +118,7 @@ fun LoginScreen(
                     .height(52.dp),
                 shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isButtonEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    containerColor = if (isButtonEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
                 )
             ) {
                 if (state.isLoading) {
@@ -132,8 +129,8 @@ fun LoginScreen(
                 } else {
                     FilmHunterText(
                         text = stringResource(id = R.string.login_cta),
-                        style = typography.labelLarge,
-                        color = colors.onPrimary
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (isButtonEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -145,13 +142,13 @@ fun LoginScreen(
             ) {
                 FilmHunterText(
                     text = stringResource(id = R.string.login_forgot_password),
-                    style = typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 4.dp),
-                color = colors.outlineVariant
+                color = MaterialTheme.colorScheme.outlineVariant
             )
 
             // CTA crear cuenta
@@ -165,7 +162,7 @@ fun LoginScreen(
             ) {
                 FilmHunterText(
                     text = stringResource(id = R.string.login_create_account),
-                    style = typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }

@@ -24,8 +24,7 @@ fun FilmHunterTextField(
         focusedContainerColor = MaterialTheme.colorScheme.background,
         unfocusedContainerColor = MaterialTheme.colorScheme.background,
         focusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
-        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        cursorColor = MaterialTheme.colorScheme.onSurface
+        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
     ),
     placeholder: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
