@@ -3,23 +3,19 @@ package com.darvi.filmhunter.presentation.auth.login
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.darvi.filmhunter.R
+import com.darvi.filmhunter.presentation.core.components.FilmHunterPrimaryButton
+import com.darvi.filmhunter.presentation.core.components.FilmHunterSecondaryButton
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.components.FilmHunterTextField
 
@@ -56,7 +54,7 @@ fun LoginScreen(
                 .padding(padding)
                 .padding(horizontal = 16.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             FilmHunterText(
@@ -65,7 +63,6 @@ fun LoginScreen(
                     .padding(bottom = 8.dp),
                 text = stringResource(id = R.string.login_title),
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground,
             )
 
             FilmHunterTextField(
@@ -109,62 +106,36 @@ fun LoginScreen(
                     imeAction = ImeAction.Done
                 ),
             )
-            val isButtonEnabled = !state.isLoading && state.isLoginEnabled
-            Button(
+
+            Spacer(Modifier.height(8.dp))
+
+            FilmHunterPrimaryButton(
+                text = stringResource(id = R.string.login_cta),
                 onClick = { loginViewModel.onClick() },
-                enabled = isButtonEnabled,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isButtonEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                )
-            ) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    FilmHunterText(
-                        text = stringResource(id = R.string.login_cta),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = if (isButtonEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
+                enabled = !state.isLoading && state.isLoginEnabled,
+                isLoading = state.isLoading
+            )
 
             TextButton(
                 onClick = { },
                 enabled = !state.isLoading,
                 modifier = Modifier.align(Alignment.End)
             ) {
-                FilmHunterText(
-                    text = stringResource(id = R.string.login_forgot_password),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                FilmHunterText(text = stringResource(id = R.string.login_forgot_password))
             }
+
+            Spacer(Modifier.height(32.dp))
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 4.dp),
                 color = MaterialTheme.colorScheme.outlineVariant
             )
 
-            // CTA crear cuenta
-            OutlinedButton(
+            FilmHunterSecondaryButton(
+                text = stringResource(id = R.string.login_create_account),
                 onClick = {},
-                enabled = !state.isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = MaterialTheme.shapes.large
-            ) {
-                FilmHunterText(
-                    text = stringResource(id = R.string.login_create_account),
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
+                enabled = !state.isLoading
+            )
         }
     }
 }

@@ -34,7 +34,7 @@ fun FilmHunterTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         enabled = enabled,
         singleLine = singleLine,
         label = { FilmHunterText(text = label) },
