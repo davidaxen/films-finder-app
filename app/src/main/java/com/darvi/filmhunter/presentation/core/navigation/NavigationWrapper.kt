@@ -2,21 +2,21 @@ package com.darvi.filmhunter.presentation.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.darvi.filmhunter.presentation.auth.login.LoginScreen
-import com.darvi.filmhunter.presentation.auth.register.RegisterScreen
 
 @Composable
-fun NavigationWrapper() {
+fun NavigationWrapper(
+//    sessionViewModel: SessionViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Login) {
-        composable<Login> {
-            LoginScreen()
-        }
+//    val user by sessionViewModel.currentUser.collectAsStateWithLifecycle(null)
 
-        composable<Register> {
-            RegisterScreen()
-        }
+//    LaunchedEffect(user) {
+//        Log.i("PRUEBA SESSION NAV", user.toString())
+//    }
+
+    NavHost(navController = navController, startDestination = AppGraph.Main) {
+        authGraph(navController)
+        mainGraph(navController)
     }
 }

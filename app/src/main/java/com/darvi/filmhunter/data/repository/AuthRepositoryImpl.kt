@@ -13,8 +13,4 @@ class AuthRepositoryImpl(private val authDataSource: SupabaseAuthDataSource): Au
     override suspend fun doRegister(email: String, password: String): UserEntity {
         return authDataSource.signUp(email, password).toDomain()
     }
-
-    override suspend fun getCurrentUser(): UserEntity? {
-        return authDataSource.getCurrentUser()?.toDomain()
-    }
 }

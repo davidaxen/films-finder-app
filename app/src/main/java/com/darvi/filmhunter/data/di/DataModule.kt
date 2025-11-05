@@ -4,7 +4,9 @@ import com.darvi.filmhunter.BuildConfig
 import com.darvi.filmhunter.data.datasource.SupabaseAuthDataSource
 import com.darvi.filmhunter.data.datasource.SupabaseAuthDataSourceImpl
 import com.darvi.filmhunter.data.repository.AuthRepositoryImpl
+import com.darvi.filmhunter.data.repository.SessionRepositoryImpl
 import com.darvi.filmhunter.domain.repository.AuthRepository
+import com.darvi.filmhunter.domain.repository.SessionRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,11 +23,17 @@ import javax.inject.Singleton
 object DataModule {
 
     @Provides
+    fun provideSessionRepository(dataSource: SupabaseAuthDataSource): SessionRepository {
+        return SessionRepositoryImpl(dataSource)
+    }
+
+    @Provides
     fun provideAuthRepository(dataSource: SupabaseAuthDataSource): AuthRepository {
         return AuthRepositoryImpl(dataSource)
     }
 
     @Provides
+    @Singleton
     fun provideSupabaseAuthDataSource(supabaseAuth: Auth): SupabaseAuthDataSource {
         return SupabaseAuthDataSourceImpl(supabaseAuth)
     }

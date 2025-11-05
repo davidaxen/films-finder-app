@@ -3,9 +3,12 @@ package com.darvi.filmhunter.presentation.auth.register
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darvi.filmhunter.domain.entity.UserEntity
+import com.darvi.filmhunter.domain.usecase.GetCurrentUser
 import com.darvi.filmhunter.domain.usecase.Register
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -16,9 +19,11 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val register: Register,
+    getCurrentUser: GetCurrentUser
 ): ViewModel() {
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState
+    val userFlow: Flow<UserEntity?> = getCurrentUser()
 
     fun onEmailChanged(email: String) {
         _uiState.update {

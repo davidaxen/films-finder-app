@@ -41,7 +41,9 @@ import com.darvi.filmhunter.presentation.core.components.FilmHunterTextField
 
 @Composable
 fun LoginScreen(
-    loginViewModel: LoginViewModel = hiltViewModel()
+    loginViewModel: LoginViewModel = hiltViewModel(),
+    navigateToRegister: () -> Unit,
+    navigateToForgotPassword: () -> Unit,
 ) {
     val state by loginViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -117,7 +119,7 @@ fun LoginScreen(
             )
 
             TextButton(
-                onClick = { },
+                onClick = navigateToForgotPassword,
                 enabled = !state.isLoading,
                 modifier = Modifier.align(Alignment.End)
             ) {
@@ -133,7 +135,7 @@ fun LoginScreen(
 
             FilmHunterSecondaryButton(
                 text = stringResource(id = R.string.login_create_account),
-                onClick = {},
+                onClick = navigateToRegister,
                 enabled = !state.isLoading
             )
         }

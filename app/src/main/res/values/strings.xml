@@ -3,7 +3,7 @@
 
     <!-- Login Scren -->
     <string name="login_title">Iniciar sesión</string>
-    <string name="login_email_label">Email</string>
+    <string name="login_email_label">Correo</string>
     <string name="login_email_placeholder">tu@email.com</string>
     <string name="login_password_label">Contraseña</string>
     <string name="login_password_placeholder">••••••••</string>
