@@ -2,8 +2,30 @@ package com.darvi.filmhunter.presentation.core.navigation
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-object Login
+interface AppGraph {
+    @Serializable object Auth
+    @Serializable object Main
+}
 
-@Serializable
-object Register
+interface AuthRoutes {
+    @Serializable object Login
+    @Serializable object Register
+}
+
+interface MainGraph {
+    @Serializable object Home
+    @Serializable object Fav
+    @Serializable object Profile
+}
+
+interface HomeRoutes {
+    @Serializable object HomeList
+}
+
+interface FavRoutes {
+    @Serializable object Main
+}
+
+interface ProfileRoutes {
+    @Serializable object Main
+}

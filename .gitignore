@@ -15,6 +15,9 @@
 .cxx
 local.properties
 
+#Environment variables
+secret.properties
+
 #built application files
 *.apk
 *.ap_

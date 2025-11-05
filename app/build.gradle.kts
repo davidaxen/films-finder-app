@@ -1,8 +1,12 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrainsKotlinSerialization)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -21,6 +25,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val localProperties = Properties()
+    val localPropertiesFile = File(rootDir, "secret.properties")
+    if(localPropertiesFile.exists() && localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use {
+            localProperties.load(it)
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -28,6 +40,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "SUPABASE_KEY", localProperties.getProperty("SUPABASE_KEY"))
+            buildConfigField("String", "SUPABASE_URL", localProperties.getProperty("SUPABASE_URL"))
+        }
+        debug {
+            buildConfigField("String", "SUPABASE_KEY", localProperties.getProperty("SUPABASE_KEY"))
+            buildConfigField("String", "SUPABASE_URL", localProperties.getProperty("SUPABASE_URL"))
         }
     }
     compileOptions {
@@ -39,6 +57,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -61,7 +80,17 @@ dependencies {
 
     //Supabase
     implementation(platform(libs.supabase.bom))
-    implementation(libs.postgrest.kt)
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.supabase.auth.kt)
+
+    //DI
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation)
+    ksp(libs.hilt.compiler)
+
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.adapter)
 
     //Testing
     testImplementation(libs.junit)
