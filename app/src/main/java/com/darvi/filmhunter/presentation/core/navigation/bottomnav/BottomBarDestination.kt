@@ -2,10 +2,12 @@ package com.darvi.filmhunter.presentation.core.navigation.bottomnav
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.AccountBox
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -47,10 +49,10 @@ sealed class BottomBarDestination<T>(
     data object Profile: BottomBarDestination<MainGraph.Profile>(
         title = "Perfil",
         selectedIcon = {
-            Icon(imageVector = Icons.Filled.AccountBox, contentDescription = "")
+            Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "")
         },
         unselectedIcon = {
-            Icon(imageVector = Icons.Outlined.AccountBox, contentDescription = "")
+            Icon(imageVector = Icons.Outlined.AccountCircle, contentDescription = "")
         },
         route = MainGraph.Profile
     )
