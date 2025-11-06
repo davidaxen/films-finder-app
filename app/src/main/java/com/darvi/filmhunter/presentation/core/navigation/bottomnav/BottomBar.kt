@@ -6,9 +6,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationItemIconPosition
@@ -19,12 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -37,24 +32,34 @@ fun BottomBar(
     onNavigate: (Any) -> Unit
 ) {
     val tabs = remember {
-        listOf(BottomBarDestination.Home, BottomBarDestination.Fav, BottomBarDestination.Profile,BottomBarDestination.Profile)
+        listOf(
+            BottomBarDestination.Home,
+            BottomBarDestination.Fav,
+            BottomBarDestination.Profile,
+        )
     }
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
-    ){
-        Box(
+    ) {
+        /*Box(
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
                 .shimmerLoading()
-        )
+        )*/
         tabs.forEach { tab ->
-            val selected =  currentDestination?.hierarchy?.any { it.hasRoute(tab.route::class) } == true
+            val selected =
+                currentDestination?.hierarchy?.any { it.hasRoute(tab.route::class) } == true
             ShortNavigationBarItem(
                 selected = selected,
                 onClick = { onNavigate(tab.route) },
                 icon = if (selected) tab.selectedIcon else tab.unselectedIcon,
-                label = { Text(tab.title, style = MaterialTheme.typography.titleMedium.copy(fontSize = 14.sp)) },
+                label = {
+                    Text(
+                        tab.title,
+                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 14.sp)
+                    )
+                },
                 iconPosition = NavigationItemIconPosition.Start,
                 colors = ShortNavigationBarItemDefaults.colors(
                     selectedIndicatorColor = MaterialTheme.colorScheme.primary,

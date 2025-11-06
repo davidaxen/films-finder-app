@@ -1,12 +1,11 @@
 package com.darvi.filmhunter.presentation.core.navigation.bottomnav
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ViewList
+import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import com.darvi.filmhunter.presentation.core.navigation.MainGraph
@@ -21,24 +20,24 @@ sealed class BottomBarDestination<T>(
 ) {
     @Serializable
     data object Home: BottomBarDestination<MainGraph.Home>(
-        title = "Home",
+        title = "Lista",
         selectedIcon = {
-            Icon(imageVector = Icons.Filled.Home, contentDescription = "")
+            Icon(imageVector = Icons.AutoMirrored.Filled.ViewList, contentDescription = "")
         },
         unselectedIcon = {
-            Icon(imageVector = Icons.Outlined.Home, contentDescription = "")
+            Icon(imageVector = Icons.AutoMirrored.Outlined.ViewList, contentDescription = "")
         },
         route = MainGraph.Home
     )
 
     @Serializable
     data object Fav: BottomBarDestination<MainGraph.Fav>(
-        title = "Favoritos",
+        title = "Guardado",
         selectedIcon = {
-            Icon(imageVector = Icons.Default.Favorite, contentDescription = "")
+            Icon(imageVector = Icons.Default.Bookmark, contentDescription = "")
         },
         unselectedIcon = {
-            Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = "")
+            Icon(imageVector = Icons.Default.Bookmark, contentDescription = "")
         },
         route = MainGraph.Fav
     )

@@ -42,10 +42,12 @@ android {
             )
             buildConfigField("String", "SUPABASE_KEY", localProperties.getProperty("SUPABASE_KEY"))
             buildConfigField("String", "SUPABASE_URL", localProperties.getProperty("SUPABASE_URL"))
+            buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY"))
         }
         debug {
             buildConfigField("String", "SUPABASE_KEY", localProperties.getProperty("SUPABASE_KEY"))
             buildConfigField("String", "SUPABASE_URL", localProperties.getProperty("SUPABASE_URL"))
+            buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY"))
         }
     }
     compileOptions {
@@ -74,6 +76,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.ktor.client.android)
+
+    //Images
+    implementation(libs.coil.compose)
+    implementation(libs.coil.okhttp)
 
     //Navigation
     implementation(libs.androidx.navigation.compose)

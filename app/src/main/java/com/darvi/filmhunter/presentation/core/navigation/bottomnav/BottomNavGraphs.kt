@@ -8,10 +8,12 @@ import com.darvi.filmhunter.presentation.core.navigation.FavRoutes
 import com.darvi.filmhunter.presentation.core.navigation.HomeRoutes
 import com.darvi.filmhunter.presentation.core.navigation.MainGraph
 import com.darvi.filmhunter.presentation.core.navigation.ProfileRoutes
+import com.darvi.filmhunter.presentation.list.ListScreen
 
 fun NavGraphBuilder.homeGraph(navController: NavController) {
     navigation<MainGraph.Home>(startDestination = HomeRoutes.HomeList) {
         composable<HomeRoutes.HomeList> {
+            ListScreen()
         }
     }
 }
