@@ -1,11 +1,11 @@
 package com.darvi.filmhunter.presentation.core.navigation.bottomnav
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ViewList
-import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import com.darvi.filmhunter.presentation.core.navigation.MainGraph
@@ -20,12 +20,12 @@ sealed class BottomBarDestination<T>(
 ) {
     @Serializable
     data object Home: BottomBarDestination<MainGraph.Home>(
-        title = "Lista",
+        title = "Inicio",
         selectedIcon = {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ViewList, contentDescription = "")
+            Icon(imageVector = Icons.Filled.Home, contentDescription = "")
         },
         unselectedIcon = {
-            Icon(imageVector = Icons.AutoMirrored.Outlined.ViewList, contentDescription = "")
+            Icon(imageVector = Icons.Outlined.Home, contentDescription = "")
         },
         route = MainGraph.Home
     )
