@@ -2,8 +2,9 @@ package com.darvi.filmhunter.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.entity.MovieEntity
 import com.darvi.filmhunter.domain.repository.MovieRepository
+import com.darvi.filmhunter.presentation.list.model.FilmUiModel
+import com.darvi.filmhunter.presentation.list.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,9 +20,10 @@ class ListViewModel @Inject constructor(private val repository: MovieRepository)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update {
-                it.copy(
-                    movies = repository.getPopularMovies()
+            _uiState.update { state ->
+                state.copy(
+                    movies = repository.getPopularMovies().map { it.toUiModel() },
+                    isLoading = false
                 )
             }
         }
@@ -29,5 +31,6 @@ class ListViewModel @Inject constructor(private val repository: MovieRepository)
 }
 
 data class ListUiState(
-    val movies: List<MovieEntity> = emptyList()
+    val movies: List<FilmUiModel> = emptyList(),
+    val isLoading: Boolean = true
 )
