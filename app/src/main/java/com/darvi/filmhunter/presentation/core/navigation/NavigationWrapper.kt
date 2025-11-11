@@ -70,9 +70,9 @@ fun NavigationWrapper() {
                         FilmHunterText(text = "Películas")
                     }
                     Tab(
-                        selected = selectedTabRow == FilmType.TV,
+                        selected = selectedTabRow == FilmType.SERIES,
                         onClick = {
-                            selectedTabRow = FilmType.TV
+                            selectedTabRow = FilmType.SERIES
                             navController.navigate(HomeRoutes.SeriesList)
                         },
                         modifier = Modifier.height(40.dp)

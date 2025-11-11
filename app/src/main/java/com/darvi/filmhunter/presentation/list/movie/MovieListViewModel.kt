@@ -2,7 +2,7 @@ package com.darvi.filmhunter.presentation.list.movie
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.usecase.GetFilmList
+import com.darvi.filmhunter.domain.usecase.GetMoviesList
 import com.darvi.filmhunter.presentation.list.model.FilmUiModel
 import com.darvi.filmhunter.presentation.list.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,43 +15,43 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MovieListViewModel @Inject constructor(
-    private val getList: GetFilmList
+    private val getList: GetMoviesList
 ): ViewModel() {
-    private val _uiState = MutableStateFlow(ListUiState())
-    val uiState: StateFlow<ListUiState> = _uiState
+    private val _uiState = MutableStateFlow(MovieListUiState())
+    val uiState: StateFlow<MovieListUiState> = _uiState
 
     init {
-        getFilmLists()
+        getMoviesLists()
     }
 
-    private fun getFilmLists() {
-        getFilmList(ListSection.POPULAR)
-        getFilmList(ListSection.UPCOMING)
-        getFilmList(ListSection.TOP_RATED)
-        getFilmList(ListSection.NOW_PLAYING)
+    private fun getMoviesLists() {
+        getMoviesList(MovieListSection.POPULAR)
+        getMoviesList(MovieListSection.UPCOMING)
+        getMoviesList(MovieListSection.TOP_RATED)
+        getMoviesList(MovieListSection.NOW_PLAYING)
     }
 
-    private fun getFilmList(listType: ListSection) {
+    private fun getMoviesList(listType: MovieListSection) {
         viewModelScope.launch(Dispatchers.IO) {
             val list = getList(listType.path).map { it.toUiModel() }
             when (listType) {
-                ListSection.POPULAR -> _uiState.update { it.copy(popularMovies = list) }
-                ListSection.TOP_RATED -> _uiState.update { it.copy(topRatedMovies = list) }
-                ListSection.NOW_PLAYING -> _uiState.update { it.copy(nowPlayingMovies = list) }
-                ListSection.UPCOMING -> _uiState.update { it.copy(upcomingMovies = list) }
+                MovieListSection.POPULAR -> _uiState.update { it.copy(popularMovies = list) }
+                MovieListSection.TOP_RATED -> _uiState.update { it.copy(topRatedMovies = list) }
+                MovieListSection.NOW_PLAYING -> _uiState.update { it.copy(nowPlayingMovies = list) }
+                MovieListSection.UPCOMING -> _uiState.update { it.copy(upcomingMovies = list) }
             }
         }
     }
 }
 
-enum class ListSection(val path: String) {
+enum class MovieListSection(val path: String) {
     POPULAR("popular"),
     TOP_RATED("top_rated"),
     NOW_PLAYING("now_playing"),
     UPCOMING("upcoming")
 }
 
-data class ListUiState(
+data class MovieListUiState(
     val popularMovies: List<FilmUiModel> = emptyList(),
     val upcomingMovies: List<FilmUiModel> = emptyList(),
     val nowPlayingMovies: List<FilmUiModel> = emptyList(),

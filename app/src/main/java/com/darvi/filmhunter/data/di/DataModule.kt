@@ -6,8 +6,10 @@ import com.darvi.filmhunter.data.repository.AuthRepositoryImpl
 import com.darvi.filmhunter.data.repository.MovieRepositoryImpl
 import com.darvi.filmhunter.data.repository.SessionRepositoryImpl
 import com.darvi.filmhunter.data.datasource.api.ApiService
+import com.darvi.filmhunter.data.repository.SeriesRepositoryImpl
 import com.darvi.filmhunter.domain.repository.AuthRepository
 import com.darvi.filmhunter.domain.repository.MovieRepository
+import com.darvi.filmhunter.domain.repository.SeriesRepository
 import com.darvi.filmhunter.domain.repository.SessionRepository
 import dagger.Module
 import dagger.Provides
@@ -37,6 +39,12 @@ object DataModule {
     @Singleton
     fun provideSupabaseAuthDataSource(supabaseAuth: Auth): SupabaseAuthDataSource {
         return SupabaseAuthDataSourceImpl(supabaseAuth)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSeriesRepository(api: ApiService): SeriesRepository {
+        return SeriesRepositoryImpl(api)
     }
 
     @Provides

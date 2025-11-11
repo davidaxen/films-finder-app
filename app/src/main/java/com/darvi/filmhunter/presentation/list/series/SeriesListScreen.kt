@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.presentation.list.movie
+package com.darvi.filmhunter.presentation.list.series
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,34 +10,34 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.darvi.filmhunter.presentation.list.components.FilmListSection
 
 @Composable
-fun MovieListScreen(
-    movieListViewModel: MovieListViewModel = hiltViewModel(),
+fun SeriesListScreen(
+    seriesListViewModel: SeriesListViewModel = hiltViewModel()
 ) {
-    val uiState by movieListViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by seriesListViewModel.uiState.collectAsStateWithLifecycle()
 
     LazyColumn(Modifier.fillMaxSize()) {
         item {
             FilmListSection(
                 title = "Populares",
-                list = uiState.popularMovies,
+                list = uiState.popularSeries,
             )
         }
         item {
             FilmListSection(
                 title = "Mejor valoradas",
-                list = uiState.topRatedMovies,
+                list = uiState.topRatedSeries,
             )
         }
         item {
             FilmListSection(
-                title = "En cines",
-                list = uiState.nowPlayingMovies,
+                title = "En retransmisión",
+                list = uiState.airingTodaySeries,
             )
         }
         item {
             FilmListSection(
                 title = "Proximos estrenos",
-                list = uiState.upcomingMovies,
+                list = uiState.onTheAirSeries,
             )
         }
     }
