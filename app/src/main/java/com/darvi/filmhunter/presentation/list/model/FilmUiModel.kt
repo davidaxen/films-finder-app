@@ -6,7 +6,8 @@ data class FilmUiModel(
     val id: Int,
     val title: String,
     val description: String,
-    val posterPath: String?
+    val posterPath: String?,
+    val type: FilmType
 )
 
 fun MovieEntity.toUiModel(): FilmUiModel {
@@ -15,5 +16,6 @@ fun MovieEntity.toUiModel(): FilmUiModel {
         title = title,
         description = overview,
         posterPath = posterPath,
+        type = FilmType.MOVIE
     )
 }

@@ -19,7 +19,8 @@ interface MainGraph {
 }
 
 interface HomeRoutes {
-    @Serializable object HomeList
+    @Serializable object MoviesList
+    @Serializable object SeriesList
 }
 
 interface FavRoutes {

@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.presentation.list
+package com.darvi.filmhunter.presentation.list.movie
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,70 +32,37 @@ import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.list.model.FilmUiModel
 
 @Composable
-fun ListScreen(
-    listViewModel: ListViewModel = hiltViewModel()
+fun MovieListScreen(
+    movieListViewModel: MovieListViewModel = hiltViewModel(),
 ) {
-    val uiState by listViewModel.uiState.collectAsStateWithLifecycle()
-    LazyColumn(
-        Modifier.fillMaxSize()
-    ) {
+    val uiState by movieListViewModel.uiState.collectAsStateWithLifecycle()
+
+    LazyColumn(Modifier.fillMaxSize()) {
         item {
             FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
+                title = "Populares",
+                list = uiState.popularMovies,
             )
         }
         item {
             FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
+                title = "Mejor valoradas",
+                list = uiState.topRatedMovies,
             )
         }
         item {
             FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
+                title = "En cines",
+                list = uiState.nowPlayingMovies,
             )
         }
         item {
             FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
-            )
-        }
-        item {
-            FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
-            )
-        }
-        item {
-            FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
-            )
-        }
-        item {
-            FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
-            )
-        }
-        item {
-            FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
-            )
-        }
-        item {
-            FilmListSection(
-                title = "Peliculas populares",
-                list = uiState.movies.shuffled(),
+                title = "Proximos estrenos",
+                list = uiState.upcomingMovies,
             )
         }
     }
-
-//    MovieGrid(uiState.movies)
 }
 
 @Composable
@@ -106,7 +73,7 @@ fun FilmListSection(
     onMovieClick: (FilmUiModel) -> Unit = {}
 ) {
     Column(
-        Modifier
+        modifier
             .fillMaxWidth()
             .fillMaxHeight(0.30f)
             .padding(horizontal = 4.dp, vertical = 8.dp)
@@ -169,37 +136,6 @@ private fun FilmListItem(
                     }
                 }
             }
-
-//            Text(
-//                text = film.title,
-//                style = MaterialTheme.typography.bodyMedium,
-//                maxLines = 2,
-//                overflow = TextOverflow.Ellipsis,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(10.dp)
-//            )
         }
     }
-}
-
-@Composable
-fun MovieGrid(
-    movies: List<FilmUiModel>,
-    onMovieClick: (FilmUiModel) -> Unit = {}
-) {
-//    LazyVerticalGrid(
-//        columns = GridCells.Fixed(2),
-//        contentPadding = PaddingValues(12.dp),
-//        verticalArrangement = Arrangement.spacedBy(12.dp),
-//        horizontalArrangement = Arrangement.spacedBy(12.dp),
-//        modifier = Modifier.fillMaxSize()
-//    ) {
-//        items(
-//            items = movies,
-//            key = { it.id }
-//        ) { movie ->
-//            FilmListItem(film = movie, onClick = { onMovieClick(movie) })
-//        }
-//    }
 }

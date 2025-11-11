@@ -7,8 +7,8 @@ import com.darvi.filmhunter.domain.repository.MovieRepository
 import javax.inject.Inject
 
 class MovieRepositoryImpl @Inject constructor(private val api: ApiService): MovieRepository {
-    override suspend fun getPopularMovies(): List<MovieEntity> {
-        return api.getPopularMovies().results.map {
+    override suspend fun getMoviesList(path: String): List<MovieEntity> {
+        return api.getMoviesList(path = path).results.map {
             it.toDomain()
         }
     }
