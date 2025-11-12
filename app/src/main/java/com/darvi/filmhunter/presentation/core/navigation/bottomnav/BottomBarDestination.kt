@@ -4,8 +4,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import com.darvi.filmhunter.presentation.core.navigation.MainGraph
@@ -28,6 +30,18 @@ sealed class BottomBarDestination<T>(
             Icon(imageVector = Icons.Outlined.Home, contentDescription = "")
         },
         route = MainGraph.Home
+    )
+
+    @Serializable
+    data object Search: BottomBarDestination<MainGraph.Search>(
+        title = "Buscar",
+        selectedIcon = {
+            Icon(imageVector = Icons.Filled.Search, contentDescription = "")
+        },
+        unselectedIcon = {
+            Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
+        },
+        route = MainGraph.Search
     )
 
     @Serializable

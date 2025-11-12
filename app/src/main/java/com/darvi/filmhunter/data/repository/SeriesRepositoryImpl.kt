@@ -12,4 +12,10 @@ class SeriesRepositoryImpl @Inject constructor(private val api: SeriesApiService
             it.toDomain()
         }
     }
+
+    override suspend fun getSeriesByTitle(query: String): List<SeriesEntity> {
+        return api.getSeriesByTitle(query).results.map {
+            it.toDomain()
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.domain.usecase
+package com.darvi.filmhunter.domain.usecase.list
 
 import com.darvi.filmhunter.domain.entity.SeriesEntity
 import com.darvi.filmhunter.domain.repository.SeriesRepository

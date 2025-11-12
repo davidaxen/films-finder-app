@@ -2,7 +2,7 @@ package com.darvi.filmhunter.presentation.list.movie
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.usecase.GetMoviesList
+import com.darvi.filmhunter.domain.usecase.list.GetMoviesList
 import com.darvi.filmhunter.presentation.list.model.FilmUiModel
 import com.darvi.filmhunter.presentation.list.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel

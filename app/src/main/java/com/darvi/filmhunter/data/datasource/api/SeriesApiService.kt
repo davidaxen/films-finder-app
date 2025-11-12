@@ -11,4 +11,10 @@ interface SeriesApiService {
         @Path("path") path: String,
         @Query("language") language: String = "es-ES"
     ): SeriesResponse
+
+    @GET("search/tv")
+    suspend fun getSeriesByTitle(
+        @Query("query") q: String = "es-ES",
+        @Query("language") language: String = "es-ES"
+    ): SeriesResponse
 }

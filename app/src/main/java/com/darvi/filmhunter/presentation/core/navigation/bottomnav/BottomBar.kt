@@ -21,6 +21,7 @@ fun BottomBar(
     val tabs = remember {
         listOf(
             BottomBarDestination.Home,
+            BottomBarDestination.Search,
             BottomBarDestination.Fav,
             BottomBarDestination.Profile,
         )

@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.domain.usecase
+package com.darvi.filmhunter.domain.usecase.auth
 
 import com.darvi.filmhunter.domain.entity.UserEntity
 import com.darvi.filmhunter.domain.repository.SessionRepository

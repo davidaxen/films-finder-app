@@ -11,4 +11,10 @@ interface MovieApiService {
         @Path("path") path: String,
         @Query("language") language: String = "es-ES"
     ): MovieResponse
+
+    @GET("search/movie")
+    suspend fun getMoviesByTitle(
+        @Query("query") q: String = "es-ES",
+        @Query("language") language: String = "es-ES"
+    ): MovieResponse
 }

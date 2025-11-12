@@ -9,6 +9,7 @@ import com.darvi.filmhunter.presentation.auth.register.RegisterScreen
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.favGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.homeGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.profileGraph
+import com.darvi.filmhunter.presentation.core.navigation.bottomnav.searchGraph
 
 fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation<AppGraph.Auth>(startDestination = AuthRoutes.Login) {
@@ -30,6 +31,7 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
 fun NavGraphBuilder.mainGraph(navController: NavController) {
     navigation<AppGraph.Main>(startDestination = MainGraph.Home) {
         homeGraph(navController)
+        searchGraph(navController)
         favGraph(navController)
         profileGraph(navController)
     }

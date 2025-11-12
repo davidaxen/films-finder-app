@@ -2,7 +2,7 @@ package com.darvi.filmhunter.presentation.core
 
 import androidx.lifecycle.ViewModel
 import com.darvi.filmhunter.domain.entity.UserEntity
-import com.darvi.filmhunter.domain.usecase.GetCurrentUser
+import com.darvi.filmhunter.domain.usecase.auth.GetCurrentUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

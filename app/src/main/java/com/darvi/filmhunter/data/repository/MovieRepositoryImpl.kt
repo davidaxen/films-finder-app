@@ -12,4 +12,10 @@ class MovieRepositoryImpl @Inject constructor(private val api: MovieApiService):
             it.toDomain()
         }
     }
+
+    override suspend fun getMoviesByTitle(query: String): List<MovieEntity> {
+        return api.getMoviesByTitle(query).results.map {
+            it.toDomain()
+        }
+    }
 }

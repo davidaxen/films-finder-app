@@ -14,6 +14,7 @@ interface AuthRoutes {
 
 interface MainGraph {
     @Serializable object Home
+    @Serializable object Search
     @Serializable object Fav
     @Serializable object Profile
 }
@@ -21,6 +22,10 @@ interface MainGraph {
 interface HomeRoutes {
     @Serializable object MoviesList
     @Serializable object SeriesList
+}
+
+interface SearchRoutes {
+    @Serializable object Search
 }
 
 interface FavRoutes {
