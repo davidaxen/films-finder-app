@@ -48,7 +48,10 @@ fun SearchScreen(
         SearchBarItem(
             value = uiState.searchQuery,
             onCancelQuerySearch = { searchViewModel.onCancelQuerySearch() },
-            onValueChange = { searchViewModel.onQueryChange(it) },
+            onValueChange = {
+                searchViewModel.onQueryChange(it)
+                searchViewModel.onSearch()
+            },
             onSearch = { searchViewModel.onSearch() }
         )
 
