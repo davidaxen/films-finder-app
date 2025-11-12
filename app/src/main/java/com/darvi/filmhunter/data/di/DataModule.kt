@@ -5,7 +5,8 @@ import com.darvi.filmhunter.data.datasource.SupabaseAuthDataSourceImpl
 import com.darvi.filmhunter.data.repository.AuthRepositoryImpl
 import com.darvi.filmhunter.data.repository.MovieRepositoryImpl
 import com.darvi.filmhunter.data.repository.SessionRepositoryImpl
-import com.darvi.filmhunter.data.datasource.api.ApiService
+import com.darvi.filmhunter.data.datasource.api.MovieApiService
+import com.darvi.filmhunter.data.datasource.api.SeriesApiService
 import com.darvi.filmhunter.data.repository.SeriesRepositoryImpl
 import com.darvi.filmhunter.domain.repository.AuthRepository
 import com.darvi.filmhunter.domain.repository.MovieRepository
@@ -43,19 +44,25 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideSeriesRepository(api: ApiService): SeriesRepository {
+    fun provideSeriesRepository(api: SeriesApiService): SeriesRepository {
         return SeriesRepositoryImpl(api)
     }
 
     @Provides
     @Singleton
-    fun provideMovieRepository(api: ApiService): MovieRepository {
+    fun provideMovieRepository(api: MovieApiService): MovieRepository {
         return MovieRepositoryImpl(api)
     }
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
+    fun provideMovieApiService(retrofit: Retrofit): MovieApiService {
+        return retrofit.create(MovieApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSeriesApiService(retrofit: Retrofit): SeriesApiService {
+        return retrofit.create(SeriesApiService::class.java)
     }
 }
