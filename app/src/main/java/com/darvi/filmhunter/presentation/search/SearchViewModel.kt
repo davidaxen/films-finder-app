@@ -28,7 +28,7 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val searchMoviesByTitle: SearchMoviesByTitle,
     private val searchSeriesByTitle: SearchSeriesByTitle
-): ViewModel() {
+) : ViewModel() {
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState
 
@@ -46,6 +46,9 @@ class SearchViewModel @Inject constructor(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     fun onSearch() {
         viewModelScope.launch {
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
             _uiState
                 .map { it.searchQuery }
                 .distinctUntilChanged()
@@ -55,7 +58,8 @@ class SearchViewModel @Inject constructor(
                         return@mapLatest SearchUiState(
                             searchQuery = q,
                             moviesFound = emptyList(),
-                            seriesFound = emptyList()
+                            seriesFound = emptyList(),
+                            isLoading = false
                         )
                     }
 
@@ -67,11 +71,16 @@ class SearchViewModel @Inject constructor(
 
                     _uiState.value.copy(
                         moviesFound = movies,
-                        seriesFound = series
+                        seriesFound = series,
+                        isLoading = false
                     )
                 }.catch { e ->
                     _uiState.update {
-                        it.copy(moviesFound = emptyList(), seriesFound = emptyList())
+                        it.copy(
+                            moviesFound = emptyList(),
+                            seriesFound = emptyList(),
+                            isLoading = false
+                        )
                     }
                     Log.e("DEBOUNCE SEARCH VIEWMODEL", e.toString())
                 }.collect { newState ->
@@ -89,6 +98,7 @@ class SearchViewModel @Inject constructor(
 
 data class SearchUiState(
     val searchQuery: String = "",
+    val isLoading: Boolean = false,
     val moviesFound: List<MovieEntity> = emptyList(),
     val seriesFound: List<SeriesEntity> = emptyList(),
 )
