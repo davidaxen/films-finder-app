@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.entity.MovieEntity
 import com.darvi.filmhunter.domain.entity.SeriesEntity
+import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.domain.usecase.search.SearchMoviesByTitle
 import com.darvi.filmhunter.domain.usecase.search.SearchSeriesByTitle
+import com.darvi.filmhunter.presentation.list.model.FilmType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,7 +49,7 @@ class SearchViewModel @Inject constructor(
     fun onSearch() {
         viewModelScope.launch {
             _uiState.update {
-                it.copy(isLoading = true)
+                it.copy(isSearching = true)
             }
             _uiState
                 .map { it.searchQuery }
@@ -59,7 +61,7 @@ class SearchViewModel @Inject constructor(
                             searchQuery = q,
                             moviesFound = emptyList(),
                             seriesFound = emptyList(),
-                            isLoading = false
+                            isSearching = false
                         )
                     }
 
@@ -72,14 +74,14 @@ class SearchViewModel @Inject constructor(
                     _uiState.value.copy(
                         moviesFound = movies,
                         seriesFound = series,
-                        isLoading = false
+                        isSearching = false
                     )
                 }.catch { e ->
                     _uiState.update {
                         it.copy(
                             moviesFound = emptyList(),
                             seriesFound = emptyList(),
-                            isLoading = false
+                            isSearching = false
                         )
                     }
                     Log.e("DEBOUNCE SEARCH VIEWMODEL", e.toString())
@@ -89,16 +91,38 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    fun onFilmTypeSelected(type: FilmType) {
+        if (type != _uiState.value.filmTypeSelected) {
+            _uiState.update {
+                it.copy(
+                    filmTypeSelected = type
+                )
+            }
+        }
+    }
+
     fun onCancelQuerySearch() {
         _uiState.update {
             it.copy(searchQuery = "")
+        }
+    }
+
+    fun onWatchProviderSelected(watchProvider: WatchProvider?) {
+        if (watchProvider != _uiState.value.watchProviderSelected) {
+            _uiState.update {
+                it.copy(
+                    watchProviderSelected = watchProvider
+                )
+            }
         }
     }
 }
 
 data class SearchUiState(
     val searchQuery: String = "",
-    val isLoading: Boolean = false,
+    val isSearching: Boolean = false,
     val moviesFound: List<MovieEntity> = emptyList(),
     val seriesFound: List<SeriesEntity> = emptyList(),
+    val filmTypeSelected: FilmType = FilmType.MOVIE,
+    val watchProviderSelected: WatchProvider? = null
 )
