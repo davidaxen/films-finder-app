@@ -4,13 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,36 +17,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -63,8 +42,11 @@ import com.darvi.filmhunter.domain.entity.SeriesEntity
 import com.darvi.filmhunter.domain.entity.SeriesGenre
 import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
-import com.darvi.filmhunter.presentation.core.components.FilmHunterTextField
 import com.darvi.filmhunter.presentation.list.model.FilmType
+import com.darvi.filmhunter.presentation.search.components.SearchBarItem
+import com.darvi.filmhunter.presentation.search.components.SearchFilterChip
+import com.darvi.filmhunter.presentation.search.components.SearchItemsHeader
+import com.darvi.filmhunter.presentation.search.components.SearchResultCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,9 +59,10 @@ fun SearchScreen(
         searchViewModel.onCancelQuerySearch()
     }
 
-    Column(Modifier
-        .fillMaxSize()
-        .padding(horizontal = 8.dp)
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp)
     ) {
         SearchBarItem(
             value = uiState.searchQuery,
@@ -93,7 +76,7 @@ fun SearchScreen(
         )
 
         Box(Modifier.fillMaxSize()) {
-            SearchedFilms(
+            SearchedFilmsList(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
@@ -102,9 +85,9 @@ fun SearchScreen(
                 isSearching = uiState.isSearching,
                 moviesFound = uiState.moviesFound,
                 seriesFound = uiState.seriesFound,
-            ) {
-
-            }
+                onSeeAllClick = {},
+                onFilmClick = {}
+            )
 
             LazyVerticalGrid(
                 modifier = Modifier.fillMaxSize(),
@@ -163,6 +146,7 @@ fun SearchScreen(
                             onClick = { /*genre -> onMovieGenreClick(genre)*/ }
                         )
                     }
+
                     FilmType.SERIES -> {
                         genreGrid(
                             items = SeriesGenre.entries.toList(),
@@ -178,12 +162,13 @@ fun SearchScreen(
 }
 
 @Composable
-fun SearchedFilms(
+fun SearchedFilmsList(
     modifier: Modifier = Modifier,
     isVisible: Boolean,
     isSearching: Boolean,
     moviesFound: List<MovieEntity>,
     seriesFound: List<SeriesEntity>,
+    onSeeAllClick: (FilmType) -> Unit,
     onFilmClick: () -> Unit
 ) {
     AnimatedVisibility(
@@ -212,58 +197,64 @@ fun SearchedFilms(
                 )
             }
         } else {
-            LazyColumn(
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(4.dp)
             ) {
-                items(moviesFound) { item ->
-                    FilmHunterText(
-                        text = item.title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onFilmClick() }
-                            .padding(16.dp)
-                    )
-                    HorizontalDivider()
+
+                // ---- Películas ----
+                val moviesToShow = moviesFound.take(6)
+                if (moviesToShow.isNotEmpty()) {
+                    item(span = { GridItemSpan(3) }) {
+                        SearchItemsHeader(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp, bottom = 2.dp),
+                            title = "Películas",
+                        ) {
+                            onSeeAllClick(FilmType.MOVIE)
+                        }
+                    }
+                    items(moviesToShow) { item ->
+                        SearchResultCard(
+                            title = item.title,
+                            posterPath = item.posterPath,
+                            year = item.releaseDate.take(4),
+                            onClick = { /*onFilmClick(item.id)*/ }
+                        )
+                    }
                 }
-                items(seriesFound) { item ->
-                    FilmHunterText(
-                        text = item.title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onFilmClick() }
-                            .padding(16.dp)
-                    )
-                    HorizontalDivider()
+
+                // ---- Series ----
+                val seriesToShow = seriesFound.take(6)
+                if (seriesToShow.isNotEmpty()) {
+                    item(span = { GridItemSpan(3) }) {
+                        SearchItemsHeader(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp, bottom = 2.dp),
+                            title = "Series",
+                        ) {
+                            onSeeAllClick(FilmType.SERIES)
+                        }
+                    }
+                    items(seriesToShow) { item ->
+                        SearchResultCard(
+                            title = item.title,
+                            posterPath = item.posterPath,
+                            year = item.releaseDate.take(4),
+                            onClick = { /*onFilmClick(item.id)*/ }
+                        )
+                    }
                 }
             }
         }
     }
-}
-
-@Composable
-fun SearchFilterChip(
-    isSelected: Boolean,
-    text: String,
-    onClick: () -> Unit,
-) {
-    FilterChip(
-        selected = isSelected,
-        onClick = onClick,
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.surface
-        ),
-        label = {
-            FilmHunterText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                text = text,
-                textAlign = TextAlign.Center
-            )
-        },
-    )
 }
 
 @Composable
@@ -304,96 +295,6 @@ private fun <T> LazyGridScope.genreGrid(
                     textAlign = TextAlign.Center
                 )
             },
-        )
-    }
-
-}
-
-@Composable
-fun SearchBarItem(
-    value: String,
-    showBackIcon: Boolean = false,
-    onCancelQuerySearch: () -> Unit,
-    onValueChange: (String) -> Unit,
-    onSearch: () -> Unit
-) {
-    Row(Modifier.fillMaxWidth()) {
-        AnimatedVisibility(
-            visible = showBackIcon,
-            enter = slideInHorizontally(
-                initialOffsetX = { -it },
-                animationSpec = tween(300)
-            ) + fadeIn(tween(400)),
-            exit = slideOutHorizontally(
-                targetOffsetX = { -it },
-                animationSpec = tween(300)
-            ) + fadeOut(tween(200))
-        ) {
-            IconButton(
-                onClick = { onCancelQuerySearch() }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Borrar busqueda"
-                )
-            }
-        }
-
-        FilmHunterTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = value,
-            onValueChange = { onValueChange(it) },
-            shape = MaterialTheme.shapes.large,
-            label = "",
-            placeholder = "Busca una pelicula o serie...",
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Search
-            ),
-            keyboardActions = KeyboardActions(
-                onSearch = { onSearch() }
-            ),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Busqueda"
-                )
-            },
-            trailingIcon = {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clipToBounds(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    this@Row.AnimatedVisibility(
-                        visible = value.isNotEmpty(),
-                        enter = slideInHorizontally(
-                            initialOffsetX = { it },
-                            animationSpec = tween(300)
-                        ) + fadeIn(tween(400)),
-                        exit = slideOutHorizontally(
-                            targetOffsetX = { it },
-                            animationSpec = tween(300)
-                        ) + fadeOut(tween(200))
-                    ) {
-                        IconButton(onClick = { onCancelQuerySearch() }) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Cancelar"
-                            )
-                        }
-                    }
-                }
-            },
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurface,
-                focusedLeadingIconColor = MaterialTheme.colorScheme.onSurface,
-            )
         )
     }
 }
