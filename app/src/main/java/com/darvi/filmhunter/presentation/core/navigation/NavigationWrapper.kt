@@ -35,8 +35,13 @@ fun NavigationWrapper() {
     var selectedTabRow by rememberSaveable { mutableStateOf(FilmType.MOVIE) }
 
     val showBottomBar = destination?.hierarchy?.any {
-        it.hasRoute<MainGraph.Home>() ||
-        it.hasRoute<MainGraph.Search>() ||
+        it.hasRoute<HomeRoutes.MoviesList>() ||
+        it.hasRoute<HomeRoutes.SeriesList>() ||
+        it.hasRoute<SearchRoutes.Main>() ||
+
+                
+//        it.hasRoute<MainGraph.Home>() ||
+//        it.hasRoute<MainGraph.Search>() ||
         it.hasRoute<MainGraph.Fav>() ||
         it.hasRoute<MainGraph.Profile>()
     } == true

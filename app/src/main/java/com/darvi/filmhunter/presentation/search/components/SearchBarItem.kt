@@ -14,12 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -30,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.darvi.filmhunter.presentation.core.components.FilmHunterTextField
+import com.darvi.filmhunter.presentation.core.components.GoBackIconButton
 
 
 @Composable
@@ -56,19 +55,8 @@ fun SearchBarItem(
                 animationSpec = tween(300)
             ) + fadeOut(tween(200))
         ) {
-            IconButton(
-                modifier = Modifier.size(56.dp),
-                onClick = { onCancelQuerySearch() },
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                shape = MaterialTheme.shapes.large
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Borrar busqueda"
-                )
+            GoBackIconButton {
+                onCancelQuerySearch()
             }
         }
 

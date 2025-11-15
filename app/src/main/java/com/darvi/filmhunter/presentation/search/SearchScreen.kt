@@ -51,7 +51,8 @@ import com.darvi.filmhunter.presentation.search.components.SearchResultCard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    searchViewModel: SearchViewModel = hiltViewModel()
+    searchViewModel: SearchViewModel = hiltViewModel(),
+    onSeeAllClick: (String, Int) -> Unit
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -85,7 +86,7 @@ fun SearchScreen(
                 isSearching = uiState.isSearching,
                 moviesFound = uiState.moviesFound,
                 seriesFound = uiState.seriesFound,
-                onSeeAllClick = {},
+                onSeeAllClick = { onSeeAllClick(uiState.searchQuery, it.value) },
                 onFilmClick = {}
             )
 
