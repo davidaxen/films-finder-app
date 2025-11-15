@@ -1,5 +1,6 @@
 package com.darvi.filmhunter.presentation.search
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -31,6 +32,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -71,12 +73,17 @@ fun SearchScreen(
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
+    BackHandler(enabled = uiState.searchQuery.isNotEmpty()) {
+        searchViewModel.onCancelQuerySearch()
+    }
+
     Column(Modifier
         .fillMaxSize()
         .padding(horizontal = 8.dp)
     ) {
         SearchBarItem(
             value = uiState.searchQuery,
+            showBackIcon = uiState.searchQuery.isNotEmpty(),
             onCancelQuerySearch = { searchViewModel.onCancelQuerySearch() },
             onValueChange = {
                 searchViewModel.onQueryChange(it)
@@ -233,7 +240,6 @@ fun SearchedFilms(
             }
         }
     }
-
 }
 
 @Composable
@@ -306,64 +312,88 @@ private fun <T> LazyGridScope.genreGrid(
 @Composable
 fun SearchBarItem(
     value: String,
+    showBackIcon: Boolean = false,
     onCancelQuerySearch: () -> Unit,
     onValueChange: (String) -> Unit,
     onSearch: () -> Unit
 ) {
-    FilmHunterTextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = value,
-        onValueChange = { onValueChange(it) },
-        shape = MaterialTheme.shapes.large,
-        label = "",
-        placeholder = "Busca una pelicula o serie...",
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Search
-        ),
-        keyboardActions = KeyboardActions(
-            onSearch = { onSearch() }
-        ),
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Busqueda"
-            )
-        },
-        trailingIcon = {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clipToBounds(),
-                contentAlignment = Alignment.Center
+    Row(Modifier.fillMaxWidth()) {
+        AnimatedVisibility(
+            visible = showBackIcon,
+            enter = slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = tween(300)
+            ) + fadeIn(tween(400)),
+            exit = slideOutHorizontally(
+                targetOffsetX = { -it },
+                animationSpec = tween(300)
+            ) + fadeOut(tween(200))
+        ) {
+            IconButton(
+                onClick = { onCancelQuerySearch() }
             ) {
-                AnimatedVisibility(
-                    visible = value.isNotEmpty(),
-                    enter = slideInHorizontally(
-                        initialOffsetX = { it },
-                        animationSpec = tween(300)
-                    ) + fadeIn(tween(400)),
-                    exit = slideOutHorizontally(
-                        targetOffsetX = { it },
-                        animationSpec = tween(300)
-                    ) + fadeOut(tween(200))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Borrar busqueda"
+                )
+            }
+        }
+
+        FilmHunterTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = value,
+            onValueChange = { onValueChange(it) },
+            shape = MaterialTheme.shapes.large,
+            label = "",
+            placeholder = "Busca una pelicula o serie...",
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = { onSearch() }
+            ),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Busqueda"
+                )
+            },
+            trailingIcon = {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clipToBounds(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    IconButton(onClick = { onCancelQuerySearch() }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Cancelar"
-                        )
+                    this@Row.AnimatedVisibility(
+                        visible = value.isNotEmpty(),
+                        enter = slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(300)
+                        ) + fadeIn(tween(400)),
+                        exit = slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(300)
+                        ) + fadeOut(tween(200))
+                    ) {
+                        IconButton(onClick = { onCancelQuerySearch() }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Cancelar"
+                            )
+                        }
                     }
                 }
-            }
-        },
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurface,
-            focusedLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+            },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+                focusedLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+            )
         )
-    )
+    }
 }
