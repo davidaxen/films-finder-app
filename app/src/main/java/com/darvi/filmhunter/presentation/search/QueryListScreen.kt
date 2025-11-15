@@ -1,6 +1,5 @@
 package com.darvi.filmhunter.presentation.search
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,8 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -40,7 +40,6 @@ fun QueryListScreen(
     val uiState by queryListViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        Log.i("QUERYLISTSCREEN LAUNCHED EFFECT", "$query, $filmType")
         queryListViewModel.onScreenParamsLoad(q = query, filmType = filmType)
     }
 
@@ -76,23 +75,51 @@ fun QueryListScreen(
             ) {
                 when (uiState.filmTypeSelected) {
                     FilmType.MOVIE -> {
-                        items(uiState.moviesFound) { item ->
+                        itemsIndexed(uiState.moviesFound, key = { index, _ -> index  }) { index, item ->
                             SearchResultCard(
                                 title = item.title,
                                 posterPath = item.posterPath,
                                 year = item.releaseDate.take(4),
                                 onClick = { /*onFilmClick(item.id)*/ }
                             )
+
+                            if (
+                                index == uiState.moviesFound.lastIndex &&
+                                !uiState.isLoadingMore &&
+                                !uiState.endReached
+                            ) {
+                                queryListViewModel.loadNextPage()
+                            }
                         }
                     }
                     FilmType.SERIES -> {
-                        items(uiState.seriesFound) { item ->
+                        itemsIndexed(uiState.seriesFound, key = { index, _ -> index  }) { index, item ->
                             SearchResultCard(
                                 title = item.title,
                                 posterPath = item.posterPath,
                                 year = item.releaseDate.take(4),
                                 onClick = { /*onFilmClick(item.id)*/ }
                             )
+
+                            if (
+                                index == uiState.seriesFound.lastIndex &&
+                                !uiState.isLoadingMore &&
+                                !uiState.endReached
+                            ) {
+                                queryListViewModel.loadNextPage()
+                            }
+                        }
+                    }
+                }
+                if (uiState.isLoadingMore) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            FilmHunterCircularProgress()
                         }
                     }
                 }

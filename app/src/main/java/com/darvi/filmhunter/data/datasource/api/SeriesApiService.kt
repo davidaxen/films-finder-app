@@ -14,7 +14,8 @@ interface SeriesApiService {
 
     @GET("search/tv")
     suspend fun getSeriesByTitle(
-        @Query("query") q: String = "es-ES",
+        @Query("query") q: String,
+        @Query("page") page: Int = 1,
         @Query("language") language: String = "es-ES"
     ): SeriesResponse
 }

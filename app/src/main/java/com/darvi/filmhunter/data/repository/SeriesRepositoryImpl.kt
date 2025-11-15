@@ -13,8 +13,8 @@ class SeriesRepositoryImpl @Inject constructor(private val api: SeriesApiService
         }
     }
 
-    override suspend fun getSeriesByTitle(query: String): List<SeriesEntity> {
-        return api.getSeriesByTitle(query).results.map {
+    override suspend fun getSeriesByTitle(query: String, page: Int): List<SeriesEntity> {
+        return api.getSeriesByTitle(q = query, page = page).results.map {
             it.toDomain()
         }
     }

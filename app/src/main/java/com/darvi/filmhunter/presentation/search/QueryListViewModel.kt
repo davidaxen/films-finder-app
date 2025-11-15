@@ -1,6 +1,5 @@
 package com.darvi.filmhunter.presentation.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.entity.MovieEntity
@@ -35,29 +34,62 @@ class QueryListViewModel @Inject constructor(
                 it.copy(
                     searchQuery = q,
                     isSearching = true,
-                    filmTypeSelected = type
+                    isLoadingMore = false,
+                    endReached = false,
+                    currentPage = 1,
+                    filmTypeSelected = type,
+                    moviesFound = emptyList(),
+                    seriesFound = emptyList()
                 )
             }
-            searchFilms()
+            loadPage(page = 1, isFirstPage = true)
         }
     }
 
-    fun searchFilms() {
+    fun loadNextPage() {
+        if (_uiState.value.isLoadingMore || _uiState.value.endReached || _uiState.value.isSearching) return
+        loadPage(page = _uiState.value.currentPage, isFirstPage = false)
+    }
+
+    private fun loadPage(page: Int, isFirstPage: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            when(_uiState.value.filmTypeSelected) {
+            if (isFirstPage) {
+                _uiState.update { it.copy(isSearching = true) }
+            } else {
+                _uiState.update { it.copy(isLoadingMore = true) }
+            }
+
+            when (_uiState.value.filmTypeSelected) {
                 FilmType.MOVIE -> {
-                    _uiState.update {
-                        it.copy(
-                            moviesFound = searchMoviesByTitle(it.searchQuery),
-                            isSearching = false
+                    val newMovies = searchMoviesByTitle(_uiState.value.searchQuery, page)
+
+                    _uiState.update { state ->
+                        val allMovies =
+                            if (isFirstPage) newMovies else state.moviesFound + newMovies
+
+                        state.copy(
+                            moviesFound = allMovies,
+                            isSearching = false,
+                            isLoadingMore = false,
+                            endReached = newMovies.isEmpty(),
+                            currentPage = if (newMovies.isNotEmpty()) page + 1 else state.currentPage
                         )
                     }
                 }
+
                 FilmType.SERIES -> {
-                    _uiState.update {
-                        it.copy(
-                            seriesFound = searchSeriesByTitle(it.searchQuery),
-                            isSearching = false
+                    val newSeries = searchSeriesByTitle(_uiState.value.searchQuery, page)
+
+                    _uiState.update { state ->
+                        val allSeries =
+                            if (isFirstPage) newSeries else state.seriesFound + newSeries
+
+                        state.copy(
+                            seriesFound = allSeries,
+                            isSearching = false,
+                            isLoadingMore = false,
+                            endReached = newSeries.isEmpty(),
+                            currentPage = if (newSeries.isNotEmpty()) page + 1 else state.currentPage
                         )
                     }
                 }
@@ -69,6 +101,9 @@ class QueryListViewModel @Inject constructor(
 data class QueryListUiState(
     val searchQuery: String = "",
     val isSearching: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val endReached: Boolean = false,
+    val currentPage: Int = 1,
     val moviesFound: List<MovieEntity> = emptyList(),
     val seriesFound: List<SeriesEntity> = emptyList(),
     val filmTypeSelected: FilmType = FilmType.MOVIE,
