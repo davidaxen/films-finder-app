@@ -17,7 +17,7 @@ enum class MovieGenre(val id: Int, val displayName: String) {
     ROMANCE(10749, "Romance"),
     SCIENCE_FICTION(878, "Ciencia ficción"),
     TV_MOVIE(10770, "Película de TV"),
-    THRILLER(53, "Suspense"),
+    THRILLER(53, "Suspenso"),
     WAR(10752, "Bélica"),
     WESTERN(37, "Western");
 

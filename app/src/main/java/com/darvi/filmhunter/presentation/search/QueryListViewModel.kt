@@ -6,7 +6,7 @@ import com.darvi.filmhunter.domain.entity.MovieEntity
 import com.darvi.filmhunter.domain.entity.SeriesEntity
 import com.darvi.filmhunter.domain.usecase.search.SearchMoviesByTitle
 import com.darvi.filmhunter.domain.usecase.search.SearchSeriesByTitle
-import com.darvi.filmhunter.presentation.list.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.FilmType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

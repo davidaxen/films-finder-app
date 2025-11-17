@@ -2,6 +2,7 @@ package com.darvi.filmhunter.presentation.list.model
 
 import com.darvi.filmhunter.domain.entity.MovieEntity
 import com.darvi.filmhunter.domain.entity.SeriesEntity
+import com.darvi.filmhunter.presentation.core.model.FilmType
 
 data class FilmUiModel(
     val id: Int,

@@ -24,7 +24,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.BottomBar
-import com.darvi.filmhunter.presentation.list.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.FilmType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

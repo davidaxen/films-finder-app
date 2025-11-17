@@ -22,11 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.darvi.filmhunter.R
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
+import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 import com.darvi.filmhunter.presentation.list.model.FilmUiModel
 
 @Composable
@@ -63,7 +62,7 @@ private fun FilmListItem(
     film: FilmUiModel,
     onClick: () -> Unit
 ) {
-    val posterUrl = film.posterPath?.let { "${stringResource(R.string.poster_url_w342)}$it" }
+    val posterUrl = film.posterPath?.let { ImageUrlHelper.getW342Url(it) }
 
     Card(
         modifier = Modifier

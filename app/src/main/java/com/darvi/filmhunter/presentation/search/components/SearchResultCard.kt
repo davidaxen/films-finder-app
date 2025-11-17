@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.darvi.filmhunter.R
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.modifiers.shimmerLoading
+import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 
 @Composable
 fun SearchResultCard(
@@ -41,7 +40,7 @@ fun SearchResultCard(
     onClick: () -> Unit
 ) {
     var isLoading by remember { mutableStateOf(true) }
-    val imageURL = posterPath?.let { "${stringResource(R.string.poster_url_original)}$it" }
+    val imageURL = posterPath?.let { ImageUrlHelper.getOriginalUrl(it) }
     Card(
         Modifier.width(120.dp),
         colors = CardDefaults.cardColors(

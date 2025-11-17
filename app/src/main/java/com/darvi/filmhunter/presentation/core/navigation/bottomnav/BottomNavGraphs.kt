@@ -30,6 +30,11 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
     navigation<MainGraph.Search>(startDestination = SearchRoutes.Main) {
         composable<SearchRoutes.Main> {
             SearchScreen(
+                onFilmClick = { id ->
+                    navController.navigate(
+                        MainGraph.Detail(id = id)
+                    )
+                },
                 onSeeAllClick = { q, type ->
                     navController.navigate(
                         SearchRoutes.QueryList(
@@ -45,6 +50,11 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
             QueryListScreen(
                 query = data.query,
                 filmType = data.filmType,
+                onFilmClick = { id ->
+                    navController.navigate(
+                        MainGraph.Detail(id = id)
+                    )
+                },
                 onBackPress = { navController.popBackStack() }
             )
         }

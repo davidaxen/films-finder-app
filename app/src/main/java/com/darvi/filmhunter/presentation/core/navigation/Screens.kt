@@ -17,6 +17,7 @@ interface MainGraph {
     @Serializable object Search
     @Serializable object Fav
     @Serializable object Profile
+    @Serializable data class Detail(val id: Int)
 }
 
 interface HomeRoutes {

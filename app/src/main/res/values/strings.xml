@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">FilmHunter</string>
-    <string name="poster_url_w342">https://image.tmdb.org/t/p/w342</string>
-    <string name="poster_url_original">https://image.tmdb.org/t/p/original</string>
 
     <!-- Login Scren -->
     <string name="login_title">Iniciar sesión</string>

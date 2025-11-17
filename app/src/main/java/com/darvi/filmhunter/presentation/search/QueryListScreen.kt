@@ -26,7 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.darvi.filmhunter.presentation.core.components.FilmHunterCircularProgress
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.components.GoBackIconButton
-import com.darvi.filmhunter.presentation.list.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.search.components.SearchResultCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +35,7 @@ fun QueryListScreen(
     queryListViewModel: QueryListViewModel = hiltViewModel(),
     query: String,
     filmType: Int,
+    onFilmClick: (Int) -> Unit,
     onBackPress: () -> Unit
 ) {
     val uiState by queryListViewModel.uiState.collectAsStateWithLifecycle()
@@ -80,7 +81,7 @@ fun QueryListScreen(
                                 title = item.title,
                                 posterPath = item.posterPath,
                                 year = item.releaseDate.take(4),
-                                onClick = { /*onFilmClick(item.id)*/ }
+                                onClick = { onFilmClick(item.id) }
                             )
 
                             if (
@@ -98,7 +99,7 @@ fun QueryListScreen(
                                 title = item.title,
                                 posterPath = item.posterPath,
                                 year = item.releaseDate.take(4),
-                                onClick = { /*onFilmClick(item.id)*/ }
+                                onClick = { onFilmClick(item.id) }
                             )
 
                             if (

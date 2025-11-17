@@ -14,11 +14,10 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun GoBackIconButton(onClick: () -> Unit) {
     IconButton(
-        modifier = Modifier.size(56.dp),
+        modifier = Modifier.size(42.dp),
         onClick = onClick,
         colors = IconButtonDefaults.iconButtonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
+            contentColor = MaterialTheme.colorScheme.onBackground
         ),
         shape = MaterialTheme.shapes.large
     ) {

@@ -42,7 +42,7 @@ import com.darvi.filmhunter.domain.entity.SeriesEntity
 import com.darvi.filmhunter.domain.entity.SeriesGenre
 import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
-import com.darvi.filmhunter.presentation.list.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.search.components.SearchBarItem
 import com.darvi.filmhunter.presentation.search.components.SearchFilterChip
 import com.darvi.filmhunter.presentation.search.components.SearchItemsHeader
@@ -52,6 +52,7 @@ import com.darvi.filmhunter.presentation.search.components.SearchResultCard
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel = hiltViewModel(),
+    onFilmClick: (Int) -> Unit,
     onSeeAllClick: (String, Int) -> Unit
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -87,7 +88,7 @@ fun SearchScreen(
                 moviesFound = uiState.moviesFound,
                 seriesFound = uiState.seriesFound,
                 onSeeAllClick = { onSeeAllClick(uiState.searchQuery, it.value) },
-                onFilmClick = {}
+                onFilmClick = onFilmClick
             )
 
             LazyVerticalGrid(
@@ -170,7 +171,7 @@ fun SearchedFilmsList(
     moviesFound: List<MovieEntity>,
     seriesFound: List<SeriesEntity>,
     onSeeAllClick: (FilmType) -> Unit,
-    onFilmClick: () -> Unit
+    onFilmClick: (Int) -> Unit
 ) {
     AnimatedVisibility(
         visible = isVisible,
@@ -226,7 +227,7 @@ fun SearchedFilmsList(
                             title = item.title,
                             posterPath = item.posterPath,
                             year = item.releaseDate.take(4),
-                            onClick = { /*onFilmClick(item.id)*/ }
+                            onClick = { onFilmClick(item.id) }
                         )
                     }
                 }
@@ -249,7 +250,7 @@ fun SearchedFilmsList(
                             title = item.title,
                             posterPath = item.posterPath,
                             year = item.releaseDate.take(4),
-                            onClick = { /*onFilmClick(item.id)*/ }
+                            onClick = { onFilmClick(item.id) }
                         )
                     }
                 }
