@@ -54,34 +54,38 @@ fun SearchResultCard(
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
         ) {
-            if (imageURL != null) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(imageURL)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(0.66f)
-                        .clip(MaterialTheme.shapes.medium)
-                        .shimmerLoading(isVisible = isLoading),
-                    onSuccess = { isLoading = false },
-                    onError = { isLoading = false }
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(0.66f)
-                        .background(MaterialTheme.colorScheme.surface),
-                ) {
-                    FilmHunterText(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "Imagen no disponible",
-                        textAlign = TextAlign.Center
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(0.6f)
+                    .clip(MaterialTheme.shapes.medium)
+            ) {
+                if (imageURL != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(imageURL)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .matchParentSize()
+                            .shimmerLoading(isVisible = isLoading),
+                        onSuccess = { isLoading = false },
+                        onError = { isLoading = false }
                     )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(MaterialTheme.colorScheme.surface),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        FilmHunterText(
+                            text = "Imagen no disponible",
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
 
