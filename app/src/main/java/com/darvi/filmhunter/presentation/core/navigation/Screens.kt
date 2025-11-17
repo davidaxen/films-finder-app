@@ -14,12 +14,20 @@ interface AuthRoutes {
 
 interface MainGraph {
     @Serializable object Home
+    @Serializable object Search
     @Serializable object Fav
     @Serializable object Profile
+    @Serializable data class Detail(val id: Int)
 }
 
 interface HomeRoutes {
-    @Serializable object HomeList
+    @Serializable object MoviesList
+    @Serializable object SeriesList
+}
+
+interface SearchRoutes {
+    @Serializable object Main
+    @Serializable data class QueryList(val query: String, val filmType: Int)
 }
 
 interface FavRoutes {

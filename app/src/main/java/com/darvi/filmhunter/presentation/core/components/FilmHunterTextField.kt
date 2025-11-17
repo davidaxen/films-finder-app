@@ -1,6 +1,7 @@
 package com.darvi.filmhunter.presentation.core.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -29,7 +30,9 @@ fun FilmHunterTextField(
     placeholder: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    leadingIcon: @Composable (() -> Unit)? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     OutlinedTextField(
         value = value,
@@ -37,12 +40,14 @@ fun FilmHunterTextField(
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
         singleLine = singleLine,
-        label = { FilmHunterText(text = label) },
+        label = if (label.isNotEmpty()) { { FilmHunterText(text = label) } } else null,
         placeholder = { if (placeholder != null) FilmHunterText(text = placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant) },
         colors = colors,
         shape = shape,
         visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
-        keyboardOptions = keyboardOptions
+        leadingIcon = leadingIcon,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions
     )
 }

@@ -3,7 +3,7 @@ package com.darvi.filmhunter.presentation.auth.login
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.usecase.Login
+import com.darvi.filmhunter.domain.usecase.auth.Login
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.entity.UserEntity
-import com.darvi.filmhunter.domain.usecase.GetCurrentUser
-import com.darvi.filmhunter.domain.usecase.Register
+import com.darvi.filmhunter.domain.usecase.auth.GetCurrentUser
+import com.darvi.filmhunter.domain.usecase.auth.Register
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
