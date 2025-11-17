@@ -70,17 +70,12 @@ fun DetailContent(
     film: FilmDetailUiModel,
     onBackClick: () -> Unit
 ) {
-
     val listState = rememberLazyListState()
 
-    // Hasta dónde queremos que "colapse" el header
-    val maxOffsetPx = 400    // píxeles de scroll para colapsar del todo
-    val scrollOffset = min(
-        listState.firstVisibleItemScrollOffset,
-        maxOffsetPx
-    )
-
-    val collapseFraction = scrollOffset / maxOffsetPx.toFloat() // 0f..1f
+    val maxOffsetPx = 1000
+    val scrollOffset = min(listState.firstVisibleItemScrollOffset, maxOffsetPx)
+    val rawFraction = scrollOffset / maxOffsetPx.toFloat()
+    val darkenFraction = (rawFraction * rawFraction)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -95,7 +90,7 @@ fun DetailContent(
             item {
                 DetailHeader(
                     film = film,
-                    collapseFraction = collapseFraction
+                    darkenFraction  = darkenFraction
                 )
             }
 
@@ -130,7 +125,7 @@ fun DetailContent(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 12.dp),
+                .padding(horizontal = 4.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {

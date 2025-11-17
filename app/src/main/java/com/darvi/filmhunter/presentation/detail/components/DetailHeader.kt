@@ -10,9 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.util.lerp
 import coil3.compose.AsyncImage
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
@@ -20,18 +18,10 @@ import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
 @Composable
 fun DetailHeader(
     film: FilmDetailUiModel,
-    collapseFraction: Float,
+    darkenFraction: Float,
 ) {
-    val clampedFraction = collapseFraction.coerceIn(0f, 1f)
-
-    // Opacidad del degradado: cuanto más scroll, más oscuro
-    val baseAlpha = 0.35f
-    val maxAlpha = 0.85f
-    val overlayAlpha = lerp(
-        start = baseAlpha,
-        stop = maxAlpha,
-        fraction = clampedFraction
-    )
+    val fraction = darkenFraction.coerceIn(0f, 1f)
+    val bgOverlayAlpha = (fraction * 1.0f).coerceIn(0f, 1f)
 
     Box(
         modifier = Modifier
@@ -60,17 +50,21 @@ fun DetailHeader(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = overlayAlpha * 0.1f), // arriba muy suave
-                            Color.Black.copy(alpha = overlayAlpha * 0.4f),
-                            Color.Black.copy(alpha = overlayAlpha * 0.8f), // abajo muy oscuro
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.15f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.35f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.65f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
                             MaterialTheme.colorScheme.background
-//                            MaterialTheme.colorScheme.background.copy(alpha = 0.25f),
-//                            MaterialTheme.colorScheme.background.copy(alpha = 0.45f),
-//                            MaterialTheme.colorScheme.background.copy(alpha = 0.60f),
-//                            MaterialTheme.colorScheme.background.copy(alpha = 0.85f),
-//                            MaterialTheme.colorScheme.background
                         ),
                     )
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    MaterialTheme.colorScheme.background.copy(alpha = bgOverlayAlpha)
                 )
         )
 
