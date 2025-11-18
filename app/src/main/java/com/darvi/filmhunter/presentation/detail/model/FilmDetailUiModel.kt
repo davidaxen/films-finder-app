@@ -2,6 +2,7 @@ package com.darvi.filmhunter.presentation.detail.model
 
 import com.darvi.filmhunter.domain.entity.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.MovieGenre
+import com.darvi.filmhunter.domain.entity.SeriesDetailEntity
 import com.darvi.filmhunter.presentation.core.model.FilmType
 
 data class FilmDetailUiModel(
@@ -56,17 +57,21 @@ fun MovieDetailEntity.toUiModel(): FilmDetailUiModel {
     )
 }
 
-//fun SeriesDetail.toUiModel(type: FilmType) = FilmDetailUiModel(
-//    id = id,
-//    title = name,
-//    year = year,
-//    overview = overview,
-//    posterUrl = posterUrl,
-//    backdropUrl = backdropUrl,
-//    rating = voteAverage,
-//    genres = genres,
-//    type = type,
-//    seasons = seasons.map { it.toUiModel() }
-//)
+fun SeriesDetailEntity.toUiModel(): FilmDetailUiModel{
+    return FilmDetailUiModel(
+        id = id,
+        title = title,
+        description = overview,
+        originalTitle = originalTitle,
+        posterPath = posterPath,
+        backdropPath = backdropPath,
+        year = releaseDate.take(4),
+        rating = voteAverage,
+        voteCount = voteCount,
+        genres = genres,
+        type = FilmType.SERIES,
+        seasons = seasons.map { it.toUiModel() }
+    )
+}
 
 

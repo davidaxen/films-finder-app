@@ -52,7 +52,7 @@ import com.darvi.filmhunter.presentation.search.components.SearchResultCard
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel = hiltViewModel(),
-    onFilmClick: (Int) -> Unit,
+    onFilmClick: (Int, Int) -> Unit,
     onSeeAllClick: (String, Int) -> Unit
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -171,7 +171,7 @@ fun SearchedFilmsList(
     moviesFound: List<MovieEntity>,
     seriesFound: List<SeriesEntity>,
     onSeeAllClick: (FilmType) -> Unit,
-    onFilmClick: (Int) -> Unit
+    onFilmClick: (Int, Int) -> Unit
 ) {
     AnimatedVisibility(
         visible = isVisible,
@@ -227,7 +227,7 @@ fun SearchedFilmsList(
                             title = item.title,
                             posterPath = item.posterPath,
                             year = item.releaseDate.take(4),
-                            onClick = { onFilmClick(item.id) }
+                            onClick = { onFilmClick(item.id, FilmType.MOVIE.value) }
                         )
                     }
                 }
@@ -250,7 +250,7 @@ fun SearchedFilmsList(
                             title = item.title,
                             posterPath = item.posterPath,
                             year = item.releaseDate.take(4),
-                            onClick = { onFilmClick(item.id) }
+                            onClick = { onFilmClick(item.id, FilmType.SERIES.value) }
                         )
                     }
                 }

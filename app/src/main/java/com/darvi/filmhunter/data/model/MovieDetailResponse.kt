@@ -20,11 +20,6 @@ data class MovieDetailResponse(
     @SerialName("genres") val genres: List<GenreIdModel>
 )
 
-@Serializable
-data class GenreIdModel(
-    val id: Int
-)
-
 fun MovieDetailResponse.toDomain(): MovieDetailEntity {
     return MovieDetailEntity(
         id = id,

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
+import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 import com.darvi.filmhunter.presentation.detail.model.SeasonUiModel
 
 @Composable
@@ -64,7 +65,7 @@ private fun SeasonCard(season: SeasonUiModel) {
         ) {
             if (season.posterPath != null) {
                 AsyncImage(
-                    model = season.posterPath,
+                    model = ImageUrlHelper.getOriginalUrl(season.posterPath),
                     contentDescription = season.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()

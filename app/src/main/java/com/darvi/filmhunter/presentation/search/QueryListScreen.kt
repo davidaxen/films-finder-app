@@ -35,7 +35,7 @@ fun QueryListScreen(
     queryListViewModel: QueryListViewModel = hiltViewModel(),
     query: String,
     filmType: Int,
-    onFilmClick: (Int) -> Unit,
+    onFilmClick: (Int, Int) -> Unit,
     onBackPress: () -> Unit
 ) {
     val uiState by queryListViewModel.uiState.collectAsStateWithLifecycle()
@@ -81,7 +81,7 @@ fun QueryListScreen(
                                 title = item.title,
                                 posterPath = item.posterPath,
                                 year = item.releaseDate.take(4),
-                                onClick = { onFilmClick(item.id) }
+                                onClick = { onFilmClick(item.id, FilmType.MOVIE.value) }
                             )
 
                             if (
@@ -99,7 +99,7 @@ fun QueryListScreen(
                                 title = item.title,
                                 posterPath = item.posterPath,
                                 year = item.releaseDate.take(4),
-                                onClick = { onFilmClick(item.id) }
+                                onClick = { onFilmClick(item.id, FilmType.SERIES.value) }
                             )
 
                             if (

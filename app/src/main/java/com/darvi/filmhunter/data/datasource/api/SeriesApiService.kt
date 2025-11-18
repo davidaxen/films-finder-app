@@ -1,5 +1,6 @@
 package com.darvi.filmhunter.data.datasource.api
 
+import com.darvi.filmhunter.data.model.SeriesDetailResponse
 import com.darvi.filmhunter.data.model.SeriesResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -18,4 +19,10 @@ interface SeriesApiService {
         @Query("page") page: Int = 1,
         @Query("language") language: String = "es-ES"
     ): SeriesResponse
+
+    @GET("tv/{id}")
+    suspend fun getSeriesById(
+        @Path("id") id: Int,
+        @Query("language") language: String = "es-ES"
+    ): SeriesDetailResponse
 }

@@ -35,12 +35,13 @@ import kotlin.math.min
 fun DetailScreen(
     detailViewModel: DetailViewModel = hiltViewModel(),
     filmId: Int,
+    filmType: Int,
     onBackClick: () -> Unit
 ) {
     val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(filmId) {
-        detailViewModel.getDetail(filmId)
+        detailViewModel.getDetail(filmId, filmType)
     }
 
     when {

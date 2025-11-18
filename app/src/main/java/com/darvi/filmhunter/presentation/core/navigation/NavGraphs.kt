@@ -41,6 +41,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             val data = stackEntry.toRoute<MainGraph.Detail>()
             DetailScreen(
                 filmId = data.id,
+                filmType = data.filmType,
                 onBackClick = { navController.popBackStack() }
             )
         }
