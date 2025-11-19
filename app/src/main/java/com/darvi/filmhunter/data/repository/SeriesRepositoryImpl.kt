@@ -2,6 +2,7 @@ package com.darvi.filmhunter.data.repository
 
 import com.darvi.filmhunter.data.datasource.api.SeriesApiService
 import com.darvi.filmhunter.data.model.series.toDomain
+import com.darvi.filmhunter.domain.entity.series.SeasonDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesEntity
 import com.darvi.filmhunter.domain.repository.SeriesRepository
@@ -22,5 +23,12 @@ class SeriesRepositoryImpl @Inject constructor(private val api: SeriesApiService
 
     override suspend fun getSeriesById(id: Int): SeriesDetailEntity {
         return api.getSeriesById(id = id).toDomain()
+    }
+
+    override suspend fun getSeriesSeasonDetail(
+        seriesId: Int,
+        seasonNumber: Int
+    ): SeasonDetailEntity {
+        return api.getSeriesSeasonDetail(seriesId = seriesId, seasonNumber = seasonNumber).toDomain()
     }
 }

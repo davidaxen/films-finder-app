@@ -18,6 +18,7 @@ interface MainGraph {
     @Serializable object Fav
     @Serializable object Profile
     @Serializable data class Detail(val id: Int, val filmType: Int)
+    @Serializable data class SeasonDetail(val seriesId: Int, val seasonNumber: Int)
 }
 
 interface HomeRoutes {

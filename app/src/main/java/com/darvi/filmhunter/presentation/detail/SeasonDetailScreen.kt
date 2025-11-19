@@ -10,51 +10,39 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.darvi.filmhunter.domain.entity.series.SeasonDetailEntity
 import com.darvi.filmhunter.presentation.core.components.FilmHunterCircularProgress
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.components.GoBackIconButton
 import com.darvi.filmhunter.presentation.detail.components.DetailHeader
-import com.darvi.filmhunter.presentation.detail.components.DetailInfoSection
-import com.darvi.filmhunter.presentation.detail.components.GenresSection
 import com.darvi.filmhunter.presentation.detail.components.OverviewSection
-import com.darvi.filmhunter.presentation.detail.components.RecommendationSection
-import com.darvi.filmhunter.presentation.detail.components.SeasonsSection
 import com.darvi.filmhunter.presentation.detail.components.WatchProvidersSection
-import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
 import kotlin.math.min
 
 @Composable
-fun DetailScreen(
-    detailViewModel: DetailViewModel = hiltViewModel(),
-    filmId: Int,
-    filmType: Int,
-    onSeasonClick: ((Int, Int) -> Unit)? = null,
-    onFilmRecommendedClick: (Int, Int) -> Unit,
+fun SeasonDetailScreen(
+    seasonDetailViewModel: SeasonDetailViewModel = hiltViewModel(),
+    seriesId: Int,
+    seasonNumber: Int,
     onBackClick: () -> Unit
 ) {
-    val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
 
-    val listState = rememberSaveable(
-        saver = LazyListState.Saver
-    ) {
-        LazyListState()
-    }
+    val uiState by seasonDetailViewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(filmId) {
-        detailViewModel.getDetail(filmId, filmType)
+    LaunchedEffect(seriesId, seasonNumber) {
+        seasonDetailViewModel.getDetail(seriesId, seasonNumber)
     }
 
     when {
@@ -71,26 +59,20 @@ fun DetailScreen(
         }
 
         else -> {
-            DetailContent(
-                film = uiState.film,
-                onBackClick = onBackClick,
-                onSeasonClick = onSeasonClick,
-                listState = listState,
-                onFilmRecommendedClick = onFilmRecommendedClick
+            SeasonDetailContent(
+                season = uiState.season,
+                onBackClick = onBackClick
             )
         }
     }
 }
 
 @Composable
-fun DetailContent(
-    film: FilmDetailUiModel,
-    onFilmRecommendedClick: (Int, Int) -> Unit,
-    onSeasonClick: ((Int, Int) -> Unit)? = null,
-    listState: LazyListState,
+fun SeasonDetailContent(
+    season: SeasonDetailEntity,
     onBackClick: () -> Unit
 ) {
-//    val listState = rememberLazyListState()
+    val listState = rememberLazyListState()
 
     val darkenFraction by remember {
         derivedStateOf {
@@ -110,62 +92,26 @@ fun DetailContent(
                 .background(MaterialTheme.colorScheme.background),
             state = listState
         ) {
+
             item {
                 DetailHeader(
-                    title = film.title,
-                    posterPath = film.posterPath,
-                    releaseDate = film.year,
-                    runtime = film.runtime,
-                    filmType = film.type,
-                    rating = film.rating,
-                    voteCount = film.voteCount,
-                    darkenFraction = darkenFraction
+                    title = season.title,
+                    posterPath = season.posterPath,
+                    releaseDate = season.releaseDate,
+                    rating = season.voteAverage,
+                    darkenFraction  = darkenFraction
                 )
             }
 
-            if (film.originalTitle.isNotBlank() && film.originalTitle != film.title) {
-                item {
-                    Spacer(Modifier.height(8.dp))
-                    DetailInfoSection(film = film)
-                    Spacer(Modifier.height(12.dp))
-                }
-            }
-
             item {
                 Spacer(Modifier.height(16.dp))
-                GenresSection(genres = film.genres)
+                OverviewSection(overview = season.description)
             }
 
-            item {
-                Spacer(Modifier.height(16.dp))
-                OverviewSection(overview = film.description)
-            }
-
-            if (film.seasons.isNotEmpty()) {
+            if (season.watchProviders.isNotEmpty()) {
                 item {
                     Spacer(Modifier.height(24.dp))
-                    SeasonsSection(
-                        seasons = film.seasons,
-                        seriesId = film.id,
-                        onSeasonClick = onSeasonClick
-                    )
-                }
-            }
-
-            if (film.recommendations.isNotEmpty()) {
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    RecommendationSection(
-                        film.recommendations,
-                        onFilmClick = onFilmRecommendedClick
-                    )
-                }
-            }
-
-            if (film.watchProviders.isNotEmpty()) {
-                item {
-                    Spacer(Modifier.height(24.dp))
-                    WatchProvidersSection(providers = film.watchProviders)
+                    WatchProvidersSection(providers = season.watchProviders)
                 }
             }
 
@@ -185,6 +131,4 @@ fun DetailContent(
             GoBackIconButton(onClick = onBackClick)
         }
     }
-
 }
-

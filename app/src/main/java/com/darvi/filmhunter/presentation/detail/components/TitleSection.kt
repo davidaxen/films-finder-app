@@ -14,12 +14,16 @@ import androidx.compose.ui.unit.dp
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.core.util.RuntimeFormat
-import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
 
 @Composable
 fun TitleSection(
     modifier: Modifier = Modifier,
-    film: FilmDetailUiModel
+    title: String,
+    releaseDate: String,
+    runtime: Int? = null,
+    filmType: FilmType? = null,
+    rating: Double,
+    voteCount: Int?,
 ) {
     Row(
         modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp)
@@ -30,7 +34,7 @@ fun TitleSection(
                 .padding(bottom = 8.dp)
         ) {
             FilmHunterText(
-                text = film.title,
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -41,28 +45,30 @@ fun TitleSection(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 FilmHunterText(
-                    text = film.year,
+                    text = releaseDate,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                 )
 
-                film.runtime?.let {
+                runtime?.let {
                     FilmHunterText(
                         text = " • ${RuntimeFormat.formatDuration(it)}",
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                     )
                 }
-                val typeTitle = if (film.type == FilmType.MOVIE) "Película"
-                else "Serie"
+                if (filmType != null) {
+                    val typeTitle = if (filmType == FilmType.MOVIE) "Película"
+                    else "Serie"
 
-                FilmHunterText(
-                    text = " • $typeTitle",
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
-                )
+                    FilmHunterText(
+                        text = " • $typeTitle",
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                    )
+                }
             }
 
             Spacer(Modifier.height(6.dp))
 
-            RatingRow(rating = film.rating, voteCount = film.voteCount)
+            RatingRow(rating = rating, voteCount = voteCount)
         }
     }
 }

@@ -19,7 +19,8 @@ import com.darvi.filmhunter.presentation.core.model.FilmUiModel
 
 @Composable
 fun RecommendationSection(
-    films: List<FilmUiModel>
+    films: List<FilmUiModel>,
+    onFilmClick: (Int, Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -44,7 +45,7 @@ fun RecommendationSection(
                     titleMaxLines = 1,
                     aspectRatio = 0.66f
                 ) {
-
+                    onFilmClick(film.id, film.type.value)
                 }
             }
         }

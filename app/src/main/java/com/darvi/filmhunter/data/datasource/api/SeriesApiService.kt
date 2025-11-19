@@ -1,5 +1,6 @@
 package com.darvi.filmhunter.data.datasource.api
 
+import com.darvi.filmhunter.data.model.series.SeasonDetailResponse
 import com.darvi.filmhunter.data.model.series.SeriesDetailResponse
 import com.darvi.filmhunter.data.model.series.SeriesResponse
 import retrofit2.http.GET
@@ -26,4 +27,12 @@ interface SeriesApiService {
         @Query("append_to_response") appendToResponse: String = "watch/providers,recommendations",
         @Query("language") language: String = "es-ES"
     ): SeriesDetailResponse
+
+    @GET("tv/{series_id}/season/{season_number}")
+    suspend fun getSeriesSeasonDetail(
+        @Path("series_id") seriesId: Int,
+        @Path("season_number") seasonNumber: Int,
+        @Query("append_to_response") appendToResponse: String = "watch/providers",
+        @Query("language") language: String = "es-ES"
+    ): SeasonDetailResponse
 }

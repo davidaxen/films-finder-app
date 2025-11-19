@@ -17,7 +17,7 @@ import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 @Composable
 fun RatingRow(
     rating: Double,
-    voteCount: Int
+    voteCount: Int?
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
@@ -28,10 +28,12 @@ fun RatingRow(
         )
         Spacer(Modifier.width(4.dp))
         FilmHunterText(text = String.format("%.1f", rating))
-        FilmHunterText(
-            text = "  ($voteCount votos)",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-        )
+        if (voteCount != null) {
+            FilmHunterText(
+                text = "  ($voteCount votos)",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            )
+        }
     }
 }

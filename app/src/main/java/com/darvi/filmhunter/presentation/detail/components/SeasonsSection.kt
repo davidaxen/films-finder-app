@@ -18,7 +18,9 @@ import com.darvi.filmhunter.presentation.core.components.FilmResultCard
 
 @Composable
 fun SeasonsSection(
-    seasons: List<SeriesSeasonEntity>
+    seasons: List<SeriesSeasonEntity>,
+    seriesId: Int,
+    onSeasonClick: ((Int, Int) -> Unit)?,
 ) {
     Column(
         modifier = Modifier
@@ -42,7 +44,7 @@ fun SeasonsSection(
                     aspectRatio = 0.66f,
                     titleMaxLines = 1
                 ) {
-
+                    onSeasonClick?.invoke(seriesId, season.seasonNumber)
                 }
             }
         }
