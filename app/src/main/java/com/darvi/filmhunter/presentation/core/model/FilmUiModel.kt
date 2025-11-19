@@ -1,14 +1,14 @@
-package com.darvi.filmhunter.presentation.list.model
+package com.darvi.filmhunter.presentation.core.model
 
 import com.darvi.filmhunter.domain.entity.movie.MovieEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesEntity
-import com.darvi.filmhunter.presentation.core.model.FilmType
 
 data class FilmUiModel(
     val id: Int,
     val title: String,
     val description: String,
     val posterPath: String?,
+    val releaseYear: String = "",
     val type: FilmType
 )
 
@@ -18,6 +18,7 @@ fun MovieEntity.toUiModel(): FilmUiModel {
         title = title,
         description = overview,
         posterPath = posterPath,
+        releaseYear = releaseDate.take(4),
         type = FilmType.MOVIE
     )
 }
@@ -28,6 +29,7 @@ fun SeriesEntity.toUiModel(): FilmUiModel {
         title = title,
         description = overview,
         posterPath = posterPath,
+        releaseYear = releaseDate.take(4),
         type = FilmType.SERIES
     )
 }

@@ -46,7 +46,7 @@ import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.search.components.SearchBarItem
 import com.darvi.filmhunter.presentation.search.components.SearchFilterChip
 import com.darvi.filmhunter.presentation.search.components.SearchItemsHeader
-import com.darvi.filmhunter.presentation.search.components.SearchResultCard
+import com.darvi.filmhunter.presentation.core.components.FilmResultCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -223,7 +223,7 @@ fun SearchedFilmsList(
                         }
                     }
                     items(moviesToShow) { item ->
-                        SearchResultCard(
+                        FilmResultCard(
                             title = item.title,
                             posterPath = item.posterPath,
                             year = item.releaseDate.take(4),
@@ -246,7 +246,7 @@ fun SearchedFilmsList(
                         }
                     }
                     items(seriesToShow) { item ->
-                        SearchResultCard(
+                        FilmResultCard(
                             title = item.title,
                             posterPath = item.posterPath,
                             year = item.releaseDate.take(4),

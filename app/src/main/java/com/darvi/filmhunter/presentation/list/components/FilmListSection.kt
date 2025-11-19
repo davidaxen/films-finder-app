@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
-import com.darvi.filmhunter.presentation.list.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.FilmUiModel
 
 @Composable
 fun FilmListSection(

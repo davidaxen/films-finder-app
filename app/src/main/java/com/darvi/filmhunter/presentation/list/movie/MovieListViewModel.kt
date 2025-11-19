@@ -3,8 +3,8 @@ package com.darvi.filmhunter.presentation.list.movie
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.usecase.movie.GetMoviesList
-import com.darvi.filmhunter.presentation.list.model.FilmUiModel
-import com.darvi.filmhunter.presentation.list.model.toUiModel
+import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

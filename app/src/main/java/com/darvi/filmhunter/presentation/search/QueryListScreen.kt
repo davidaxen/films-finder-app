@@ -27,7 +27,7 @@ import com.darvi.filmhunter.presentation.core.components.FilmHunterCircularProgr
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.components.GoBackIconButton
 import com.darvi.filmhunter.presentation.core.model.FilmType
-import com.darvi.filmhunter.presentation.search.components.SearchResultCard
+import com.darvi.filmhunter.presentation.core.components.FilmResultCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +77,7 @@ fun QueryListScreen(
                 when (uiState.filmTypeSelected) {
                     FilmType.MOVIE -> {
                         itemsIndexed(uiState.moviesFound, key = { index, _ -> index  }) { index, item ->
-                            SearchResultCard(
+                            FilmResultCard(
                                 title = item.title,
                                 posterPath = item.posterPath,
                                 year = item.releaseDate.take(4),
@@ -95,7 +95,7 @@ fun QueryListScreen(
                     }
                     FilmType.SERIES -> {
                         itemsIndexed(uiState.seriesFound, key = { index, _ -> index  }) { index, item ->
-                            SearchResultCard(
+                            FilmResultCard(
                                 title = item.title,
                                 posterPath = item.posterPath,
                                 year = item.releaseDate.take(4),

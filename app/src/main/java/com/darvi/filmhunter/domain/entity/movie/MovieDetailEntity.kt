@@ -15,4 +15,5 @@ data class MovieDetailEntity(
     val voteCount: Int,
     val genres: List<MovieGenre>,
     val watchProviders: List<WatchProviderEntity>,
+    val recommendations: List<MovieEntity>,
 )

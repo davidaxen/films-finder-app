@@ -22,6 +22,7 @@ data class MovieDetailResponse(
     @SerialName("vote_count") val voteCount: Int,
     @SerialName("genres") val genres: List<GenreIdModel>,
     @SerialName("watch/providers") val watchProviders: WatchProviderResponse,
+    @SerialName("recommendations") val recommendations: MovieResponse,
 )
 
 fun MovieDetailResponse.toDomain(): MovieDetailEntity {
@@ -47,6 +48,7 @@ fun MovieDetailResponse.toDomain(): MovieDetailEntity {
         voteAverage = voteAverage,
         voteCount = voteCount,
         genres = genres.mapNotNull { MovieGenre.fromId(it.id) },
-        watchProviders = providers
+        watchProviders = providers,
+        recommendations = recommendations.results.map { it.toDomain() }
     )
 }

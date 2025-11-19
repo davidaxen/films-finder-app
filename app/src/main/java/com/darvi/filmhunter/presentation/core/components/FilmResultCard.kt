@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.presentation.search.components
+package com.darvi.filmhunter.presentation.core.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,15 +28,16 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.modifiers.shimmerLoading
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 
 @Composable
-fun SearchResultCard(
+fun FilmResultCard(
     title: String,
     posterPath: String?,
     year: String,
+    aspectRatio: Float = 0.6f,
+    titleMaxLines: Int = 2,
     onClick: () -> Unit
 ) {
     var isLoading by remember { mutableStateOf(true) }
@@ -56,7 +57,7 @@ fun SearchResultCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(0.6f)
+                    .aspectRatio(aspectRatio)
                     .clip(MaterialTheme.shapes.medium)
             ) {
                 if (imageURL != null) {
@@ -96,7 +97,7 @@ fun SearchResultCard(
                 FilmHunterText(
                     modifier = Modifier.fillMaxWidth(),
                     text = title,
-                    maxLines = 2,
+                    maxLines = titleMaxLines,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                 )

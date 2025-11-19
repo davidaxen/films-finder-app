@@ -6,6 +6,8 @@ import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesSeasonEntity
 import com.darvi.filmhunter.domain.entity.WatchProviderEntity
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.toUiModel
 
 data class FilmDetailUiModel(
     val id: Int,
@@ -21,7 +23,8 @@ data class FilmDetailUiModel(
     val genres: List<MovieGenre>,
     val type: FilmType,
     val watchProviders: List<WatchProviderEntity>,
-    val seasons: List<SeriesSeasonEntity> = emptyList()
+    val seasons: List<SeriesSeasonEntity> = emptyList(),
+    val recommendations: List<FilmUiModel>
 ) {
     companion object {
         fun empty() = FilmDetailUiModel(
@@ -38,7 +41,8 @@ data class FilmDetailUiModel(
             genres = emptyList(),
             type = FilmType.MOVIE,
             seasons = emptyList(),
-            watchProviders = emptyList()
+            watchProviders = emptyList(),
+            recommendations = emptyList()
         )
     }
 }
@@ -58,6 +62,7 @@ fun MovieDetailEntity.toUiModel(): FilmDetailUiModel {
         genres = genres,
         type = FilmType.MOVIE,
         watchProviders = watchProviders,
+        recommendations = recommendations.map { it.toUiModel() }
     )
 }
 
@@ -75,7 +80,8 @@ fun SeriesDetailEntity.toUiModel(): FilmDetailUiModel{
         genres = genres,
         type = FilmType.SERIES,
         seasons = seasons,
-        watchProviders = watchProviders
+        watchProviders = watchProviders,
+        recommendations = emptyList() /*recommendations.map { it.toUiModel() }*/
     )
 }
 
