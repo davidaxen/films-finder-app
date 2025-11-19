@@ -23,6 +23,7 @@ interface MovieApiService {
     @GET("movie/{id}")
     suspend fun getMovieById(
         @Path("id") id: Int,
+        @Query("append_to_response") appendToResponse: String = "watch/providers,recommendations",
         @Query("language") language: String = "es-ES"
     ): MovieDetailResponse
 }

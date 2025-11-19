@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.util.RuntimeFormat
 import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
 
 @Composable
@@ -46,7 +47,7 @@ fun TitleSection(
 
                 film.runtime?.let {
                     FilmHunterText(
-                        text = " • $it min",
+                        text = " • ${RuntimeFormat.formatDuration(it)}",
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                     )
                 }

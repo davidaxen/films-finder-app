@@ -28,6 +28,7 @@ import com.darvi.filmhunter.presentation.detail.components.DetailInfoSection
 import com.darvi.filmhunter.presentation.detail.components.GenresSection
 import com.darvi.filmhunter.presentation.detail.components.OverviewSection
 import com.darvi.filmhunter.presentation.detail.components.SeasonsSection
+import com.darvi.filmhunter.presentation.detail.components.WatchProvidersSection
 import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
 import kotlin.math.min
 
@@ -95,9 +96,12 @@ fun DetailContent(
                 )
             }
 
-            item {
-                Spacer(Modifier.height(16.dp))
-                DetailInfoSection(film = film)
+            if (film.originalTitle.isNotBlank() && film.originalTitle != film.title) {
+                item {
+                    Spacer(Modifier.height(8.dp))
+                    DetailInfoSection(film = film)
+                    Spacer(Modifier.height(12.dp))
+                }
             }
 
             item {
@@ -114,6 +118,13 @@ fun DetailContent(
                 item {
                     Spacer(Modifier.height(24.dp))
                     SeasonsSection(seasons = film.seasons)
+                }
+            }
+
+            if (film.watchProviders.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(24.dp))
+                    WatchProvidersSection(providers = film.watchProviders)
                 }
             }
 

@@ -22,13 +22,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.darvi.filmhunter.domain.entity.SeriesSeasonEntity
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
-import com.darvi.filmhunter.presentation.detail.model.SeasonUiModel
 
 @Composable
 fun SeasonsSection(
-    seasons: List<SeasonUiModel>
+    seasons: List<SeriesSeasonEntity>
 ) {
     Column(
         modifier = Modifier
@@ -52,7 +52,7 @@ fun SeasonsSection(
 }
 
 @Composable
-private fun SeasonCard(season: SeasonUiModel) {
+private fun SeasonCard(season: SeriesSeasonEntity) {
     Column(
         modifier = Modifier
             .width(120.dp)
