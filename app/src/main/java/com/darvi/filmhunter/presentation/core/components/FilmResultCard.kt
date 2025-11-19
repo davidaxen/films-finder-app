@@ -35,7 +35,7 @@ import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 fun FilmResultCard(
     title: String,
     posterPath: String?,
-    year: String,
+    subtitle: String,
     aspectRatio: Float = 0.6f,
     titleMaxLines: Int = 2,
     onClick: () -> Unit
@@ -103,7 +103,7 @@ fun FilmResultCard(
                 )
 
                 FilmHunterText(
-                    text = year,
+                    text = subtitle,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

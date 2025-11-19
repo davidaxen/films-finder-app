@@ -81,7 +81,7 @@ fun SeriesDetailEntity.toUiModel(): FilmDetailUiModel{
         type = FilmType.SERIES,
         seasons = seasons,
         watchProviders = watchProviders,
-        recommendations = emptyList() /*recommendations.map { it.toUiModel() }*/
+        recommendations = recommendations.map { it.toUiModel() }
     )
 }
 

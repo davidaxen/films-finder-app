@@ -226,7 +226,7 @@ fun SearchedFilmsList(
                         FilmResultCard(
                             title = item.title,
                             posterPath = item.posterPath,
-                            year = item.releaseDate.take(4),
+                            subtitle = item.releaseDate.take(4),
                             onClick = { onFilmClick(item.id, FilmType.MOVIE.value) }
                         )
                     }
@@ -249,7 +249,7 @@ fun SearchedFilmsList(
                         FilmResultCard(
                             title = item.title,
                             posterPath = item.posterPath,
-                            year = item.releaseDate.take(4),
+                            subtitle = item.releaseDate.take(4),
                             onClick = { onFilmClick(item.id, FilmType.SERIES.value) }
                         )
                     }

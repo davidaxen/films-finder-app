@@ -23,6 +23,7 @@ data class SeriesDetailResponse(
     @SerialName("genres") val genres: List<GenreIdModel>,
     @SerialName("seasons") val seasons: List<SeriesSeasonModel>,
     @SerialName("watch/providers") val watchProviders: WatchProviderResponse,
+    @SerialName("recommendations") val recommendations: SeriesResponse,
 )
 
 @Serializable
@@ -57,7 +58,8 @@ fun SeriesDetailResponse.toDomain(): SeriesDetailEntity {
         voteCount = voteCount,
         genres = genres.mapNotNull { MovieGenre.fromId(it.id) },
         seasons = seasons.map { it.toDomain() },
-        watchProviders = providers
+        watchProviders = providers,
+        recommendations = recommendations.results.map { it.toDomain() }
     )
 }
 

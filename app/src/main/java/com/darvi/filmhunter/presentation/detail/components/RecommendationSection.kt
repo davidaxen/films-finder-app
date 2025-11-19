@@ -34,13 +34,13 @@ fun RecommendationSection(
 
         LazyRow(
             modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(films) { film ->
                 FilmResultCard(
                     title = film.title,
                     posterPath = film.posterPath,
-                    year = film.releaseYear,
+                    subtitle = film.releaseYear,
                     titleMaxLines = 1,
                     aspectRatio = 0.66f
                 ) {
