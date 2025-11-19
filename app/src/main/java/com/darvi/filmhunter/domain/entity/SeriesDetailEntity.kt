@@ -11,7 +11,8 @@ data class SeriesDetailEntity(
     val voteAverage: Double,
     val voteCount: Int,
     val genres: List<MovieGenre>,
-    val seasons: List<SeriesSeasonEntity>
+    val seasons: List<SeriesSeasonEntity>,
+    val watchProviders: List<WatchProviderEntity>,
 )
 
 data class SeriesSeasonEntity(

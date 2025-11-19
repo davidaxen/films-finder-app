@@ -75,7 +75,7 @@ fun SeriesDetailEntity.toUiModel(): FilmDetailUiModel{
         genres = genres,
         type = FilmType.SERIES,
         seasons = seasons,
-        watchProviders = emptyList() // TODO: hacer los de series
+        watchProviders = watchProviders
     )
 }
 

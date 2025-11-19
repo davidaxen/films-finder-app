@@ -18,7 +18,8 @@ data class SeriesDetailResponse(
     @SerialName("vote_average") val voteAverage: Double,
     @SerialName("vote_count") val voteCount: Int,
     @SerialName("genres") val genres: List<GenreIdModel>,
-    @SerialName("seasons") val seasons: List<SeriesSeasonModel>
+    @SerialName("seasons") val seasons: List<SeriesSeasonModel>,
+    @SerialName("watch/providers") val watchProviders: WatchProviderResponse,
 )
 
 @Serializable
@@ -31,6 +32,16 @@ data class SeriesSeasonModel(
 )
 
 fun SeriesDetailResponse.toDomain(): SeriesDetailEntity {
+    val esProvider = watchProviders.results["ES"]
+
+    val providers =
+        (esProvider?.flatrate.orEmpty() +
+                esProvider?.rent.orEmpty() +
+                esProvider?.buy.orEmpty())
+            .associateBy { it.providerId }
+            .values
+            .map { it.toDomain() }
+
     return SeriesDetailEntity(
         id = id,
         title = title,
@@ -42,7 +53,8 @@ fun SeriesDetailResponse.toDomain(): SeriesDetailEntity {
         voteAverage = voteAverage,
         voteCount = voteCount,
         genres = genres.mapNotNull { MovieGenre.fromId(it.id) },
-        seasons = seasons.map { it.toDomain() }
+        seasons = seasons.map { it.toDomain() },
+        watchProviders = providers
     )
 }
 

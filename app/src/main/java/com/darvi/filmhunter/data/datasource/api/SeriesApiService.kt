@@ -23,6 +23,7 @@ interface SeriesApiService {
     @GET("tv/{id}")
     suspend fun getSeriesById(
         @Path("id") id: Int,
+        @Query("append_to_response") appendToResponse: String = "watch/providers,recommendations",
         @Query("language") language: String = "es-ES"
     ): SeriesDetailResponse
 }
