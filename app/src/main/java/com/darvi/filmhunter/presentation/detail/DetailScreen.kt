@@ -14,7 +14,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -74,10 +76,13 @@ fun DetailContent(
 ) {
     val listState = rememberLazyListState()
 
-    val maxOffsetPx = 1000
-    val scrollOffset = min(listState.firstVisibleItemScrollOffset, maxOffsetPx)
-    val rawFraction = scrollOffset / maxOffsetPx.toFloat()
-    val darkenFraction = (rawFraction * rawFraction)
+    val darkenFraction by remember {
+        derivedStateOf {
+            val scrollOffset = min(listState.firstVisibleItemScrollOffset, 1000)
+            val rawFraction = scrollOffset / 1000f
+            rawFraction * rawFraction
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
