@@ -1,9 +1,9 @@
 package com.darvi.filmhunter.presentation.detail.model
 
-import com.darvi.filmhunter.domain.entity.MovieDetailEntity
-import com.darvi.filmhunter.domain.entity.MovieGenre
-import com.darvi.filmhunter.domain.entity.SeriesDetailEntity
-import com.darvi.filmhunter.domain.entity.SeriesSeasonEntity
+import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
+import com.darvi.filmhunter.domain.entity.movie.MovieGenre
+import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesSeasonEntity
 import com.darvi.filmhunter.domain.entity.WatchProviderEntity
 import com.darvi.filmhunter.presentation.core.model.FilmType
 

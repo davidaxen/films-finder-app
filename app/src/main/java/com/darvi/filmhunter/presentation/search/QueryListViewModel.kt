@@ -2,10 +2,10 @@ package com.darvi.filmhunter.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.entity.MovieEntity
-import com.darvi.filmhunter.domain.entity.SeriesEntity
-import com.darvi.filmhunter.domain.usecase.search.SearchMoviesByTitle
-import com.darvi.filmhunter.domain.usecase.search.SearchSeriesByTitle
+import com.darvi.filmhunter.domain.entity.movie.MovieEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesEntity
+import com.darvi.filmhunter.domain.usecase.movie.SearchMoviesByTitle
+import com.darvi.filmhunter.domain.usecase.series.SearchSeriesByTitle
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

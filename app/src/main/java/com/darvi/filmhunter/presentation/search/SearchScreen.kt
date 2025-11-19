@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.darvi.filmhunter.domain.entity.MovieEntity
-import com.darvi.filmhunter.domain.entity.MovieGenre
-import com.darvi.filmhunter.domain.entity.SeriesEntity
-import com.darvi.filmhunter.domain.entity.SeriesGenre
+import com.darvi.filmhunter.domain.entity.movie.MovieEntity
+import com.darvi.filmhunter.domain.entity.movie.MovieGenre
+import com.darvi.filmhunter.domain.entity.series.SeriesEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesGenre
 import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.model.FilmType

@@ -1,9 +1,9 @@
 package com.darvi.filmhunter.data.repository
 
 import com.darvi.filmhunter.data.datasource.api.SeriesApiService
-import com.darvi.filmhunter.data.model.toDomain
-import com.darvi.filmhunter.domain.entity.SeriesDetailEntity
-import com.darvi.filmhunter.domain.entity.SeriesEntity
+import com.darvi.filmhunter.data.model.series.toDomain
+import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesEntity
 import com.darvi.filmhunter.domain.repository.SeriesRepository
 import javax.inject.Inject
 

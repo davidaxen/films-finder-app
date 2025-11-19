@@ -1,4 +1,7 @@
-package com.darvi.filmhunter.domain.entity
+package com.darvi.filmhunter.domain.entity.series
+
+import com.darvi.filmhunter.domain.entity.movie.MovieGenre
+import com.darvi.filmhunter.domain.entity.WatchProviderEntity
 
 data class SeriesDetailEntity(
     val id: Int,

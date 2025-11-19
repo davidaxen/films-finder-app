@@ -1,37 +1,30 @@
-package com.darvi.filmhunter.data.model
+package com.darvi.filmhunter.data.model.movie
 
-import com.darvi.filmhunter.domain.entity.MovieGenre
-import com.darvi.filmhunter.domain.entity.SeriesDetailEntity
-import com.darvi.filmhunter.domain.entity.SeriesSeasonEntity
+import com.darvi.filmhunter.data.model.GenreIdModel
+import com.darvi.filmhunter.data.model.WatchProviderResponse
+import com.darvi.filmhunter.data.model.toDomain
+import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
+import com.darvi.filmhunter.domain.entity.movie.MovieGenre
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SeriesDetailResponse(
+data class MovieDetailResponse(
     val id: Int,
-    @SerialName("name") val title: String,
+    val title: String,
     val overview: String,
-    @SerialName("original_name") val originalTitle: String,
+    val runtime: Int? = null,
+    @SerialName("original_title") val originalTitle: String,
     @SerialName("poster_path") val posterPath: String? = null,
     @SerialName("backdrop_path") val backdropPath: String? = null,
-    @SerialName("first_air_date") val releaseDate: String,
+    @SerialName("release_date") val releaseDate: String,
     @SerialName("vote_average") val voteAverage: Double,
     @SerialName("vote_count") val voteCount: Int,
     @SerialName("genres") val genres: List<GenreIdModel>,
-    @SerialName("seasons") val seasons: List<SeriesSeasonModel>,
     @SerialName("watch/providers") val watchProviders: WatchProviderResponse,
 )
 
-@Serializable
-data class SeriesSeasonModel(
-    val id: Int,
-    val name: String,
-    @SerialName("season_number") val seasonNumber: Int,
-    @SerialName("episode_count") val episodeCount: Int,
-    @SerialName("poster_path") val posterPath: String? = null,
-)
-
-fun SeriesDetailResponse.toDomain(): SeriesDetailEntity {
+fun MovieDetailResponse.toDomain(): MovieDetailEntity {
     val esProvider = watchProviders.results["ES"]
 
     val providers =
@@ -42,10 +35,11 @@ fun SeriesDetailResponse.toDomain(): SeriesDetailEntity {
             .values
             .map { it.toDomain() }
 
-    return SeriesDetailEntity(
+    return MovieDetailEntity(
         id = id,
         title = title,
         overview = overview,
+        runtime = runtime,
         originalTitle = originalTitle,
         posterPath = posterPath,
         backdropPath = backdropPath,
@@ -53,17 +47,6 @@ fun SeriesDetailResponse.toDomain(): SeriesDetailEntity {
         voteAverage = voteAverage,
         voteCount = voteCount,
         genres = genres.mapNotNull { MovieGenre.fromId(it.id) },
-        seasons = seasons.map { it.toDomain() },
         watchProviders = providers
-    )
-}
-
-fun SeriesSeasonModel.toDomain(): SeriesSeasonEntity {
-    return SeriesSeasonEntity(
-        id = id,
-        name = name,
-        seasonNumber = seasonNumber,
-        episodeCount = episodeCount,
-        posterPath = posterPath
     )
 }

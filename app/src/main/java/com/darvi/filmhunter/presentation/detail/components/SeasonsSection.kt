@@ -22,7 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.darvi.filmhunter.domain.entity.SeriesSeasonEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesSeasonEntity
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 

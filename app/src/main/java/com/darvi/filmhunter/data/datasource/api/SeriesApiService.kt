@@ -1,7 +1,7 @@
 package com.darvi.filmhunter.data.datasource.api
 
-import com.darvi.filmhunter.data.model.SeriesDetailResponse
-import com.darvi.filmhunter.data.model.SeriesResponse
+import com.darvi.filmhunter.data.model.series.SeriesDetailResponse
+import com.darvi.filmhunter.data.model.series.SeriesResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

@@ -2,8 +2,8 @@ package com.darvi.filmhunter.presentation.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.usecase.detail.GetMovieById
-import com.darvi.filmhunter.domain.usecase.detail.GetSeriesById
+import com.darvi.filmhunter.domain.usecase.movie.GetMovieById
+import com.darvi.filmhunter.domain.usecase.series.GetSeriesById
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
 import com.darvi.filmhunter.presentation.detail.model.toUiModel

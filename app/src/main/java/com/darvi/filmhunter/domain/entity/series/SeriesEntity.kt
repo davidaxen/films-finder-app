@@ -1,6 +1,6 @@
-package com.darvi.filmhunter.domain.entity
+package com.darvi.filmhunter.domain.entity.series
 
-data class MovieEntity(
+data class SeriesEntity(
     val id: Int,
     val title: String,
     val overview: String,

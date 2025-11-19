@@ -1,6 +1,6 @@
-package com.darvi.filmhunter.domain.usecase.detail
+package com.darvi.filmhunter.domain.usecase.movie
 
-import com.darvi.filmhunter.domain.entity.MovieDetailEntity
+import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.repository.MovieRepository
 import javax.inject.Inject
 

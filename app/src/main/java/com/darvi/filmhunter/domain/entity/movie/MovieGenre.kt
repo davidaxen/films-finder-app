@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.domain.entity
+package com.darvi.filmhunter.domain.entity.movie
 
 enum class MovieGenre(val id: Int, val displayName: String) {
     ACTION(28, "Acción"),
