@@ -26,12 +26,4 @@ data class SeasonDetailEntity(
     }
 }
 
-data class EpisodeEntity(
-    val title: String,
-    val overview: String,
-    val runtime: Int? = null,
-    val episodeNumber: Int,
-    val voteAverage: Double,
-    val voteCount: Int,
-    val releaseDate: String,
-)
+

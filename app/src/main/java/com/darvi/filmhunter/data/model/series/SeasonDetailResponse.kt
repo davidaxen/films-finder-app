@@ -30,6 +30,7 @@ data class EpisodeModel(
     @SerialName("vote_average") val voteAverage: Double,
     @SerialName("vote_count") val voteCount: Int,
     @SerialName("air_date") val releaseDate: String,
+    @SerialName("still_path") val picturePath: String?,
 )
 
 fun SeasonDetailResponse.toDomain(): SeasonDetailEntity {
@@ -62,6 +63,7 @@ fun EpisodeModel.toDomain(): EpisodeEntity {
         episodeNumber = episodeNumber,
         voteAverage = voteAverage,
         voteCount = voteCount,
-        releaseDate = releaseDate
+        releaseDate = releaseDate,
+        picturePath = picturePath
     )
 }
