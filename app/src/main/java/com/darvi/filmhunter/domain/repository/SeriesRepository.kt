@@ -9,4 +9,5 @@ interface SeriesRepository {
     suspend fun getSeriesByTitle(query: String, page: Int): List<SeriesEntity>
     suspend fun getSeriesById(id: Int): SeriesDetailEntity
     suspend fun getSeriesSeasonDetail(seriesId: Int, seasonNumber: Int): SeasonDetailEntity
+    suspend fun saveFilm(filmId: Int)
 }

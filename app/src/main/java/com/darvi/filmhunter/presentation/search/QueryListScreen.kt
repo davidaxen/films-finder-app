@@ -80,6 +80,7 @@ fun QueryListScreen(
                             FilmResultCard(
                                 title = item.title,
                                 posterPath = item.posterPath,
+                                aspectRatio = 0.56f,
                                 subtitle = item.releaseDate.take(4),
                                 onClick = { onFilmClick(item.id, FilmType.MOVIE.value) }
                             )
@@ -98,6 +99,7 @@ fun QueryListScreen(
                             FilmResultCard(
                                 title = item.title,
                                 posterPath = item.posterPath,
+                                aspectRatio = 0.56f,
                                 subtitle = item.releaseDate.take(4),
                                 onClick = { onFilmClick(item.id, FilmType.SERIES.value) }
                             )
