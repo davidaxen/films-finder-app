@@ -76,6 +76,7 @@ fun DetailScreen(
                 onBackClick = onBackClick,
                 onSeasonClick = onSeasonClick,
                 listState = listState,
+                onSaveClick = { detailViewModel.onSaveFilm() },
                 onFilmRecommendedClick = onFilmRecommendedClick
             )
         }
@@ -87,11 +88,10 @@ fun DetailContent(
     film: FilmDetailUiModel,
     onFilmRecommendedClick: (Int, Int) -> Unit,
     onSeasonClick: ((Int, Int) -> Unit)? = null,
+    onSaveClick: () -> Unit,
     listState: LazyListState,
     onBackClick: () -> Unit
 ) {
-//    val listState = rememberLazyListState()
-
     val darkenFraction by remember {
         derivedStateOf {
             val scrollOffset = min(listState.firstVisibleItemScrollOffset, 1000)
@@ -119,7 +119,9 @@ fun DetailContent(
                     filmType = film.type,
                     rating = film.rating,
                     voteCount = film.voteCount,
-                    darkenFraction = darkenFraction
+                    isSaved = film.isSaved,
+                    onSaveClick = onSaveClick,
+                    darkenFraction = darkenFraction,
                 )
             }
 

@@ -27,10 +27,10 @@ class DetailViewModel @Inject constructor(
         id: Int,
         filmType: Int
     ) {
+        _uiState.update {
+            it.copy(isLoading = true)
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update {
-                it.copy(isLoading = true)
-            }
             try {
                 val type = if (filmType == FilmType.SERIES.value) FilmType.SERIES else FilmType.MOVIE
                 if (type == FilmType.SERIES) {
@@ -58,6 +58,14 @@ class DetailViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun onSaveFilm() {
+        _uiState.update {
+            it.copy(
+                film = it.film.copy(isSaved = !it.film.isSaved)
+            )
         }
     }
 

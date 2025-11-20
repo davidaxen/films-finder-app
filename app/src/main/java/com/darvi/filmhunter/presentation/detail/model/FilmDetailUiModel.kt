@@ -22,6 +22,7 @@ data class FilmDetailUiModel(
     val voteCount: Int,
     val genres: List<MovieGenre>,
     val type: FilmType,
+    val isSaved: Boolean = false,
     val watchProviders: List<WatchProviderEntity>,
     val seasons: List<SeriesSeasonEntity> = emptyList(),
     val recommendations: List<FilmUiModel>
@@ -61,6 +62,7 @@ fun MovieDetailEntity.toUiModel(): FilmDetailUiModel {
         voteCount = voteCount,
         genres = genres,
         type = FilmType.MOVIE,
+        isSaved = isSaved,
         watchProviders = watchProviders,
         recommendations = recommendations.map { it.toUiModel() }
     )
@@ -79,6 +81,7 @@ fun SeriesDetailEntity.toUiModel(): FilmDetailUiModel{
         voteCount = voteCount,
         genres = genres,
         type = FilmType.SERIES,
+        isSaved = isSaved,
         seasons = seasons,
         watchProviders = watchProviders,
         recommendations = recommendations.map { it.toUiModel() }

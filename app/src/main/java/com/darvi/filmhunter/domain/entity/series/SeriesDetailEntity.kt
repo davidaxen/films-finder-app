@@ -13,6 +13,7 @@ data class SeriesDetailEntity(
     val releaseDate: String,
     val voteAverage: Double,
     val voteCount: Int,
+    val isSaved: Boolean = false,
     val genres: List<MovieGenre>,
     val seasons: List<SeriesSeasonEntity>,
     val watchProviders: List<WatchProviderEntity>,

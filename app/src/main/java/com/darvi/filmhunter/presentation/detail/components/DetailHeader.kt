@@ -22,6 +22,8 @@ fun DetailHeader(
     releaseDate: String,
     runtime: Int? = null,
     filmType: FilmType? = null,
+    isSaved: Boolean? = null,
+    onSaveClick: (() -> Unit)? = null,
     rating: Double,
     voteCount: Int? = null,
     darkenFraction: Float,
@@ -80,6 +82,8 @@ fun DetailHeader(
             releaseDate = releaseDate,
             runtime = runtime,
             filmType = filmType,
+            isSaved = isSaved,
+            onSaveClick = onSaveClick,
             rating = rating,
             voteCount = voteCount,
         )

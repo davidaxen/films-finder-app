@@ -13,6 +13,7 @@ data class MovieDetailEntity(
     val releaseDate: String,
     val voteAverage: Double,
     val voteCount: Int,
+    val isSaved: Boolean = false,
     val genres: List<MovieGenre>,
     val watchProviders: List<WatchProviderEntity>,
     val recommendations: List<MovieEntity>,
