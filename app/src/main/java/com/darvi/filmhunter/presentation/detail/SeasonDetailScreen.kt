@@ -6,6 +6,8 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -27,6 +29,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +39,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +66,7 @@ import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 import com.darvi.filmhunter.presentation.detail.components.DetailHeader
 import com.darvi.filmhunter.presentation.detail.components.OverviewSection
 import com.darvi.filmhunter.presentation.detail.components.WatchProvidersSection
+import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.math.min
 
@@ -107,6 +112,7 @@ fun SeasonDetailContent(
     onBackClick: () -> Unit
 ) {
     val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     val darkenFraction by remember {
         derivedStateOf {
@@ -118,6 +124,25 @@ fun SeasonDetailContent(
 
     var expandedEpisodeNumber by remember { mutableStateOf<Int?>(null) }
     var isEpisodesExpanded by remember { mutableStateOf(false) }
+
+    val showScrollToTop by remember {
+        derivedStateOf {
+            val minEpisodesToShowButton = 20
+            val hasManyEpisodes = season.episodes.size > minEpisodesToShowButton
+
+            // Índice donde empiezan los episodios en el LazyColumn:
+            // 0 -> DetailHeader
+            // 1 -> OverviewSection
+            // 2 -> Cabecera "Capítulos"
+            val firstEpisodeIndex = 3
+
+            val firstVisibleIndex = listState.firstVisibleItemIndex
+
+            hasManyEpisodes &&
+                    isEpisodesExpanded &&
+                    firstVisibleIndex >= firstEpisodeIndex + minEpisodesToShowButton
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -230,6 +255,32 @@ fun SeasonDetailContent(
             horizontalArrangement = Arrangement.Start
         ) {
             GoBackIconButton(onClick = onBackClick)
+        }
+
+        AnimatedVisibility(
+            visible = showScrollToTop,
+            enter = slideInVertically(
+                initialOffsetY = { it }
+            ) + fadeIn(),
+            exit = slideOutVertically(
+                targetOffsetY = { it }
+            ) + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowUpward,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(0)
+                    }
+                },
+                contentDescription = "Volver arriba"
+            )
         }
     }
 }
