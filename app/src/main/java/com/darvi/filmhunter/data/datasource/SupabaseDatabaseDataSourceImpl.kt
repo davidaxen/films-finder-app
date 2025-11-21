@@ -2,6 +2,7 @@ package com.darvi.filmhunter.data.datasource
 
 import com.darvi.filmhunter.data.model.supabase.FilmsSavedDTO
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Count
 import javax.inject.Inject
 
 class SupabaseDatabaseDataSourceImpl @Inject constructor(
@@ -16,5 +17,20 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
     }
 
     override suspend fun removeSavedFilm(filmId: Int) {
+    }
+
+    override suspend fun isFilmSaved(filmId: Int, filmType: String): Boolean {
+        val resp = database
+            .from("saved_films")
+            .select {
+                filter {
+                    eq("film_id", filmId)
+                    eq("film_type", filmType)
+                }
+                count(Count.EXACT)
+            }
+            .countOrNull()
+
+        return (resp ?: 0) > 0
     }
 }

@@ -27,7 +27,12 @@ class SeriesRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSeriesById(id: Int): SeriesDetailEntity {
-        return api.getSeriesById(id = id).toDomain()
+        return api
+            .getSeriesById(id = id)
+            .toDomain()
+            .copy(
+                isSaved = database.isFilmSaved(id, FilmType.SERIES.name)
+            )
     }
 
     override suspend fun getSeriesSeasonDetail(

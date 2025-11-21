@@ -26,7 +26,12 @@ class MovieRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMovieById(id: Int): MovieDetailEntity {
-        return api.getMovieById(id = id).toDomain()
+        return api
+            .getMovieById(id = id)
+            .toDomain()
+            .copy(
+                isSaved = database.isFilmSaved(id, FilmType.MOVIE.name)
+            )
     }
 
     override suspend fun saveFilm(filmId: Int) {
