@@ -1,7 +1,7 @@
 package com.darvi.filmhunter.presentation.detail
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,12 +22,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -40,8 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -115,7 +117,7 @@ fun SeasonDetailContent(
     }
 
     var expandedEpisodeNumber by remember { mutableStateOf<Int?>(null) }
-    var isEpisodesExpanded by remember { mutableStateOf(true) }
+    var isEpisodesExpanded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -159,38 +161,51 @@ fun SeasonDetailContent(
                         }
                 ) {
                     FilmHunterText(
-                        text = "Capítulos",
+                        text = "Capítulos (${season.episodes.size})",
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Spacer(Modifier.weight(1f))
+
+                    val rotation by animateFloatAsState(
+                        targetValue = if (isEpisodesExpanded) 180f else 0f,
+                        label = "EpisodeChevronRotation"
+                    )
+
                     Icon(
-                        imageVector = if (isEpisodesExpanded) Icons.Filled.ArrowDropDown
-                                    else Icons.Filled.ArrowDropUp,
-                        contentDescription = "Capítulos",
-                        modifier = Modifier.size(32.dp)
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = "Capítulos (${season.episodes.size})",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .graphicsLayer {
+                                rotationZ = rotation
+                            }
                     )
                 }
                 Spacer(Modifier.height(8.dp))
             }
 
-            items(
-                items = season.episodes,
-                key = { it.episodeNumber }
-            ) { episode ->
+            itemsIndexed(
+                items = if (isEpisodesExpanded) season.episodes else emptyList(),
+                key = { _, episode -> episode.episodeNumber }
+            ) { index, episode ->
                 val isExpanded = expandedEpisodeNumber == episode.episodeNumber
-                AnimatedVisibility(
-                    visible = isEpisodesExpanded,
-                    enter = expandVertically() + fadeIn(),
-                    exit = shrinkVertically() + fadeOut()
-                ) {
+
+                Column(Modifier.padding(vertical = 2.dp)){
                     EpisodeRow(
                         episode = episode,
                         isExpanded = isExpanded,
+                        modifier = Modifier.animateItem(),
                         onClick = {
                             expandedEpisodeNumber =
                                 if (isExpanded) null else episode.episodeNumber
                         }
                     )
+
+                    if (index < season.episodes.lastIndex) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.surface
+                        )
+                    }
                 }
             }
 
@@ -227,33 +242,30 @@ fun EpisodeRow(
     modifier: Modifier = Modifier
 ) {
     var isLoading by remember { mutableStateOf(true) }
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Número de episodio (columna muy estrecha a la izquierda)
-        FilmHunterText(
-            text = episode.episodeNumber.toString(),
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier
-                .width(24.dp)
-                .padding(top = 4.dp)
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .animateContentSize()
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
             ) {
-                // Imagen
-                if (!episode.picturePath.isNullOrEmpty()) {
+                onClick()
+            }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
+            // Imagen
+            if (!episode.picturePath.isNullOrEmpty()) {
+                Box(
+                    Modifier
+                        .width(160.dp)
+                        .aspectRatio(16f / 9f)
+                        .clip(RoundedCornerShape(8.dp))
+                ) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(ImageUrlHelper.getOriginalUrl(episode.picturePath))
@@ -261,7 +273,7 @@ fun EpisodeRow(
                             .build(), // o tu helper de URLs
                         contentDescription = episode.title,
                         modifier = Modifier
-                            .width(120.dp)
+                            .width(160.dp)
                             .aspectRatio(16f / 9f)
                             .clip(RoundedCornerShape(8.dp))
                             .shimmerLoading(isVisible = isLoading),
@@ -269,93 +281,100 @@ fun EpisodeRow(
                         onSuccess = { isLoading = false },
                         onError = { isLoading = false }
                     )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surface)
-                            .width(120.dp)
-                            .aspectRatio(16f / 9f)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        FilmHunterText(
-                            text = "Imagen no disponible",
-                            textAlign = TextAlign.Center
-                        )
-                    }
                 }
-
-                Spacer(Modifier.width(12.dp))
-
-                // Info del episodio
-                Column(
-                    modifier = Modifier.weight(1f)
+            } else {
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .width(160.dp)
+                        .aspectRatio(16f / 9f)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    // Título
                     FilmHunterText(
-                        text = episode.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = if (isExpanded) Int.MAX_VALUE else 1,
-                        overflow = TextOverflow.Ellipsis
+                        text = "Imagen no disponible",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
                     )
+                }
+            }
 
-                    Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.width(12.dp))
 
+            // Info del episodio
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                // Título
+                FilmHunterText(
+                    text = "${episode.episodeNumber}- ${episode.title}",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(Modifier.height(4.dp))
+
+                if (episode.releaseDate.isNotEmpty()) {
                     // Fecha
                     FilmHunterText(
                         text = episode.releaseDate,
                         style = MaterialTheme.typography.bodySmall
                     )
+                } else {
+                    FilmHunterText(
+                        text = "Fecha no disponible",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
 
-                    Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(4.dp))
 
-                    // Rating + votos + duración
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Estrella
+                // Rating + votos + duración
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Estrella
+                    FilmHunterText(
+                        text = "★",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    Spacer(Modifier.width(4.dp))
+
+                    FilmHunterText(
+                        text = String.format(Locale.US, "%.1f", episode.voteAverage),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    Spacer(Modifier.width(4.dp))
+
+                    FilmHunterText(
+                        text = "(${episode.voteCount})",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+
+                    episode.runtime?.let {
+                        Spacer(Modifier.width(8.dp))
                         FilmHunterText(
-                            text = "★",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Spacer(Modifier.width(4.dp))
-
-                        FilmHunterText(
-                            text = String.format(Locale.US, "%.1f", episode.voteAverage),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Spacer(Modifier.width(4.dp))
-
-                        FilmHunterText(
-                            text = "(${episode.voteCount})",
+                            text = "$it min",
                             style = MaterialTheme.typography.bodySmall
                         )
-
-                        episode.runtime?.let {
-                            Spacer(Modifier.width(8.dp))
-                            FilmHunterText(
-                                text = "$it min",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
                     }
                 }
             }
-            // OVERVIEW DESPLEGABLE
-            AnimatedVisibility(
-                visible = isExpanded,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                FilmHunterText(
-                    modifier = Modifier.padding(top = 8.dp),
-                    text = episode.overview,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Justify,
-                )
-            }
+        }
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            FilmHunterText(
+                modifier = Modifier.padding(top = 8.dp),
+                text = episode.overview,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Justify,
+            )
         }
     }
 }
