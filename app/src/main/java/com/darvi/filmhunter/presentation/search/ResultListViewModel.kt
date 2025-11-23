@@ -2,11 +2,11 @@ package com.darvi.filmhunter.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.entity.movie.MovieEntity
-import com.darvi.filmhunter.domain.entity.series.SeriesEntity
 import com.darvi.filmhunter.domain.usecase.movie.SearchMoviesByTitle
 import com.darvi.filmhunter.domain.usecase.series.SearchSeriesByTitle
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,15 +16,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class QueryListViewModel @Inject constructor(
+class ResultListViewModel @Inject constructor(
     private val searchMoviesByTitle: SearchMoviesByTitle,
     private val searchSeriesByTitle: SearchSeriesByTitle
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(QueryListUiState())
-    val uiState: StateFlow<QueryListUiState> = _uiState
+    private val _uiState = MutableStateFlow(ResultListUiState())
+    val uiState: StateFlow<ResultListUiState> = _uiState
 
-    fun onScreenParamsLoad(
+    fun onQueryParamsLoad(
         q: String,
         filmType: Int
     ) {
@@ -38,8 +38,7 @@ class QueryListViewModel @Inject constructor(
                     endReached = false,
                     currentPage = 1,
                     filmTypeSelected = type,
-                    moviesFound = emptyList(),
-                    seriesFound = emptyList()
+                    filmsFound = emptyList()
                 )
             }
             loadPage(page = 1, isFirstPage = true)
@@ -61,14 +60,14 @@ class QueryListViewModel @Inject constructor(
 
             when (_uiState.value.filmTypeSelected) {
                 FilmType.MOVIE -> {
-                    val newMovies = searchMoviesByTitle(_uiState.value.searchQuery, page)
+                    val newMovies = searchMoviesByTitle(_uiState.value.searchQuery, page).map { it.toUiModel() }
 
                     _uiState.update { state ->
                         val allMovies =
-                            if (isFirstPage) newMovies else state.moviesFound + newMovies
+                            if (isFirstPage) newMovies else state.filmsFound + newMovies
 
                         state.copy(
-                            moviesFound = allMovies,
+                            filmsFound = allMovies,
                             isSearching = false,
                             isLoadingMore = false,
                             endReached = newMovies.isEmpty(),
@@ -78,14 +77,14 @@ class QueryListViewModel @Inject constructor(
                 }
 
                 FilmType.SERIES -> {
-                    val newSeries = searchSeriesByTitle(_uiState.value.searchQuery, page)
+                    val newSeries = searchSeriesByTitle(_uiState.value.searchQuery, page).map { it.toUiModel() }
 
                     _uiState.update { state ->
                         val allSeries =
-                            if (isFirstPage) newSeries else state.seriesFound + newSeries
+                            if (isFirstPage) newSeries else state.filmsFound + newSeries
 
                         state.copy(
-                            seriesFound = allSeries,
+                            filmsFound = allSeries,
                             isSearching = false,
                             isLoadingMore = false,
                             endReached = newSeries.isEmpty(),
@@ -98,13 +97,12 @@ class QueryListViewModel @Inject constructor(
     }
 }
 
-data class QueryListUiState(
+data class ResultListUiState(
     val searchQuery: String = "",
     val isSearching: Boolean = false,
     val isLoadingMore: Boolean = false,
     val endReached: Boolean = false,
     val currentPage: Int = 1,
-    val moviesFound: List<MovieEntity> = emptyList(),
-    val seriesFound: List<SeriesEntity> = emptyList(),
+    val filmsFound: List<FilmUiModel> = emptyList(),
     val filmTypeSelected: FilmType = FilmType.MOVIE,
 )
