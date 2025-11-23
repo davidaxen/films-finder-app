@@ -127,6 +127,7 @@ fun SearchScreen(
                 items(WatchProvider.entries) { watchProvider ->
                     SearchFilterChip(
                         isSelected = uiState.watchProviderSelected == watchProvider,
+                        imageUrl = watchProvider.logoPath,
                         text = watchProvider.title
                     ) {
                         searchViewModel.onWatchProviderSelected(watchProvider)
