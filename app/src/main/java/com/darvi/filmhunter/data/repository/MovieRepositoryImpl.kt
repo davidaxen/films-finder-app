@@ -25,6 +25,15 @@ class MovieRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getMoviesByGenres(
+        genres: String,
+        page: Int
+    ): List<MovieEntity> {
+        return api.getMoviesByGenres(genres = genres, page = page).results.map {
+            it.toDomain()
+        }
+    }
+
     override suspend fun getMovieById(id: Int): MovieDetailEntity {
         return api
             .getMovieById(id = id)

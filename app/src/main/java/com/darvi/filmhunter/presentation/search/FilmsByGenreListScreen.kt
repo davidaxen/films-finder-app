@@ -7,12 +7,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.darvi.filmhunter.domain.entity.movie.MovieGenre
+import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.search.components.ResultList
 
 @Composable
-fun QueryListScreen(
+fun FilmsByGenreListScreen(
     resultListViewModel: ResultListViewModel = hiltViewModel(),
-    query: String,
+    genre: Int,
     filmType: Int,
     onFilmClick: (Int, Int) -> Unit,
     onBackPress: () -> Unit
@@ -20,13 +22,17 @@ fun QueryListScreen(
     val uiState by resultListViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        resultListViewModel.onQueryParamsLoad(q = query, filmType = filmType)
+        resultListViewModel.onGenresParamsLoad(genre = genre, filmType = filmType)
+    }
+    val title = when (uiState.filmTypeSelected) {
+        FilmType.MOVIE -> "Películas de ${MovieGenre.fromId(genre)?.displayName}"
+        FilmType.SERIES -> "Series de ${MovieGenre.fromId(genre)?.displayName}"
     }
 
     ResultList(
         modifier = Modifier.fillMaxSize(),
         films = uiState.filmsFound,
-        title = "\"${uiState.searchQuery}\"",
+        title = title,
         isSearching = uiState.isSearching,
         isLoadingMore = uiState.isLoadingMore,
         endReached = uiState.endReached,

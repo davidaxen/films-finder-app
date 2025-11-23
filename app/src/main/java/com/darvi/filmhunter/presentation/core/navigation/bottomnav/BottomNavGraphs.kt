@@ -12,6 +12,7 @@ import com.darvi.filmhunter.presentation.core.navigation.ProfileRoutes
 import com.darvi.filmhunter.presentation.core.navigation.SearchRoutes
 import com.darvi.filmhunter.presentation.list.movie.MovieListScreen
 import com.darvi.filmhunter.presentation.list.series.SeriesListScreen
+import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.QueryListScreen
 import com.darvi.filmhunter.presentation.search.SearchScreen
 
@@ -42,6 +43,14 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
                             filmType = type
                         )
                     )
+                },
+                onSearchByGenres = { genre, type ->
+                    navController.navigate(
+                        SearchRoutes.FilmsGenreList(
+                            genre = genre,
+                            filmType = type
+                        )
+                    )
                 }
             )
         }
@@ -49,6 +58,19 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
             val data = stackEntry.toRoute<SearchRoutes.QueryList>()
             QueryListScreen(
                 query = data.query,
+                filmType = data.filmType,
+                onFilmClick = { id, type ->
+                    navController.navigate(
+                        MainGraph.Detail(id = id, filmType = type)
+                    )
+                },
+                onBackPress = { navController.popBackStack() }
+            )
+        }
+        composable<SearchRoutes.FilmsGenreList> { stackEntry ->
+            val data = stackEntry.toRoute<SearchRoutes.FilmsGenreList>()
+            FilmsByGenreListScreen(
+                genre = data.genre,
                 filmType = data.filmType,
                 onFilmClick = { id, type ->
                     navController.navigate(

@@ -45,6 +45,12 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    fun onGenreClicked(id: Int) {
+        _uiState.update {
+            it.copy(genreSelected = id)
+        }
+    }
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     fun onSearch() {
         viewModelScope.launch {
@@ -95,7 +101,8 @@ class SearchViewModel @Inject constructor(
         if (type != _uiState.value.filmTypeSelected) {
             _uiState.update {
                 it.copy(
-                    filmTypeSelected = type
+                    filmTypeSelected = type,
+                    genreSelected = null
                 )
             }
         }
@@ -120,6 +127,7 @@ class SearchViewModel @Inject constructor(
 
 data class SearchUiState(
     val searchQuery: String = "",
+    val genreSelected: Int? = null,
     val isSearching: Boolean = false,
     val moviesFound: List<MovieEntity> = emptyList(),
     val seriesFound: List<SeriesEntity> = emptyList(),

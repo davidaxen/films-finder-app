@@ -20,6 +20,13 @@ interface MovieApiService {
         @Query("language") language: String = "es-ES"
     ): MovieResponse
 
+    @GET("discover/movie")
+    suspend fun getMoviesByGenres(
+        @Query("with_genres") genres: String,
+        @Query("page") page: Int = 1,
+        @Query("language") language: String = "es-ES"
+    ): MovieResponse
+
     @GET("movie/{id}")
     suspend fun getMovieById(
         @Path("id") id: Int,

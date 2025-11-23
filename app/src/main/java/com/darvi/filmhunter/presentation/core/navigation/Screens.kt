@@ -29,6 +29,7 @@ interface HomeRoutes {
 interface SearchRoutes {
     @Serializable object Main
     @Serializable data class QueryList(val query: String, val filmType: Int)
+    @Serializable data class FilmsGenreList(val genre: Int, val filmType: Int)
 }
 
 interface FavRoutes {
