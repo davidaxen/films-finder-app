@@ -47,11 +47,11 @@ fun DetailScreen(
 ) {
     val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
 
-    val listState = rememberSaveable(
-        saver = LazyListState.Saver
-    ) {
-        LazyListState()
-    }
+    val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+
+    val seasonsListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+
+    val recommendationsListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
 
     LaunchedEffect(filmId) {
         detailViewModel.getDetail(filmId, filmType)
@@ -76,6 +76,8 @@ fun DetailScreen(
                 onBackClick = onBackClick,
                 onSeasonClick = onSeasonClick,
                 listState = listState,
+                seasonsListState = seasonsListState,
+                recommendationsListState = recommendationsListState,
                 onSaveClick = { detailViewModel.onSaveFilm() },
                 onFilmRecommendedClick = onFilmRecommendedClick
             )
@@ -90,7 +92,9 @@ fun DetailContent(
     onSeasonClick: ((Int, Int) -> Unit)? = null,
     onSaveClick: () -> Unit,
     listState: LazyListState,
-    onBackClick: () -> Unit
+    seasonsListState: LazyListState,
+    recommendationsListState: LazyListState,
+    onBackClick: () -> Unit,
 ) {
     val darkenFraction by remember {
         derivedStateOf {
@@ -149,6 +153,7 @@ fun DetailContent(
                     SeasonsSection(
                         seasons = film.seasons,
                         seriesId = film.id,
+                        listState = seasonsListState,
                         onSeasonClick = onSeasonClick
                     )
                 }
@@ -158,7 +163,8 @@ fun DetailContent(
                 item {
                     Spacer(Modifier.height(24.dp))
                     RecommendationSection(
-                        film.recommendations,
+                        films = film.recommendations,
+                        listState = recommendationsListState,
                         onFilmClick = onFilmRecommendedClick
                     )
                 }

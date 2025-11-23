@@ -14,7 +14,7 @@ import kotlin.collections.plus
 data class SeasonDetailResponse(
     @SerialName("name") val title: String,
     @SerialName("poster_path") val posterPath: String? = null,
-    @SerialName("air_date") val releaseDate: String,
+    @SerialName("air_date") val releaseDate: String?,
     @SerialName("vote_average") val voteAverage: Double,
     @SerialName("watch/providers") val watchProviders: WatchProviderResponse,
     val overview: String,
@@ -48,7 +48,7 @@ fun SeasonDetailResponse.toDomain(): SeasonDetailEntity {
         title = title,
         description = overview,
         posterPath = posterPath,
-        releaseDate = releaseDate,
+        releaseDate = releaseDate ?: "",
         voteAverage = voteAverage,
         episodes = episodes.map { it.toDomain() },
         watchProviders = providers

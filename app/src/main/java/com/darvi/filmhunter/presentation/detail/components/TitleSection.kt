@@ -54,10 +54,12 @@ fun TitleSection(
             Spacer(Modifier.height(4.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                FilmHunterText(
-                    text = releaseDate,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
-                )
+                if (releaseDate.isNotEmpty()) {
+                    FilmHunterText(
+                        text = releaseDate,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                    )
+                }
 
                 runtime?.let {
                     FilmHunterText(
