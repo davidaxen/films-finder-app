@@ -13,7 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.darvi.filmhunter.domain.entity.MovieGenre
+import com.darvi.filmhunter.domain.entity.movie.MovieGenre
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 
 @OptIn(ExperimentalLayoutApi::class)

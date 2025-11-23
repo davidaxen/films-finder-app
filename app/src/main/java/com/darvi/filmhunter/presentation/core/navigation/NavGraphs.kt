@@ -12,6 +12,7 @@ import com.darvi.filmhunter.presentation.core.navigation.bottomnav.homeGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.profileGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.searchGraph
 import com.darvi.filmhunter.presentation.detail.DetailScreen
+import com.darvi.filmhunter.presentation.detail.SeasonDetailScreen
 
 fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation<AppGraph.Auth>(startDestination = AuthRoutes.Login) {
@@ -41,6 +42,25 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             val data = stackEntry.toRoute<MainGraph.Detail>()
             DetailScreen(
                 filmId = data.id,
+                filmType = data.filmType,
+                onSeasonClick = { seriesId, seasonNumber ->
+                    navController.navigate(
+                        MainGraph.SeasonDetail(seriesId = seriesId, seasonNumber = seasonNumber)
+                    )
+                },
+                onFilmRecommendedClick =  { id, type ->
+                    navController.navigate(
+                        MainGraph.Detail(id = id, filmType = type)
+                    )
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+        composable<MainGraph.SeasonDetail> { stackEntry ->
+            val data = stackEntry.toRoute<MainGraph.SeasonDetail>()
+            SeasonDetailScreen(
+                seriesId = data.seriesId,
+                seasonNumber = data.seasonNumber,
                 onBackClick = { navController.popBackStack() }
             )
         }

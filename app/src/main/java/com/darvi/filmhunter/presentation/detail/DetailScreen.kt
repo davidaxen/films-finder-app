@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,7 +30,9 @@ import com.darvi.filmhunter.presentation.detail.components.DetailHeader
 import com.darvi.filmhunter.presentation.detail.components.DetailInfoSection
 import com.darvi.filmhunter.presentation.detail.components.GenresSection
 import com.darvi.filmhunter.presentation.detail.components.OverviewSection
+import com.darvi.filmhunter.presentation.detail.components.RecommendationSection
 import com.darvi.filmhunter.presentation.detail.components.SeasonsSection
+import com.darvi.filmhunter.presentation.detail.components.WatchProvidersSection
 import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
 import kotlin.math.min
 
@@ -35,12 +40,21 @@ import kotlin.math.min
 fun DetailScreen(
     detailViewModel: DetailViewModel = hiltViewModel(),
     filmId: Int,
+    filmType: Int,
+    onSeasonClick: ((Int, Int) -> Unit)? = null,
+    onFilmRecommendedClick: (Int, Int) -> Unit,
     onBackClick: () -> Unit
 ) {
     val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
 
+    val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+
+    val seasonsListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+
+    val recommendationsListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+
     LaunchedEffect(filmId) {
-        detailViewModel.getDetail(filmId)
+        detailViewModel.getDetail(filmId, filmType)
     }
 
     when {
@@ -59,7 +73,13 @@ fun DetailScreen(
         else -> {
             DetailContent(
                 film = uiState.film,
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                onSeasonClick = onSeasonClick,
+                listState = listState,
+                seasonsListState = seasonsListState,
+                recommendationsListState = recommendationsListState,
+                onSaveClick = { detailViewModel.onSaveFilm() },
+                onFilmRecommendedClick = onFilmRecommendedClick
             )
         }
     }
@@ -68,14 +88,21 @@ fun DetailScreen(
 @Composable
 fun DetailContent(
     film: FilmDetailUiModel,
-    onBackClick: () -> Unit
+    onFilmRecommendedClick: (Int, Int) -> Unit,
+    onSeasonClick: ((Int, Int) -> Unit)? = null,
+    onSaveClick: () -> Unit,
+    listState: LazyListState,
+    seasonsListState: LazyListState,
+    recommendationsListState: LazyListState,
+    onBackClick: () -> Unit,
 ) {
-    val listState = rememberLazyListState()
-
-    val maxOffsetPx = 1000
-    val scrollOffset = min(listState.firstVisibleItemScrollOffset, maxOffsetPx)
-    val rawFraction = scrollOffset / maxOffsetPx.toFloat()
-    val darkenFraction = (rawFraction * rawFraction)
+    val darkenFraction by remember {
+        derivedStateOf {
+            val scrollOffset = min(listState.firstVisibleItemScrollOffset, 1000)
+            val rawFraction = scrollOffset / 1000f
+            rawFraction * rawFraction
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -89,14 +116,25 @@ fun DetailContent(
         ) {
             item {
                 DetailHeader(
-                    film = film,
-                    darkenFraction  = darkenFraction
+                    title = film.title,
+                    posterPath = film.posterPath,
+                    releaseDate = film.year,
+                    runtime = film.runtime,
+                    filmType = film.type,
+                    rating = film.rating,
+                    voteCount = film.voteCount,
+                    isSaved = film.isSaved,
+                    onSaveClick = onSaveClick,
+                    darkenFraction = darkenFraction,
                 )
             }
 
-            item {
-                Spacer(Modifier.height(16.dp))
-                DetailInfoSection(film = film)
+            if (film.originalTitle.isNotBlank() && film.originalTitle != film.title) {
+                item {
+                    Spacer(Modifier.height(8.dp))
+                    DetailInfoSection(film = film)
+                    Spacer(Modifier.height(12.dp))
+                }
             }
 
             item {
@@ -112,7 +150,30 @@ fun DetailContent(
             if (film.seasons.isNotEmpty()) {
                 item {
                     Spacer(Modifier.height(24.dp))
-                    SeasonsSection(seasons = film.seasons)
+                    SeasonsSection(
+                        seasons = film.seasons,
+                        seriesId = film.id,
+                        listState = seasonsListState,
+                        onSeasonClick = onSeasonClick
+                    )
+                }
+            }
+
+            if (film.recommendations.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(24.dp))
+                    RecommendationSection(
+                        films = film.recommendations,
+                        listState = recommendationsListState,
+                        onFilmClick = onFilmRecommendedClick
+                    )
+                }
+            }
+
+            if (film.watchProviders.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(24.dp))
+                    WatchProvidersSection(providers = film.watchProviders)
                 }
             }
 

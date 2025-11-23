@@ -1,8 +1,13 @@
 package com.darvi.filmhunter.presentation.detail.model
 
-import com.darvi.filmhunter.domain.entity.MovieDetailEntity
-import com.darvi.filmhunter.domain.entity.MovieGenre
+import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
+import com.darvi.filmhunter.domain.entity.movie.MovieGenre
+import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesSeasonEntity
+import com.darvi.filmhunter.domain.entity.WatchProviderEntity
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.toUiModel
 
 data class FilmDetailUiModel(
     val id: Int,
@@ -17,7 +22,10 @@ data class FilmDetailUiModel(
     val voteCount: Int,
     val genres: List<MovieGenre>,
     val type: FilmType,
-    val seasons: List<SeasonUiModel> = emptyList()
+    val isSaved: Boolean = false,
+    val watchProviders: List<WatchProviderEntity>,
+    val seasons: List<SeriesSeasonEntity> = emptyList(),
+    val recommendations: List<FilmUiModel>
 ) {
     companion object {
         fun empty() = FilmDetailUiModel(
@@ -33,7 +41,9 @@ data class FilmDetailUiModel(
             voteCount = 0,
             genres = emptyList(),
             type = FilmType.MOVIE,
-            seasons = emptyList()
+            seasons = emptyList(),
+            watchProviders = emptyList(),
+            recommendations = emptyList()
         )
     }
 }
@@ -52,21 +62,30 @@ fun MovieDetailEntity.toUiModel(): FilmDetailUiModel {
         voteCount = voteCount,
         genres = genres,
         type = FilmType.MOVIE,
-        seasons = emptyList() // pelis no tienen temporadas
+        isSaved = isSaved,
+        watchProviders = watchProviders,
+        recommendations = recommendations.map { it.toUiModel() }
     )
 }
 
-//fun SeriesDetail.toUiModel(type: FilmType) = FilmDetailUiModel(
-//    id = id,
-//    title = name,
-//    year = year,
-//    overview = overview,
-//    posterUrl = posterUrl,
-//    backdropUrl = backdropUrl,
-//    rating = voteAverage,
-//    genres = genres,
-//    type = type,
-//    seasons = seasons.map { it.toUiModel() }
-//)
+fun SeriesDetailEntity.toUiModel(): FilmDetailUiModel{
+    return FilmDetailUiModel(
+        id = id,
+        title = title,
+        description = overview,
+        originalTitle = originalTitle,
+        posterPath = posterPath,
+        backdropPath = backdropPath,
+        year = releaseDate.take(4),
+        rating = voteAverage,
+        voteCount = voteCount,
+        genres = genres,
+        type = FilmType.SERIES,
+        isSaved = isSaved,
+        seasons = seasons,
+        watchProviders = watchProviders,
+        recommendations = recommendations.map { it.toUiModel() }
+    )
+}
 
 

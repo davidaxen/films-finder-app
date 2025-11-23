@@ -2,9 +2,9 @@ package com.darvi.filmhunter.presentation.list.series
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.usecase.list.GetSeriesList
-import com.darvi.filmhunter.presentation.list.model.FilmUiModel
-import com.darvi.filmhunter.presentation.list.model.toUiModel
+import com.darvi.filmhunter.domain.usecase.series.GetSeriesList
+import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

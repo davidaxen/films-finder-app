@@ -10,6 +10,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.postgrest
 import javax.inject.Singleton
 
 @Module
@@ -31,5 +32,11 @@ object SupabaseModule {
     @Singleton
     fun provideSupabaseAuth(client: SupabaseClient): Auth {
         return client.auth
+    }
+
+    @Provides
+    @Singleton
+    fun provideSupabaseDtabase(client: SupabaseClient): Postgrest {
+        return client.postgrest
     }
 }

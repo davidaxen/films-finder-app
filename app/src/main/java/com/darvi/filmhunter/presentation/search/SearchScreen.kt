@@ -36,23 +36,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.darvi.filmhunter.domain.entity.MovieEntity
-import com.darvi.filmhunter.domain.entity.MovieGenre
-import com.darvi.filmhunter.domain.entity.SeriesEntity
-import com.darvi.filmhunter.domain.entity.SeriesGenre
+import com.darvi.filmhunter.domain.entity.movie.MovieEntity
+import com.darvi.filmhunter.domain.entity.movie.MovieGenre
+import com.darvi.filmhunter.domain.entity.series.SeriesEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesGenre
 import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.search.components.SearchBarItem
 import com.darvi.filmhunter.presentation.search.components.SearchFilterChip
 import com.darvi.filmhunter.presentation.search.components.SearchItemsHeader
-import com.darvi.filmhunter.presentation.search.components.SearchResultCard
+import com.darvi.filmhunter.presentation.core.components.FilmResultCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel = hiltViewModel(),
-    onFilmClick: (Int) -> Unit,
+    onFilmClick: (Int, Int) -> Unit,
     onSeeAllClick: (String, Int) -> Unit
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -171,7 +171,7 @@ fun SearchedFilmsList(
     moviesFound: List<MovieEntity>,
     seriesFound: List<SeriesEntity>,
     onSeeAllClick: (FilmType) -> Unit,
-    onFilmClick: (Int) -> Unit
+    onFilmClick: (Int, Int) -> Unit
 ) {
     AnimatedVisibility(
         visible = isVisible,
@@ -223,11 +223,11 @@ fun SearchedFilmsList(
                         }
                     }
                     items(moviesToShow) { item ->
-                        SearchResultCard(
+                        FilmResultCard(
                             title = item.title,
                             posterPath = item.posterPath,
-                            year = item.releaseDate.take(4),
-                            onClick = { onFilmClick(item.id) }
+                            subtitle = item.releaseDate.take(4),
+                            onClick = { onFilmClick(item.id, FilmType.MOVIE.value) }
                         )
                     }
                 }
@@ -246,11 +246,11 @@ fun SearchedFilmsList(
                         }
                     }
                     items(seriesToShow) { item ->
-                        SearchResultCard(
+                        FilmResultCard(
                             title = item.title,
                             posterPath = item.posterPath,
-                            year = item.releaseDate.take(4),
-                            onClick = { onFilmClick(item.id) }
+                            subtitle = item.releaseDate.take(4),
+                            onClick = { onFilmClick(item.id, FilmType.SERIES.value) }
                         )
                     }
                 }

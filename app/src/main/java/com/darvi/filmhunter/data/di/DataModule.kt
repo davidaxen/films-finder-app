@@ -2,6 +2,8 @@ package com.darvi.filmhunter.data.di
 
 import com.darvi.filmhunter.data.datasource.SupabaseAuthDataSource
 import com.darvi.filmhunter.data.datasource.SupabaseAuthDataSourceImpl
+import com.darvi.filmhunter.data.datasource.SupabaseDatabaseDataSource
+import com.darvi.filmhunter.data.datasource.SupabaseDatabaseDataSourceImpl
 import com.darvi.filmhunter.data.repository.AuthRepositoryImpl
 import com.darvi.filmhunter.data.repository.MovieRepositoryImpl
 import com.darvi.filmhunter.data.repository.SessionRepositoryImpl
@@ -17,6 +19,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.postgrest.Postgrest
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -44,14 +47,20 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideSeriesRepository(api: SeriesApiService): SeriesRepository {
-        return SeriesRepositoryImpl(api)
+    fun provideSupabaseDatabaseDataSource(database: Postgrest): SupabaseDatabaseDataSource {
+        return SupabaseDatabaseDataSourceImpl(database)
     }
 
     @Provides
     @Singleton
-    fun provideMovieRepository(api: MovieApiService): MovieRepository {
-        return MovieRepositoryImpl(api)
+    fun provideSeriesRepository(api: SeriesApiService, database: SupabaseDatabaseDataSource): SeriesRepository {
+        return SeriesRepositoryImpl(api, database)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMovieRepository(api: MovieApiService, database: SupabaseDatabaseDataSource): MovieRepository {
+        return MovieRepositoryImpl(api, database)
     }
 
     @Provides

@@ -1,4 +1,6 @@
-package com.darvi.filmhunter.domain.entity
+package com.darvi.filmhunter.domain.entity.movie
+
+import com.darvi.filmhunter.domain.entity.WatchProviderEntity
 
 data class MovieDetailEntity(
     val id: Int,
@@ -11,5 +13,8 @@ data class MovieDetailEntity(
     val releaseDate: String,
     val voteAverage: Double,
     val voteCount: Int,
-    val genres: List<MovieGenre>
+    val isSaved: Boolean = false,
+    val genres: List<MovieGenre>,
+    val watchProviders: List<WatchProviderEntity>,
+    val recommendations: List<MovieEntity>,
 )

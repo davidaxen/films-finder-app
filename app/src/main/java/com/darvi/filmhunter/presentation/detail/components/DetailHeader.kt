@@ -12,12 +12,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
+import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
-import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
 
 @Composable
 fun DetailHeader(
-    film: FilmDetailUiModel,
+    title: String,
+    posterPath: String? = null,
+    releaseDate: String,
+    runtime: Int? = null,
+    filmType: FilmType? = null,
+    isSaved: Boolean? = null,
+    onSaveClick: (() -> Unit)? = null,
+    rating: Double,
+    voteCount: Int? = null,
     darkenFraction: Float,
 ) {
     val fraction = darkenFraction.coerceIn(0f, 1f)
@@ -29,10 +37,10 @@ fun DetailHeader(
             .aspectRatio(0.66f)
     ) {
         // Backdrop
-        if (film.posterPath != null) {
+        if (posterPath != null) {
             AsyncImage(
-                model = ImageUrlHelper.getOriginalUrl(film.posterPath),
-                contentDescription = "${film.title} backdrop",
+                model = ImageUrlHelper.getOriginalUrl(posterPath),
+                contentDescription = "$title backdrop",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -70,7 +78,14 @@ fun DetailHeader(
 
         TitleSection(
             modifier = Modifier.align(Alignment.BottomStart),
-            film = film
+            title = title,
+            releaseDate = releaseDate,
+            runtime = runtime,
+            filmType = filmType,
+            isSaved = isSaved,
+            onSaveClick = onSaveClick,
+            rating = rating,
+            voteCount = voteCount,
         )
     }
 }
