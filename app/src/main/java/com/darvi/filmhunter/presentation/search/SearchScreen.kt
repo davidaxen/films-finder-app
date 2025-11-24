@@ -36,23 +36,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.domain.entity.movie.MovieEntity
 import com.darvi.filmhunter.domain.entity.movie.MovieGenre
 import com.darvi.filmhunter.domain.entity.series.SeriesEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesGenre
-import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
+import com.darvi.filmhunter.presentation.core.components.FilmResultCard
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.search.components.SearchBarItem
 import com.darvi.filmhunter.presentation.search.components.SearchFilterChip
 import com.darvi.filmhunter.presentation.search.components.SearchItemsHeader
-import com.darvi.filmhunter.presentation.core.components.FilmResultCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel = hiltViewModel(),
     onFilmClick: (Int, Int) -> Unit,
+    onSearchByGenres: (Int, Int) -> Unit,
     onSeeAllClick: (String, Int) -> Unit
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -127,6 +128,7 @@ fun SearchScreen(
                 items(WatchProvider.entries) { watchProvider ->
                     SearchFilterChip(
                         isSelected = uiState.watchProviderSelected == watchProvider,
+                        imageUrl = watchProvider.logoPath,
                         text = watchProvider.title
                     ) {
                         searchViewModel.onWatchProviderSelected(watchProvider)
@@ -145,7 +147,10 @@ fun SearchScreen(
                         genreGrid(
                             items = MovieGenre.entries.toList(),
                             label = { it.displayName },
-                            onClick = { /*genre -> onMovieGenreClick(genre)*/ }
+                            onClick = { genre ->
+                                searchViewModel.onGenreClicked(genre.id)
+                                onSearchByGenres(genre.id, FilmType.MOVIE.value)
+                            }
                         )
                     }
 
@@ -153,7 +158,10 @@ fun SearchScreen(
                         genreGrid(
                             items = SeriesGenre.entries.toList(),
                             label = { it.displayName },
-                            onClick = { /*genre -> onSeriesGenreClick(genre)*/ }
+                            onClick = { genre ->
+                                searchViewModel.onGenreClicked(genre.id)
+                                onSearchByGenres(genre.id, FilmType.SERIES.value)
+                            }
                         )
                     }
                 }

@@ -26,6 +26,15 @@ class SeriesRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getSeriesByGenres(
+        genres: String,
+        page: Int
+    ): List<SeriesEntity> {
+        return api.getSeriesByGenres(genres = genres, page = page).results.map {
+            it.toDomain()
+        }
+    }
+
     override suspend fun getSeriesById(id: Int): SeriesDetailEntity {
         return api
             .getSeriesById(id = id)
