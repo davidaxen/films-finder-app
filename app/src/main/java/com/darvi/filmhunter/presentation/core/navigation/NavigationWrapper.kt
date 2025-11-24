@@ -22,13 +22,17 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.darvi.filmhunter.presentation.core.SessionState
+import com.darvi.filmhunter.presentation.core.SessionViewModel
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
-import com.darvi.filmhunter.presentation.core.navigation.bottomnav.BottomBar
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.navigation.bottomnav.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationWrapper() {
+fun NavigationWrapper(
+    sessionViewModel: SessionViewModel,
+) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
@@ -92,7 +96,10 @@ fun NavigationWrapper() {
 
             NavHost(
                 navController = navController,
-                startDestination = AppGraph.Main,
+                startDestination = if (sessionViewModel.sessionState.value is SessionState.Authenticated)
+                                        AppGraph.Main
+                                    else
+                                        AppGraph.Auth,
             ) {
                 authGraph(navController)
                 mainGraph(navController)

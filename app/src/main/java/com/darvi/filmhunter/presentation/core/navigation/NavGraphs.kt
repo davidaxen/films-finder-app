@@ -18,6 +18,12 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation<AppGraph.Auth>(startDestination = AuthRoutes.Login) {
         composable<AuthRoutes.Login> {
             LoginScreen(
+                navigateToMain = {
+                    navController.navigate(AppGraph.Main) {
+                        popUpTo(AppGraph.Auth) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                 },
                 navigateToRegister = { navController.navigate(AuthRoutes.Register) },
                 navigateToForgotPassword = {}
             )
@@ -32,7 +38,6 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
 }
 
 fun NavGraphBuilder.mainGraph(navController: NavController) {
-//    navigation<AppGraph.Main>(startDestination = MainGraph.Home) {
     navigation<AppGraph.Main>(startDestination = MainGraph.Search) {
         homeGraph(navController)
         searchGraph(navController)
