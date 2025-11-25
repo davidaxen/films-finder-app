@@ -2,38 +2,26 @@ package com.darvi.filmhunter.presentation.core
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darvi.filmhunter.domain.entity.UserEntity
-import com.darvi.filmhunter.domain.usecase.auth.GetCurrentUser
+import com.darvi.filmhunter.domain.entity.SessionState
+import com.darvi.filmhunter.domain.usecase.auth.GetCurrentSession
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class SessionViewModel @Inject constructor(
-    private val getCurrentUser: GetCurrentUser
+//    private val getCurrentUser: GetCurrentUser,
+    getCurrentSession: GetCurrentSession
 ) : ViewModel() {
-    private val _sessionState = MutableStateFlow<SessionState>(SessionState.Loading)
-    val sessionState: StateFlow<SessionState> = _sessionState
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            getCurrentUser().collectLatest { user ->
-                _sessionState.value = if (user != null) {
-                    SessionState.Authenticated(user)
-                } else {
-                    SessionState.Unauthenticated
-                }
-            }
-        }
-    }
-}
+    val sessionState: StateFlow<SessionState> =
+        getCurrentSession()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = SessionState.Loading
+            )
 
-sealed interface SessionState {
-    data object Loading : SessionState
-    data class Authenticated(val user: UserEntity) : SessionState
-    data object Unauthenticated : SessionState
 }

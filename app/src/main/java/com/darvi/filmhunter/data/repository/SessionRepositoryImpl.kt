@@ -1,38 +1,53 @@
 package com.darvi.filmhunter.data.repository
 
 import com.darvi.filmhunter.data.datasource.SupabaseAuthDataSource
+import com.darvi.filmhunter.data.model.UserModel
 import com.darvi.filmhunter.data.model.toDomain
+import com.darvi.filmhunter.domain.entity.SessionState
 import com.darvi.filmhunter.domain.entity.UserEntity
 import com.darvi.filmhunter.domain.repository.SessionRepository
 import io.github.jan.supabase.auth.status.SessionStatus
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class SessionRepositoryImpl @Inject constructor(
     private val authDataSource: SupabaseAuthDataSource
 ): SessionRepository {
     private val _currentUser = MutableStateFlow<UserEntity?>(null)
-    override fun getCurrentUser(): Flow<UserEntity?> = _currentUser
+    override fun getCurrentUser(): StateFlow<UserEntity?> = _currentUser
 
-    init {
-        preloadSession()
-    }
-    private fun preloadSession() {
-        CoroutineScope(Dispatchers.IO).launch {
-            authDataSource.getCurrentUserFlow().collectLatest { status ->
+    override fun observeSession(): Flow<SessionState> {
+        return authDataSource.getCurrentUserFlow() // Flow<SessionStatus>
+            .map { status ->
+                delay(100)
                 when (status) {
                     is SessionStatus.Authenticated -> {
-                        _currentUser.value = authDataSource.getCurrentUser()?.toDomain()
+                        val user = status.session.user?.let {
+                            UserModel(
+                                uid = it.id,
+                                email = it.email ?: "",
+                                displayName = (it.userMetadata?.get("name") ?: "") as String
+                            ).toDomain()
+                        }
+
+                        if (user != null) {
+                            _currentUser.value = user
+                            SessionState.Authenticated(user)
+                        } else {
+                            SessionState.Unauthenticated
+                        }
                     }
-                    else -> {}
+
+                    is SessionStatus.NotAuthenticated -> SessionState.Unauthenticated
+                    else -> SessionState.Loading
                 }
             }
-        }
+            .distinctUntilChanged()
     }
 
     override fun setCurrentUser(user: UserEntity) {

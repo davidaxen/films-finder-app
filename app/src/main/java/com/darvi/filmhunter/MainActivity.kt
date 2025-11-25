@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.darvi.filmhunter.presentation.core.SessionState
+import com.darvi.filmhunter.domain.entity.SessionState
 import com.darvi.filmhunter.presentation.core.SessionViewModel
 import com.darvi.filmhunter.presentation.core.navigation.NavigationWrapper
 import com.darvi.filmhunter.ui.theme.FilmHunterTheme
@@ -24,7 +24,6 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition {
             sessionViewModel.sessionState.value is SessionState.Loading
         }
-
         setContent {
             FilmHunterTheme {
                 NavigationWrapper(

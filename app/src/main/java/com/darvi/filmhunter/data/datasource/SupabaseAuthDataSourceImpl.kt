@@ -24,7 +24,7 @@ class SupabaseAuthDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentUserFlow(): StateFlow<SessionStatus> {
+    override fun getCurrentUserFlow(): StateFlow<SessionStatus> {
         return auth.sessionStatus
     }
 
