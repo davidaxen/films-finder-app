@@ -34,8 +34,28 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onClick() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
-            val response = login(_uiState.value.email, _uiState.value.password)
+            val result = login(_uiState.value.email, _uiState.value.password)
+
+            result
+                .onSuccess { user ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            userIsLoggedIn = true,
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            userIsLoggedIn = false,
+                        )
+                    }
+                }
+
         }
     }
 
@@ -54,5 +74,6 @@ data class LoginUiState(
     val email: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
+    val userIsLoggedIn: Boolean = false,
     val isLoginEnabled: Boolean = true
 )

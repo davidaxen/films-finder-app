@@ -16,19 +16,25 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.darvi.filmhunter.domain.entity.SessionState
+import com.darvi.filmhunter.presentation.core.SessionViewModel
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
-import com.darvi.filmhunter.presentation.core.navigation.bottomnav.BottomBar
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.navigation.bottomnav.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationWrapper() {
+fun NavigationWrapper(
+    sessionViewModel: SessionViewModel,
+) {
+    val userSessionState by sessionViewModel.sessionState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
@@ -90,12 +96,24 @@ fun NavigationWrapper() {
                 }
             }
 
-            NavHost(
-                navController = navController,
-                startDestination = AppGraph.Main,
-            ) {
-                authGraph(navController)
-                mainGraph(navController)
+            when (val state = userSessionState) {
+                SessionState.Loading -> {
+                    // El splash de Android 12 sigue tapando esto gracias a setKeepOnScreenCondition.
+                    // Si quieres, puedes poner un loader interno si el splash ya no está:
+                    // Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                }
+                is SessionState.Authenticated, SessionState.Unauthenticated -> {
+                    NavHost(
+                        navController = navController,
+                        startDestination = if (state is SessionState.Authenticated)
+                                        AppGraph.Main
+                                    else
+                                        AppGraph.Auth,
+                    ) {
+                        authGraph(navController)
+                        mainGraph(navController)
+                    }
+                }
             }
         }
     }

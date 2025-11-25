@@ -77,6 +77,10 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.ktor.client.android)
 
+    //Splash Screen
+    implementation(libs.splash.screen)
+    implementation(libs.lottie.compose)
+
     //Images
     implementation(libs.coil.compose)
     implementation(libs.coil.okhttp)

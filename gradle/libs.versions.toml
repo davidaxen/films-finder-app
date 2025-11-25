@@ -18,6 +18,8 @@ ksp = "2.3.0"
 hilt-navigation = "1.3.0"
 retrofit = "3.0.0"
 coil = "3.3.0"
+splashVersion = "1.2.0"
+lottieComposeVer = "6.7.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +50,8 @@ supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt"
 supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil"}
 coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil"}
+splash-screen = { module = "androidx.core:core-splashscreen", version.ref = "splashVersion"}
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieComposeVer"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

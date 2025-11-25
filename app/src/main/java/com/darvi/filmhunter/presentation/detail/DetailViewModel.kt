@@ -1,6 +1,5 @@
 package com.darvi.filmhunter.presentation.detail
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.usecase.movie.GetMovieById
@@ -81,7 +80,6 @@ class DetailViewModel @Inject constructor(
                     FilmType.SERIES -> saveSeries(filmId)
                 }
             } catch (e: Exception) {
-                Log.i("DETAILVIEWMODEL SAVE FILM", e.toString())
                 _uiState.update {
                     it.copy(
                         film = it.film.copy(isSaved = !it.film.isSaved),
