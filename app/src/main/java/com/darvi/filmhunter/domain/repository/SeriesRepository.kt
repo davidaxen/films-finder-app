@@ -11,4 +11,5 @@ interface SeriesRepository {
     suspend fun getSeriesById(id: Int): SeriesDetailEntity
     suspend fun getSeriesSeasonDetail(seriesId: Int, seasonNumber: Int): SeasonDetailEntity
     suspend fun saveFilm(filmId: Int)
+    suspend fun getSavedFilms(): List<SeriesDetailEntity>
 }

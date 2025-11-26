@@ -13,12 +13,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.darvi.filmhunter.domain.entity.movie.MovieGenre
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
+import com.darvi.filmhunter.presentation.core.model.FilmGenreUiModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun GenresSection(genres: List<MovieGenre>) {
+fun GenresSection(genres: List<FilmGenreUiModel>) {
     if (genres.isEmpty()) return
 
     Column(

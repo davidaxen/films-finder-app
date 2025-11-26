@@ -11,7 +11,8 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
     override suspend fun saveFilm(filmId: Int, filmType: String) {
         val filmToSave = FilmsSavedDTO(
             filmId = filmId,
-            filmType = filmType
+            filmType = filmType,
+            createdAt = null
         )
         database.from("saved_films").insert(filmToSave)
     }
@@ -32,5 +33,18 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
             .countOrNull()
 
         return (resp ?: 0) > 0
+    }
+
+    override suspend fun getSavedFilmsId(filmType: String): List<FilmsSavedDTO> {
+        val resp = database
+            .from("saved_films")
+            .select {
+                filter {
+                    eq("film_type", filmType)
+                }
+            }
+            .decodeList<FilmsSavedDTO>()
+
+        return resp
     }
 }

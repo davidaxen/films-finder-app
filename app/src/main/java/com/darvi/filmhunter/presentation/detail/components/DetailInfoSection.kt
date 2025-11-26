@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
-import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
+import com.darvi.filmhunter.presentation.core.model.FilmDetailUiModel
 
 @Composable
 fun DetailInfoSection(film: FilmDetailUiModel) {

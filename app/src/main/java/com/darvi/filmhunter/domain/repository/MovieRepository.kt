@@ -9,4 +9,5 @@ interface MovieRepository {
     suspend fun getMoviesByGenres(genres: String, page: Int): List<MovieEntity>
     suspend fun getMovieById(id: Int): MovieDetailEntity
     suspend fun saveFilm(filmId: Int)
+    suspend fun getSavedFilms(): List<MovieDetailEntity>
 }

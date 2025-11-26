@@ -3,8 +3,8 @@ package com.darvi.filmhunter.data.model.series
 import com.darvi.filmhunter.data.model.GenreIdModel
 import com.darvi.filmhunter.data.model.WatchProviderResponse
 import com.darvi.filmhunter.data.model.toDomain
-import com.darvi.filmhunter.domain.entity.movie.MovieGenre
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesGenre
 import com.darvi.filmhunter.domain.entity.series.SeriesSeasonEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -56,7 +56,7 @@ fun SeriesDetailResponse.toDomain(): SeriesDetailEntity {
         releaseDate = releaseDate,
         voteAverage = voteAverage,
         voteCount = voteCount,
-        genres = genres.mapNotNull { MovieGenre.fromId(it.id) },
+        genres = genres.mapNotNull { SeriesGenre.fromId(it.id) },
         seasons = seasons.map { it.toDomain() },
         watchProviders = providers,
         recommendations = recommendations.results.map { it.toDomain() }

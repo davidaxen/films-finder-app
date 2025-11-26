@@ -15,6 +15,7 @@ fun FilmHunterText(
     text: String,
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = 1,
     color: Color = MaterialTheme.colorScheme.onBackground,
     style: TextStyle = MaterialTheme.typography.bodyMedium,
     overflow: TextOverflow = TextOverflow.Clip
@@ -25,6 +26,7 @@ fun FilmHunterText(
         color = color,
         style = style,
         textAlign = textAlign,
+        minLines = minLines,
         maxLines = maxLines,
         overflow = overflow
     )

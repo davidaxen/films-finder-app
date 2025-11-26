@@ -5,13 +5,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
-import com.darvi.filmhunter.presentation.core.navigation.FavRoutes
 import com.darvi.filmhunter.presentation.core.navigation.HomeRoutes
 import com.darvi.filmhunter.presentation.core.navigation.MainGraph
 import com.darvi.filmhunter.presentation.core.navigation.ProfileRoutes
+import com.darvi.filmhunter.presentation.core.navigation.SavedRoutes
 import com.darvi.filmhunter.presentation.core.navigation.SearchRoutes
 import com.darvi.filmhunter.presentation.list.movie.MovieListScreen
 import com.darvi.filmhunter.presentation.list.series.SeriesListScreen
+import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.QueryListScreen
 import com.darvi.filmhunter.presentation.search.SearchScreen
@@ -83,9 +84,16 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
     }
 }
 
-fun NavGraphBuilder.favGraph(navController: NavController) {
-    navigation<MainGraph.Fav>(startDestination = FavRoutes.Main) {
-        composable<FavRoutes.Main> {
+fun NavGraphBuilder.savedGraph(navController: NavController) {
+    navigation<MainGraph.Saved>(startDestination = SavedRoutes.Main) {
+        composable<SavedRoutes.Main> {
+            SavedListScreen(
+                onFilmClick = { id, type ->
+                    navController.navigate(
+                        MainGraph.Detail(id = id, filmType = type)
+                    )
+                }
+            )
         }
     }
 }

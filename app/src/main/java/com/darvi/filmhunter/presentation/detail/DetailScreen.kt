@@ -33,7 +33,7 @@ import com.darvi.filmhunter.presentation.detail.components.OverviewSection
 import com.darvi.filmhunter.presentation.detail.components.RecommendationSection
 import com.darvi.filmhunter.presentation.detail.components.SeasonsSection
 import com.darvi.filmhunter.presentation.detail.components.WatchProvidersSection
-import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
+import com.darvi.filmhunter.presentation.core.model.FilmDetailUiModel
 import kotlin.math.min
 
 @Composable

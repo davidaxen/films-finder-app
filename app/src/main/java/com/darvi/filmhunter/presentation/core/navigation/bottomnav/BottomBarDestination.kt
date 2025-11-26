@@ -45,7 +45,7 @@ sealed class BottomBarDestination<T>(
     )
 
     @Serializable
-    data object Fav: BottomBarDestination<MainGraph.Fav>(
+    data object Fav: BottomBarDestination<MainGraph.Saved>(
         title = "Guardado",
         selectedIcon = {
             Icon(imageVector = Icons.Default.Bookmark, contentDescription = "")
@@ -53,7 +53,7 @@ sealed class BottomBarDestination<T>(
         unselectedIcon = {
             Icon(imageVector = Icons.Default.Bookmark, contentDescription = "")
         },
-        route = MainGraph.Fav
+        route = MainGraph.Saved
     )
 
     @Serializable

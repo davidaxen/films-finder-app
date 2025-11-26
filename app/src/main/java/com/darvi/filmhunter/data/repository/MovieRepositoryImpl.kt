@@ -8,6 +8,8 @@ import com.darvi.filmhunter.domain.entity.movie.MovieEntity
 import com.darvi.filmhunter.domain.repository.MovieRepository
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import javax.inject.Inject
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class MovieRepositoryImpl @Inject constructor(
     private val api: MovieApiService,
@@ -46,4 +48,17 @@ class MovieRepositoryImpl @Inject constructor(
     override suspend fun saveFilm(filmId: Int) {
         database.saveFilm(filmId, FilmType.MOVIE.name)
     }
+
+    @OptIn(ExperimentalTime::class)
+    override suspend fun getSavedFilms(): List<MovieDetailEntity> {
+        val filmsId = database.getSavedFilmsId(FilmType.MOVIE.name)
+
+        return filmsId.map {
+            api.getMovieById(id = it.filmId).toDomain().copy(
+                isSaved = true,
+                savedAt = Instant.parse(it.createdAt as String).toEpochMilliseconds()
+            )
+        }
+    }
+
 }

@@ -7,8 +7,8 @@ import com.darvi.filmhunter.domain.usecase.movie.SaveMovie
 import com.darvi.filmhunter.domain.usecase.series.GetSeriesById
 import com.darvi.filmhunter.domain.usecase.series.SaveSeries
 import com.darvi.filmhunter.presentation.core.model.FilmType
-import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
-import com.darvi.filmhunter.presentation.detail.model.toUiModel
+import com.darvi.filmhunter.presentation.core.model.FilmDetailUiModel
+import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
