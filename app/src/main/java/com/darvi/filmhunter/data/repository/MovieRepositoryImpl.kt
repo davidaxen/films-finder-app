@@ -49,6 +49,10 @@ class MovieRepositoryImpl @Inject constructor(
         database.saveFilm(filmId, FilmType.MOVIE.name)
     }
 
+    override suspend fun removeSavedFilm(filmId: Int) {
+        database.removeSavedFilm(filmId, FilmType.MOVIE.name)
+    }
+
     @OptIn(ExperimentalTime::class)
     override suspend fun getSavedFilms(): List<MovieDetailEntity> {
         val filmsId = database.getSavedFilmsId(FilmType.MOVIE.name)

@@ -8,20 +8,31 @@ import javax.inject.Inject
 class SupabaseDatabaseDataSourceImpl @Inject constructor(
     private val database: Postgrest
 ): SupabaseDatabaseDataSource {
+    object Tables {
+        const val SAVED_FILMS = "saved_films"
+    }
+
     override suspend fun saveFilm(filmId: Int, filmType: String) {
         val filmToSave = FilmsSavedDTO(
             filmId = filmId,
             filmType = filmType,
         )
-        database.from("saved_films").insert(filmToSave)
+        database.from(Tables.SAVED_FILMS).insert(filmToSave)
     }
 
-    override suspend fun removeSavedFilm(filmId: Int) {
+    override suspend fun removeSavedFilm(filmId: Int, filmType: String) {
+        database.from(Tables.SAVED_FILMS)
+            .delete {
+                filter {
+                    eq("film_id", filmId)
+                    eq("film_type", filmType)
+                }
+            }
     }
 
     override suspend fun isFilmSaved(filmId: Int, filmType: String): Boolean {
         val resp = database
-            .from("saved_films")
+            .from(Tables.SAVED_FILMS)
             .select {
                 filter {
                     eq("film_id", filmId)
@@ -36,7 +47,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
 
     override suspend fun getSavedFilmsId(filmType: String): List<FilmsSavedDTO> {
         val resp = database
-            .from("saved_films")
+            .from(Tables.SAVED_FILMS)
             .select {
                 filter {
                     eq("film_type", filmType)
