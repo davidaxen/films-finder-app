@@ -12,7 +12,6 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
         val filmToSave = FilmsSavedDTO(
             filmId = filmId,
             filmType = filmType,
-            createdAt = null
         )
         database.from("saved_films").insert(filmToSave)
     }

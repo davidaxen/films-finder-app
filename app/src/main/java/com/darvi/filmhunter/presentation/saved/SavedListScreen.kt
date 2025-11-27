@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,24 +66,34 @@ fun SavedListScreen(
         }
 
         uiState.hasError -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                FilmHunterText(text = uiState.errorMessage)
+            PullToRefreshBox(
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = { savedListViewModel.refreshFilms() },
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    FilmHunterText(text = uiState.errorMessage)
+                }
             }
         }
 
         else -> {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(vertical = 4.dp)
-            ){
-                itemsIndexed(uiState.films, key = { index, _ -> index}) { index, film->
-                    SavedFilmRow(
-                        film = film,
-                        onClick = {
-                            onFilmClick(film.id, film.type.value)
-                        }
-                    )
+            PullToRefreshBox(
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = { savedListViewModel.refreshFilms() },
+            ) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(vertical = 4.dp)
+                ){
+                    itemsIndexed(uiState.films, key = { index, _ -> index}) { _, film ->
+                        SavedFilmRow(
+                            film = film,
+                            onClick = {
+                                onFilmClick(film.id, film.type.value)
+                            }
+                        )
+                    }
                 }
             }
         }

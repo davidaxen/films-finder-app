@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class FilmsSavedDTO(
     @SerialName("film_id") val filmId: Int,
     @SerialName("film_type") val filmType: String,
-    @SerialName("created_at") val createdAt: String?
+    @SerialName("created_at") val createdAt: String? = null
 )
