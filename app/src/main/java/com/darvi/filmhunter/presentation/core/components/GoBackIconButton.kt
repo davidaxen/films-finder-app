@@ -10,12 +10,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.dropUnlessResumed
 
 @Composable
 fun GoBackIconButton(onClick: () -> Unit) {
     IconButton(
         modifier = Modifier.size(42.dp),
-        onClick = onClick,
+        onClick = dropUnlessResumed { onClick() },
         colors = IconButtonDefaults.iconButtonColors(
             contentColor = MaterialTheme.colorScheme.onBackground
         ),

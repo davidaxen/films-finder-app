@@ -1,5 +1,6 @@
 package com.darvi.filmhunter.presentation.core.navigation
 
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -18,14 +19,14 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation<AppGraph.Auth>(startDestination = AuthRoutes.Login) {
         composable<AuthRoutes.Login> {
             LoginScreen(
-                navigateToMain = {
+                navigateToMain = dropUnlessResumed {
                     navController.navigate(AppGraph.Main) {
                         popUpTo(AppGraph.Auth) { inclusive = true }
                         launchSingleTop = true
                     }
                  },
-                navigateToRegister = { navController.navigate(AuthRoutes.Register) },
-                navigateToForgotPassword = {}
+                navigateToRegister = dropUnlessResumed { navController.navigate(AuthRoutes.Register) },
+                navigateToForgotPassword = dropUnlessResumed {}
             )
         }
 
