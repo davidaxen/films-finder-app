@@ -7,6 +7,13 @@ import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.movie.MovieEntity
 import com.darvi.filmhunter.domain.repository.MovieRepository
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -15,6 +22,15 @@ class MovieRepositoryImpl @Inject constructor(
     private val api: MovieApiService,
     private val database: SupabaseDatabaseDataSource
 ): MovieRepository {
+    private val savedMoviesFlow = MutableStateFlow<List<MovieDetailEntity>>(emptyList())
+    override fun getSavedMoviesFlow(): Flow<List<MovieDetailEntity>> = savedMoviesFlow.asStateFlow()
+
+    init {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            fetchSavedMovies()
+        }
+    }
+
     override suspend fun getMoviesList(path: String): List<MovieEntity> {
         return api.getMoviesList(path = path).results.map {
             it.toDomain()
@@ -47,22 +63,25 @@ class MovieRepositoryImpl @Inject constructor(
 
     override suspend fun saveFilm(filmId: Int) {
         database.saveFilm(filmId, FilmType.MOVIE.name)
+        fetchSavedMovies()
     }
 
     override suspend fun removeSavedFilm(filmId: Int) {
         database.removeSavedFilm(filmId, FilmType.MOVIE.name)
+        fetchSavedMovies()
     }
 
     @OptIn(ExperimentalTime::class)
-    override suspend fun getSavedFilms(): List<MovieDetailEntity> {
+    override suspend fun fetchSavedMovies() {
         val filmsId = database.getSavedFilmsId(FilmType.MOVIE.name)
 
-        return filmsId.map {
+        val movies = filmsId.map {
             api.getMovieById(id = it.filmId).toDomain().copy(
                 isSaved = true,
                 savedAt = Instant.parse(it.createdAt as String).toEpochMilliseconds()
             )
         }
-    }
 
+        savedMoviesFlow.value = movies
+    }
 }
