@@ -59,6 +59,14 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                         MainGraph.Detail(id = id, filmType = type)
                     )
                 },
+                onGenreClick = { genre, type ->
+                    navController.navigate(
+                        SearchRoutes.FilmsGenreList(
+                            genre = genre,
+                            filmType = type
+                        )
+                    )
+                },
                 onBackClick = { navController.popBackStack() }
             )
         }
