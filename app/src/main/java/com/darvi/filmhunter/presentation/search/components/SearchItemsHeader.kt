@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 
 @Composable
@@ -27,10 +28,9 @@ fun SearchItemsHeader(modifier: Modifier = Modifier, title: String, onClick: () 
         FilmHunterText(
             modifier = Modifier.clickable(
                 interactionSource = remember { MutableInteractionSource() } ,
-                indication = null
-            ) {
-                onClick()
-            },
+                indication = null,
+                onClick = dropUnlessResumed { onClick() }
+            ),
             text = "Ver todo",
             style = MaterialTheme.typography.bodyMedium,
             color = Color(0xFF39B3E3)

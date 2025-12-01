@@ -1,13 +1,9 @@
-package com.darvi.filmhunter.presentation.detail.model
+package com.darvi.filmhunter.presentation.core.model
 
+import com.darvi.filmhunter.domain.entity.WatchProviderEntity
 import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
-import com.darvi.filmhunter.domain.entity.movie.MovieGenre
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesSeasonEntity
-import com.darvi.filmhunter.domain.entity.WatchProviderEntity
-import com.darvi.filmhunter.presentation.core.model.FilmType
-import com.darvi.filmhunter.presentation.core.model.FilmUiModel
-import com.darvi.filmhunter.presentation.core.model.toUiModel
 
 data class FilmDetailUiModel(
     val id: Int,
@@ -20,9 +16,10 @@ data class FilmDetailUiModel(
     val year: String,
     val rating: Double,
     val voteCount: Int,
-    val genres: List<MovieGenre>,
+    val genres: List<FilmGenreUiModel>,
     val type: FilmType,
     val isSaved: Boolean = false,
+    val savedAt: Long? = null,
     val watchProviders: List<WatchProviderEntity>,
     val seasons: List<SeriesSeasonEntity> = emptyList(),
     val recommendations: List<FilmUiModel>
@@ -60,9 +57,10 @@ fun MovieDetailEntity.toUiModel(): FilmDetailUiModel {
         year = releaseDate.take(4),
         rating = voteAverage,
         voteCount = voteCount,
-        genres = genres,
+        genres = genres.map { it.toUiModel() },
         type = FilmType.MOVIE,
         isSaved = isSaved,
+        savedAt = savedAt,
         watchProviders = watchProviders,
         recommendations = recommendations.map { it.toUiModel() }
     )
@@ -79,9 +77,10 @@ fun SeriesDetailEntity.toUiModel(): FilmDetailUiModel{
         year = releaseDate.take(4),
         rating = voteAverage,
         voteCount = voteCount,
-        genres = genres,
+        genres = genres.map { it.toUiModel() },
         type = FilmType.SERIES,
         isSaved = isSaved,
+        savedAt = savedAt,
         seasons = seasons,
         watchProviders = watchProviders,
         recommendations = recommendations.map { it.toUiModel() }

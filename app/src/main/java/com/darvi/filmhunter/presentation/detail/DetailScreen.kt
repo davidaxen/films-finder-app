@@ -33,7 +33,7 @@ import com.darvi.filmhunter.presentation.detail.components.OverviewSection
 import com.darvi.filmhunter.presentation.detail.components.RecommendationSection
 import com.darvi.filmhunter.presentation.detail.components.SeasonsSection
 import com.darvi.filmhunter.presentation.detail.components.WatchProvidersSection
-import com.darvi.filmhunter.presentation.detail.model.FilmDetailUiModel
+import com.darvi.filmhunter.presentation.core.model.FilmDetailUiModel
 import kotlin.math.min
 
 @Composable
@@ -43,6 +43,7 @@ fun DetailScreen(
     filmType: Int,
     onSeasonClick: ((Int, Int) -> Unit)? = null,
     onFilmRecommendedClick: (Int, Int) -> Unit,
+    onGenreClick: (genreId: Int, genreType: Int) -> Unit,
     onBackClick: () -> Unit
 ) {
     val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
@@ -79,6 +80,7 @@ fun DetailScreen(
                 seasonsListState = seasonsListState,
                 recommendationsListState = recommendationsListState,
                 onSaveClick = { detailViewModel.onSaveFilm() },
+                onGenreClick = onGenreClick,
                 onFilmRecommendedClick = onFilmRecommendedClick
             )
         }
@@ -94,6 +96,7 @@ fun DetailContent(
     listState: LazyListState,
     seasonsListState: LazyListState,
     recommendationsListState: LazyListState,
+    onGenreClick: (genreId: Int, genreType: Int) -> Unit,
     onBackClick: () -> Unit,
 ) {
     val darkenFraction by remember {
@@ -139,7 +142,10 @@ fun DetailContent(
 
             item {
                 Spacer(Modifier.height(16.dp))
-                GenresSection(genres = film.genres)
+                GenresSection(
+                    genres = film.genres,
+                    onGenreClick = onGenreClick
+                )
             }
 
             item {

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.domain.entity.movie.MovieEntity
 import com.darvi.filmhunter.domain.entity.movie.MovieGenre
@@ -295,7 +296,7 @@ private fun <T> LazyGridScope.genreGrid(
 ) {
     items(items) { item ->
         SuggestionChip(
-            onClick = { onClick(item) },
+            onClick = dropUnlessResumed { onClick(item) },
             label = {
                 FilmHunterText(
                     modifier = Modifier

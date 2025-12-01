@@ -90,7 +90,6 @@ class SearchViewModel @Inject constructor(
                             isSearching = false
                         )
                     }
-                    Log.e("DEBOUNCE SEARCH VIEWMODEL", e.toString())
                 }.collect { newState ->
                     _uiState.value = newState
                 }

@@ -48,7 +48,7 @@ fun NavigationWrapper(
                 
 //        it.hasRoute<MainGraph.Home>() ||
 //        it.hasRoute<MainGraph.Search>() ||
-        it.hasRoute<MainGraph.Fav>() ||
+        it.hasRoute<MainGraph.Saved>() ||
         it.hasRoute<MainGraph.Profile>()
     } == true
 

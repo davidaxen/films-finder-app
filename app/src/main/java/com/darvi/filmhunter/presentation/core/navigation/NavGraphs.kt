@@ -1,5 +1,6 @@
 package com.darvi.filmhunter.presentation.core.navigation
 
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -7,7 +8,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
 import com.darvi.filmhunter.presentation.auth.login.LoginScreen
 import com.darvi.filmhunter.presentation.auth.register.RegisterScreen
-import com.darvi.filmhunter.presentation.core.navigation.bottomnav.favGraph
+import com.darvi.filmhunter.presentation.core.navigation.bottomnav.savedGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.homeGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.profileGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.searchGraph
@@ -18,14 +19,14 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation<AppGraph.Auth>(startDestination = AuthRoutes.Login) {
         composable<AuthRoutes.Login> {
             LoginScreen(
-                navigateToMain = {
+                navigateToMain = dropUnlessResumed {
                     navController.navigate(AppGraph.Main) {
                         popUpTo(AppGraph.Auth) { inclusive = true }
                         launchSingleTop = true
                     }
                  },
-                navigateToRegister = { navController.navigate(AuthRoutes.Register) },
-                navigateToForgotPassword = {}
+                navigateToRegister = dropUnlessResumed { navController.navigate(AuthRoutes.Register) },
+                navigateToForgotPassword = dropUnlessResumed {}
             )
         }
 
@@ -41,7 +42,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
     navigation<AppGraph.Main>(startDestination = MainGraph.Search) {
         homeGraph(navController)
         searchGraph(navController)
-        favGraph(navController)
+        savedGraph(navController)
         profileGraph(navController)
         composable<MainGraph.Detail> { stackEntry ->
             val data = stackEntry.toRoute<MainGraph.Detail>()
@@ -56,6 +57,14 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 onFilmRecommendedClick =  { id, type ->
                     navController.navigate(
                         MainGraph.Detail(id = id, filmType = type)
+                    )
+                },
+                onGenreClick = { genre, type ->
+                    navController.navigate(
+                        SearchRoutes.FilmsGenreList(
+                            genre = genre,
+                            filmType = type
+                        )
                     )
                 },
                 onBackClick = { navController.popBackStack() }
