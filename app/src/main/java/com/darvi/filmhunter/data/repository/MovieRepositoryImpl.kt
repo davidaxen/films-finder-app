@@ -45,10 +45,17 @@ class MovieRepositoryImpl @Inject constructor(
 
     override suspend fun getMoviesByGenres(
         genres: String,
+        platforms: String,
         page: Int
     ): List<MovieEntity> {
-        return api.getMoviesByGenres(genres = genres, page = page).results.map {
-            it.toDomain()
+        return if (platforms.isNotEmpty()) {
+            api.getMoviesByPlatformAndGenres(genres = genres, platformsId = platforms, page = page).results.map {
+                it.toDomain()
+            }
+        } else {
+            api.getMoviesByGenres(genres = genres, page = page).results.map {
+                it.toDomain()
+            }
         }
     }
 

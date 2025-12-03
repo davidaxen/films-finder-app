@@ -45,10 +45,11 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
                         )
                     )
                 },
-                onSearchByGenres = { genre, type ->
+                onSearchByGenres = { genre, platformId, type ->
                     navController.navigate(
                         SearchRoutes.FilmsGenreList(
                             genre = genre,
+                            platformId = platformId,
                             filmType = type
                         )
                     )
@@ -73,6 +74,7 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
             FilmsByGenreListScreen(
                 genre = data.genre,
                 filmType = data.filmType,
+                platformId = data.platformId,
                 onFilmClick = { id, type ->
                     navController.navigate(
                         MainGraph.Detail(id = id, filmType = type)

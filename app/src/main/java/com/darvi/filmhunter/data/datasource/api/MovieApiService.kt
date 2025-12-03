@@ -27,6 +27,15 @@ interface MovieApiService {
         @Query("language") language: String = "es-ES"
     ): MovieResponse
 
+    @GET("discover/movie")
+    suspend fun getMoviesByPlatformAndGenres(
+        @Query("with_genres") genres: String,
+        @Query("with_watch_providers") platformsId: String,
+        @Query("page") page: Int = 1,
+        @Query("language") language: String = "es-ES",
+        @Query("watch_region") region: String = "ES",
+    ): MovieResponse
+
     @GET("movie/{id}")
     suspend fun getMovieById(
         @Path("id") id: Int,

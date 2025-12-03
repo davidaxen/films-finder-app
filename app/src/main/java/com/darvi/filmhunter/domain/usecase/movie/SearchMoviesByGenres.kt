@@ -5,7 +5,7 @@ import com.darvi.filmhunter.domain.repository.MovieRepository
 import javax.inject.Inject
 
 class SearchMoviesByGenres @Inject constructor(private val movieRepository: MovieRepository) {
-    suspend operator fun invoke(genres: String, page: Int = 1): List<MovieEntity> {
-        return movieRepository.getMoviesByGenres(genres, page)
+    suspend operator fun invoke(genres: String, platforms: String = "", page: Int = 1): List<MovieEntity> {
+        return movieRepository.getMoviesByGenres(genres, platforms, page)
     }
 }

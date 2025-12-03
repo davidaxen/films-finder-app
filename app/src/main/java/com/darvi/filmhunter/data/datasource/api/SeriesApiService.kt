@@ -28,6 +28,15 @@ interface SeriesApiService {
         @Query("language") language: String = "es-ES"
     ): SeriesResponse
 
+    @GET("discover/tv")
+    suspend fun getSeriesByPlatformAndGenres(
+        @Query("with_genres") genres: String,
+        @Query("with_watch_providers") platformsId: String,
+        @Query("page") page: Int = 1,
+        @Query("language") language: String = "es-ES",
+        @Query("watch_region") region: String = "ES",
+    ): SeriesResponse
+
     @GET("tv/{id}")
     suspend fun getSeriesById(
         @Path("id") id: Int,
