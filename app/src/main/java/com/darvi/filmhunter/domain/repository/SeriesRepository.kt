@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface SeriesRepository {
     fun getSavedSeriesFlow(): Flow<List<SeriesDetailEntity>>
-    suspend fun getSeriesList(path: String): List<SeriesEntity>
+    suspend fun getSeriesList(path: String, page: Int): List<SeriesEntity>
     suspend fun getSeriesByTitle(query: String, page: Int): List<SeriesEntity>
     suspend fun getSeriesByGenres(genres: String, platforms: String, page: Int): List<SeriesEntity>
     suspend fun getSeriesById(id: Int): SeriesDetailEntity

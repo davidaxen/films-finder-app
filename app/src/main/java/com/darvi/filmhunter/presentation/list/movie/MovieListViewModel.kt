@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.usecase.movie.GetMoviesList
 import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.MovieListSection
 import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -42,13 +43,6 @@ class MovieListViewModel @Inject constructor(
             }
         }
     }
-}
-
-enum class MovieListSection(val path: String, val searchMethod: String) {
-    POPULAR("popular","popular"),
-    TOP_RATED("top_rated","top_rated"),
-    NOW_PLAYING("now_playing", "on_screen"),
-    UPCOMING("upcoming", "")
 }
 
 data class MovieListUiState(

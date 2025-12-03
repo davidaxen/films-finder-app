@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.SeriesListSection
 import com.darvi.filmhunter.presentation.list.components.FilmListSection
 
 @Composable

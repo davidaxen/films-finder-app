@@ -32,8 +32,8 @@ class SeriesRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getSeriesList(path: String): List<SeriesEntity> {
-        return api.getSeriesList(path = path).results.map {
+    override suspend fun getSeriesList(path: String, page: Int): List<SeriesEntity> {
+        return api.getSeriesList(path = path, page = page).results.map {
             it.toDomain()
         }
     }

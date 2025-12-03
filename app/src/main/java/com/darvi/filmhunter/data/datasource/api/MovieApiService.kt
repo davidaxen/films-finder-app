@@ -10,6 +10,7 @@ interface MovieApiService {
     @GET("movie/{path}")
     suspend fun getMoviesList(
         @Path("path") path: String,
+        @Query("page") page: Int = 1,
         @Query("language") language: String = "es-ES"
     ): MovieResponse
 
