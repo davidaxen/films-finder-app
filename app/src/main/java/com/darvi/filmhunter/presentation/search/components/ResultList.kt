@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +28,7 @@ import com.darvi.filmhunter.presentation.core.model.FilmUiModel
 @Composable
 fun ResultList(
     modifier: Modifier = Modifier,
+    listState: LazyGridState,
     title: String,
     isSearching: Boolean,
     isLoadingMore: Boolean,
@@ -62,6 +64,7 @@ fun ResultList(
             }
         } else {
             LazyVerticalGrid(
+                state = listState,
                 columns = GridCells.Fixed(3),
                 modifier = Modifier
                     .fillMaxSize()
