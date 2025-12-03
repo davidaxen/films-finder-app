@@ -15,6 +15,7 @@ import com.darvi.filmhunter.presentation.search.components.ResultList
 fun FilmsByGenreListScreen(
     resultListViewModel: ResultListViewModel = hiltViewModel(),
     genre: Int,
+    platformId: Int?,
     filmType: Int,
     onFilmClick: (Int, Int) -> Unit,
     onBackPress: () -> Unit
@@ -22,11 +23,16 @@ fun FilmsByGenreListScreen(
     val uiState by resultListViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        resultListViewModel.onGenresParamsLoad(genre = genre, filmType = filmType)
+        resultListViewModel.onGenresParamsLoad(genre = genre, platformId = platformId, filmType = filmType)
     }
-    val title = when (uiState.filmTypeSelected) {
+    var title = when (uiState.filmTypeSelected) {
         FilmType.MOVIE -> "Películas de ${MovieGenre.fromId(genre)?.displayName}"
         FilmType.SERIES -> "Series de ${MovieGenre.fromId(genre)?.displayName}"
+    }
+
+    title += when (uiState.platformSelected) {
+        null -> ""
+        else -> " (${uiState.platformSelected?.title})"
     }
 
     ResultList(

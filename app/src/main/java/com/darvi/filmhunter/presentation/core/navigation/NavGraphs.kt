@@ -63,6 +63,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                     navController.navigate(
                         SearchRoutes.FilmsGenreList(
                             genre = genre,
+                            platformId = null,
                             filmType = type
                         )
                     )

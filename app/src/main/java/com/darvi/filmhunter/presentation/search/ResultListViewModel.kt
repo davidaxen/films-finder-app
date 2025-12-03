@@ -2,6 +2,7 @@ package com.darvi.filmhunter.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.domain.usecase.movie.SearchMoviesByGenres
 import com.darvi.filmhunter.domain.usecase.movie.SearchMoviesByTitle
 import com.darvi.filmhunter.domain.usecase.series.SearchSeriesByGenres
@@ -52,12 +53,14 @@ class ResultListViewModel @Inject constructor(
 
     fun onGenresParamsLoad(
         genre: Int,
+        platformId: Int?,
         filmType: Int
     ) {
         val type = if (filmType == FilmType.SERIES.value) FilmType.SERIES else FilmType.MOVIE
         _uiState.update {
             it.copy(
                 genreIdSelected = genre,
+                platformSelected = WatchProvider.fromId(platformId),
                 isSearching = true,
                 isLoadingMore = false,
                 endReached = false,
@@ -88,15 +91,36 @@ class ResultListViewModel @Inject constructor(
 
             val newFilmsList = when (state.searchMethod) {
                 SearchMethod.TITLE -> when (state.filmTypeSelected) {
-                    FilmType.MOVIE  -> searchMoviesByTitle(state.searchQuery, page).map { it.toUiModel() }
-                    FilmType.SERIES -> searchSeriesByTitle(state.searchQuery, page).map { it.toUiModel() }
+                    FilmType.MOVIE -> searchMoviesByTitle(
+                        state.searchQuery,
+                        page
+                    ).map { it.toUiModel() }
+
+                    FilmType.SERIES -> searchSeriesByTitle(
+                        state.searchQuery,
+                        page
+                    ).map { it.toUiModel() }
                 }
 
                 SearchMethod.GENRE -> {
                     if (state.genreIdSelected != null) {
+                        val platform = if (state.platformSelected != null) {
+                            state.platformSelected.id.toString()
+                        } else {
+                            ""
+                        }
                         when (state.filmTypeSelected) {
-                            FilmType.MOVIE  -> searchMoviesByGenres(state.genreIdSelected.toString(), page).map { it.toUiModel() }
-                            FilmType.SERIES -> searchSeriesByGenres(state.genreIdSelected.toString(), page).map { it.toUiModel() }
+                            FilmType.MOVIE -> searchMoviesByGenres(
+                                state.genreIdSelected.toString(),
+                                platform,
+                                page
+                            ).map { it.toUiModel() }
+
+                            FilmType.SERIES -> searchSeriesByGenres(
+                                state.genreIdSelected.toString(),
+                                platform,
+                                page
+                            ).map { it.toUiModel() }
                         }
                     } else {
                         emptyList()
@@ -130,6 +154,7 @@ enum class SearchMethod {
 data class ResultListUiState(
     val searchQuery: String = "",
     val genreIdSelected: Int? = null,
+    val platformSelected: WatchProvider? = null,
     val isSearching: Boolean = false,
     val isLoadingMore: Boolean = false,
     val endReached: Boolean = false,

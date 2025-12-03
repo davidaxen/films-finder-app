@@ -8,7 +8,7 @@ interface MovieRepository {
     fun getSavedMoviesFlow(): Flow<List<MovieDetailEntity>>
     suspend fun getMoviesList(path: String): List<MovieEntity>
     suspend fun getMoviesByTitle(query: String, page: Int): List<MovieEntity>
-    suspend fun getMoviesByGenres(genres: String, page: Int): List<MovieEntity>
+    suspend fun getMoviesByGenres(genres: String, platforms: String, page: Int): List<MovieEntity>
     suspend fun getMovieById(id: Int): MovieDetailEntity
     suspend fun saveFilm(filmId: Int)
     suspend fun removeSavedFilm(filmId: Int)

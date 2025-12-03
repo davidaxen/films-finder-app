@@ -46,10 +46,17 @@ class SeriesRepositoryImpl @Inject constructor(
 
     override suspend fun getSeriesByGenres(
         genres: String,
+        platforms: String,
         page: Int
     ): List<SeriesEntity> {
-        return api.getSeriesByGenres(genres = genres, page = page).results.map {
-            it.toDomain()
+        return if (platforms.isNotEmpty()) {
+            api.getSeriesByPlatformAndGenres(genres = genres, platformsId = platforms, page = page).results.map {
+                it.toDomain()
+            }
+        } else {
+            api.getSeriesByGenres(genres = genres, page = page).results.map {
+                it.toDomain()
+            }
         }
     }
 

@@ -8,12 +8,16 @@ enum class WatchProvider(val id: Int, val title: String, val logoPath: String) {
     ),
     DISNEY_PLUS(
         id = 337,
-        title = "Disney Plus",
+        title = "Disney+",
         logoPath = "/97yvRBw1GzX7fXprcF80er19ot.jpg"
     ),
     HBO_MAX(
         id = 1899,
         title = "HBO Max",
         logoPath = "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg"
-    )
+    );
+
+    companion object {
+        fun fromId(id: Int?): WatchProvider? = entries.firstOrNull { it.id == id }
+    }
 }

@@ -54,7 +54,7 @@ import com.darvi.filmhunter.presentation.search.components.SearchItemsHeader
 fun SearchScreen(
     searchViewModel: SearchViewModel = hiltViewModel(),
     onFilmClick: (Int, Int) -> Unit,
-    onSearchByGenres: (Int, Int) -> Unit,
+    onSearchByGenres: (Int, Int?, Int) -> Unit,
     onSeeAllClick: (String, Int) -> Unit
 ) {
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -150,7 +150,7 @@ fun SearchScreen(
                             label = { it.displayName },
                             onClick = { genre ->
                                 searchViewModel.onGenreClicked(genre.id)
-                                onSearchByGenres(genre.id, FilmType.MOVIE.value)
+                                onSearchByGenres(genre.id, uiState.watchProviderSelected?.id, FilmType.MOVIE.value)
                             }
                         )
                     }
@@ -161,7 +161,7 @@ fun SearchScreen(
                             label = { it.displayName },
                             onClick = { genre ->
                                 searchViewModel.onGenreClicked(genre.id)
-                                onSearchByGenres(genre.id, FilmType.SERIES.value)
+                                onSearchByGenres(genre.id, uiState.watchProviderSelected?.id, FilmType.SERIES.value)
                             }
                         )
                     }
