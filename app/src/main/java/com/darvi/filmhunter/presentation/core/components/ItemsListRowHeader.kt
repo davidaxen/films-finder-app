@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.presentation.search.components
+package com.darvi.filmhunter.presentation.core.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,10 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.dropUnlessResumed
-import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 
 @Composable
-fun SearchItemsHeader(modifier: Modifier = Modifier, title: String, onClick: () -> Unit) {
+fun ItemsListRowHeader(modifier: Modifier = Modifier, title: String, onClick: () -> Unit) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,

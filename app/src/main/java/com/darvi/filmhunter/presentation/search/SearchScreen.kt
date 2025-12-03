@@ -47,7 +47,7 @@ import com.darvi.filmhunter.presentation.core.components.FilmResultCard
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.search.components.SearchBarItem
 import com.darvi.filmhunter.presentation.search.components.SearchFilterChip
-import com.darvi.filmhunter.presentation.search.components.SearchItemsHeader
+import com.darvi.filmhunter.presentation.core.components.ItemsListRowHeader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -222,7 +222,7 @@ fun SearchedFilmsList(
                 val moviesToShow = moviesFound.take(6)
                 if (moviesToShow.isNotEmpty()) {
                     item(span = { GridItemSpan(3) }) {
-                        SearchItemsHeader(
+                        ItemsListRowHeader(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 8.dp, bottom = 2.dp),
@@ -245,7 +245,7 @@ fun SearchedFilmsList(
                 val seriesToShow = seriesFound.take(6)
                 if (seriesToShow.isNotEmpty()) {
                     item(span = { GridItemSpan(3) }) {
-                        SearchItemsHeader(
+                        ItemsListRowHeader(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 8.dp, bottom = 2.dp),

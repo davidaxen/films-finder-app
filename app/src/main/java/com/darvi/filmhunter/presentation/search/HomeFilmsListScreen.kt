@@ -7,16 +7,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.darvi.filmhunter.domain.entity.movie.MovieGenre
-import com.darvi.filmhunter.domain.entity.series.SeriesGenre
 import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.SearchMethod
 import com.darvi.filmhunter.presentation.search.components.ResultList
 
 @Composable
-fun FilmsByGenreListScreen(
+fun HomeFilmsListScreen(
     resultListViewModel: ResultListViewModel = hiltViewModel(),
-    genre: Int,
-    platformId: Int?,
+    searchMethod: String,
     filmType: Int,
     onFilmClick: (Int, Int) -> Unit,
     onBackPress: () -> Unit
@@ -24,16 +22,12 @@ fun FilmsByGenreListScreen(
     val uiState by resultListViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        resultListViewModel.onGenresParamsLoad(genre = genre, platformId = platformId, filmType = filmType)
-    }
-    var title = when (uiState.filmTypeSelected) {
-        FilmType.MOVIE -> "Películas de ${MovieGenre.fromId(genre)?.displayName}"
-        FilmType.SERIES -> "Series de ${SeriesGenre.fromId(genre)?.displayName}"
+        resultListViewModel.onSearchMethodParamsLoad(searchMethod, filmType)
     }
 
-    title += when (uiState.platformSelected) {
-        null -> ""
-        else -> " (${uiState.platformSelected?.title})"
+    val title = when (uiState.filmTypeSelected) {
+        FilmType.MOVIE -> "Películas ${SearchMethod.fromValue(searchMethod)?.displayName}"
+        FilmType.SERIES -> "Series ${SearchMethod.fromValue(searchMethod)?.displayName}"
     }
 
     ResultList(

@@ -39,7 +39,7 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
 }
 
 fun NavGraphBuilder.mainGraph(navController: NavController) {
-    navigation<AppGraph.Main>(startDestination = MainGraph.Search) {
+    navigation<AppGraph.Main>(startDestination = MainGraph.Home) {
         homeGraph(navController)
         searchGraph(navController)
         savedGraph(navController)

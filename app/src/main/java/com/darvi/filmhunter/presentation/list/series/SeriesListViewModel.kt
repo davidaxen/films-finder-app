@@ -28,7 +28,7 @@ class SeriesListViewModel @Inject constructor(
         getSeriesList(SeriesListSection.POPULAR)
         getSeriesList(SeriesListSection.AIRING_TODAY)
         getSeriesList(SeriesListSection.TOP_RATED)
-        getSeriesList(SeriesListSection.ON_THE_AIR)
+//        getSeriesList(SeriesListSection.ON_THE_AIR)
     }
 
     private fun getSeriesList(listType: SeriesListSection) {
@@ -44,11 +44,11 @@ class SeriesListViewModel @Inject constructor(
     }
 }
 
-enum class SeriesListSection(val path: String) {
-    POPULAR("popular"),
-    TOP_RATED("top_rated"),
-    AIRING_TODAY("airing_today"),
-    ON_THE_AIR("on_the_air")
+enum class SeriesListSection(val path: String, val searchMethod: String) {
+    POPULAR("popular", "popular"),
+    TOP_RATED("top_rated", "top_rated"),
+    AIRING_TODAY("airing_today", "on_screen"),
+    ON_THE_AIR("on_the_air", "")
 }
 
 data class SeriesListUiState(

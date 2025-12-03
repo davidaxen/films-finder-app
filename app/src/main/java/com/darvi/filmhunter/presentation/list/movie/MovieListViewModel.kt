@@ -26,9 +26,9 @@ class MovieListViewModel @Inject constructor(
 
     private fun getMoviesLists() {
         getMoviesList(MovieListSection.POPULAR)
-        getMoviesList(MovieListSection.UPCOMING)
         getMoviesList(MovieListSection.TOP_RATED)
         getMoviesList(MovieListSection.NOW_PLAYING)
+//        getMoviesList(MovieListSection.UPCOMING)
     }
 
     private fun getMoviesList(listType: MovieListSection) {
@@ -44,11 +44,11 @@ class MovieListViewModel @Inject constructor(
     }
 }
 
-enum class MovieListSection(val path: String) {
-    POPULAR("popular"),
-    TOP_RATED("top_rated"),
-    NOW_PLAYING("now_playing"),
-    UPCOMING("upcoming")
+enum class MovieListSection(val path: String, val searchMethod: String) {
+    POPULAR("popular","popular"),
+    TOP_RATED("top_rated","top_rated"),
+    NOW_PLAYING("now_playing", "on_screen"),
+    UPCOMING("upcoming", "")
 }
 
 data class MovieListUiState(

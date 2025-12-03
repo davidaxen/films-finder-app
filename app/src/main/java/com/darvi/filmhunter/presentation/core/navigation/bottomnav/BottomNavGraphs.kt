@@ -14,16 +14,45 @@ import com.darvi.filmhunter.presentation.list.movie.MovieListScreen
 import com.darvi.filmhunter.presentation.list.series.SeriesListScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
+import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
 import com.darvi.filmhunter.presentation.search.QueryListScreen
 import com.darvi.filmhunter.presentation.search.SearchScreen
 
 fun NavGraphBuilder.homeGraph(navController: NavController) {
     navigation<MainGraph.Home>(startDestination = HomeRoutes.MoviesList) {
         composable<HomeRoutes.MoviesList> {
-            MovieListScreen()
+            MovieListScreen(
+                onSeeAllClick = { searchMethod, type ->
+                    navController.navigate(
+                        SearchRoutes.HomeFilmsList(
+                            searchMethod = searchMethod,
+                            filmType = type
+                        )
+                    )
+                },
+                onFilmClick = { id, type ->
+                    navController.navigate(
+                        MainGraph.Detail(id = id, filmType = type)
+                    )
+                }
+            )
         }
         composable<HomeRoutes.SeriesList> {
-            SeriesListScreen()
+            SeriesListScreen(
+                onSeeAllClick = { searchMethod, type ->
+                    navController.navigate(
+                        SearchRoutes.HomeFilmsList(
+                            searchMethod = searchMethod,
+                            filmType = type
+                        )
+                    )
+                },
+                onFilmClick = { id, type ->
+                    navController.navigate(
+                        MainGraph.Detail(id = id, filmType = type)
+                    )
+                }
+            )
         }
     }
 }
@@ -75,6 +104,19 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
                 genre = data.genre,
                 filmType = data.filmType,
                 platformId = data.platformId,
+                onFilmClick = { id, type ->
+                    navController.navigate(
+                        MainGraph.Detail(id = id, filmType = type)
+                    )
+                },
+                onBackPress = { navController.popBackStack() }
+            )
+        }
+        composable<SearchRoutes.HomeFilmsList> { stackEntry ->
+            val data = stackEntry.toRoute<SearchRoutes.HomeFilmsList>()
+            HomeFilmsListScreen(
+                searchMethod = data.searchMethod,
+                filmType = data.filmType,
                 onFilmClick = { id, type ->
                     navController.navigate(
                         MainGraph.Detail(id = id, filmType = type)

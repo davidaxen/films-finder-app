@@ -9,6 +9,7 @@ import com.darvi.filmhunter.domain.usecase.series.SearchSeriesByGenres
 import com.darvi.filmhunter.domain.usecase.series.SearchSeriesByTitle
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.SearchMethod
 import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -73,6 +74,26 @@ class ResultListViewModel @Inject constructor(
         loadPage(page = 1, isFirstPage = true)
     }
 
+    fun onSearchMethodParamsLoad(
+        searchMethod: String,
+        filmType: Int
+    ) {
+        if (searchMethod.isNotEmpty()) {
+            val type = if (filmType == FilmType.SERIES.value) FilmType.SERIES else FilmType.MOVIE
+            _uiState.update {
+                it.copy(
+                    isSearching = true,
+                    isLoadingMore = false,
+                    endReached = false,
+                    currentPage = 1,
+                    filmTypeSelected = type,
+                    searchMethod = SearchMethod.fromValue(searchMethod) ?: SearchMethod.POPULAR,
+                    filmsFound = emptyList()
+                )
+            }
+            loadPage(page = 1, isFirstPage = true)
+        }
+    }
 
     fun loadNextPage() {
         if (_uiState.value.isLoadingMore || _uiState.value.endReached || _uiState.value.isSearching) return
@@ -126,6 +147,9 @@ class ResultListViewModel @Inject constructor(
                         emptyList()
                     }
                 }
+                SearchMethod.POPULAR -> TODO()
+                SearchMethod.TOP_RATED -> TODO()
+                SearchMethod.ON_SCREEN -> TODO()
             }
 
 
@@ -143,12 +167,6 @@ class ResultListViewModel @Inject constructor(
             }
         }
     }
-}
-
-
-enum class SearchMethod {
-    TITLE,
-    GENRE
 }
 
 data class ResultListUiState(
