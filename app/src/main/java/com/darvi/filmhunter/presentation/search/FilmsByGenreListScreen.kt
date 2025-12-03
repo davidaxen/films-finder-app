@@ -1,11 +1,10 @@
 package com.darvi.filmhunter.presentation.search
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,10 +23,12 @@ fun FilmsByGenreListScreen(
     onBackPress: () -> Unit
 ) {
     val uiState by resultListViewModel.uiState.collectAsStateWithLifecycle()
-    val listState = rememberSaveable(saver = LazyGridState.Saver) { LazyGridState() }
+    val listState = rememberLazyGridState()
 
-    LaunchedEffect(Unit) {
-        resultListViewModel.onGenresParamsLoad(genre = genre, platformId = platformId, filmType = filmType)
+    LaunchedEffect(genre, filmType) {
+        if (uiState.filmsFound.isEmpty()) {
+            resultListViewModel.onGenresParamsLoad(genre = genre, platformId = platformId, filmType = filmType)
+        }
     }
     var title = when (uiState.filmTypeSelected) {
         FilmType.MOVIE -> "Películas de ${MovieGenre.fromId(genre)?.displayName}"
