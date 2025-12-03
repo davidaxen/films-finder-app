@@ -34,6 +34,7 @@ class SeriesListViewModel @Inject constructor(
 
     private fun getSeriesList(listType: SeriesListSection) {
         viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isLoading = true) }
             val list = getList(listType.path).map { it.toUiModel() }
             when (listType) {
                 SeriesListSection.POPULAR -> _uiState.update { it.copy(popularSeries = list) }
@@ -41,6 +42,7 @@ class SeriesListViewModel @Inject constructor(
                 SeriesListSection.AIRING_TODAY -> _uiState.update { it.copy(airingTodaySeries = list) }
                 SeriesListSection.ON_THE_AIR -> _uiState.update { it.copy(onTheAirSeries = list) }
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 }
@@ -49,5 +51,6 @@ data class SeriesListUiState(
     val popularSeries: List<FilmUiModel> = emptyList(),
     val airingTodaySeries: List<FilmUiModel> = emptyList(),
     val onTheAirSeries: List<FilmUiModel> = emptyList(),
-    val topRatedSeries: List<FilmUiModel> = emptyList()
+    val topRatedSeries: List<FilmUiModel> = emptyList(),
+    val isLoading: Boolean = false
 )

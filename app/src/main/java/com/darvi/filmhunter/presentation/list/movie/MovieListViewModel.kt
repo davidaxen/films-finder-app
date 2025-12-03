@@ -34,6 +34,7 @@ class MovieListViewModel @Inject constructor(
 
     private fun getMoviesList(listType: MovieListSection) {
         viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isLoading = true) }
             val list = getList(listType.path).map { it.toUiModel() }
             when (listType) {
                 MovieListSection.POPULAR -> _uiState.update { it.copy(popularMovies = list) }
@@ -41,6 +42,7 @@ class MovieListViewModel @Inject constructor(
                 MovieListSection.NOW_PLAYING -> _uiState.update { it.copy(nowPlayingMovies = list) }
                 MovieListSection.UPCOMING -> _uiState.update { it.copy(upcomingMovies = list) }
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 }
@@ -49,5 +51,6 @@ data class MovieListUiState(
     val popularMovies: List<FilmUiModel> = emptyList(),
     val upcomingMovies: List<FilmUiModel> = emptyList(),
     val nowPlayingMovies: List<FilmUiModel> = emptyList(),
-    val topRatedMovies: List<FilmUiModel> = emptyList()
+    val topRatedMovies: List<FilmUiModel> = emptyList(),
+    val isLoading: Boolean = false
 )
