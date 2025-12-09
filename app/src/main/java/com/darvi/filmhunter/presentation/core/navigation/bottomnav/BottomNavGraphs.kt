@@ -13,6 +13,7 @@ import com.darvi.filmhunter.presentation.core.navigation.SavedRoutes
 import com.darvi.filmhunter.presentation.core.navigation.SearchRoutes
 import com.darvi.filmhunter.presentation.list.movie.MovieListScreen
 import com.darvi.filmhunter.presentation.list.series.SeriesListScreen
+import com.darvi.filmhunter.presentation.matcher.MatcherScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -132,6 +133,13 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
 fun NavGraphBuilder.matchGraph(navController: NavController) {
     navigation<MainGraph.Match>(startDestination = MatchRoutes.Main) {
         composable<MatchRoutes.Main> {
+            MatcherScreen(
+                onJoinRoomClick = { code ->
+//                    navController.navigate(
+//                        MainGraph.Room(code = code)
+//                    )
+                }
+            )
         }
     }
 }
