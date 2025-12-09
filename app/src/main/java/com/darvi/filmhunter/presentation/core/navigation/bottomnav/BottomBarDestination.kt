@@ -3,9 +3,11 @@ package com.darvi.filmhunter.presentation.core.navigation.bottomnav
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
@@ -42,6 +44,18 @@ sealed class BottomBarDestination<T>(
             Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
         },
         route = MainGraph.Search
+    )
+
+    @Serializable
+    data object Match: BottomBarDestination<MainGraph.Match>(
+        title = "Match",
+        selectedIcon = {
+            Icon(imageVector = Icons.Filled.Group, contentDescription = "")
+        },
+        unselectedIcon = {
+            Icon(imageVector = Icons.Outlined.Group, contentDescription = "")
+        },
+        route = MainGraph.Match
     )
 
     @Serializable

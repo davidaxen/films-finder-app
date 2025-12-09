@@ -49,10 +49,7 @@ fun NavigationWrapper(
         it.hasRoute<HomeRoutes.MoviesList>() ||
         it.hasRoute<HomeRoutes.SeriesList>() ||
         it.hasRoute<SearchRoutes.Main>() ||
-
-                
-//        it.hasRoute<MainGraph.Home>() ||
-//        it.hasRoute<MainGraph.Search>() ||
+        it.hasRoute<MainGraph.Match>() ||
         it.hasRoute<MainGraph.Saved>() ||
         it.hasRoute<MainGraph.Profile>()
     } == true
@@ -72,8 +69,6 @@ fun NavigationWrapper(
                     }
                 }
             }
-//            if (showBottomBar) BottomBar(destination) {
-//            }
         }
     ) { padding ->
         Column(

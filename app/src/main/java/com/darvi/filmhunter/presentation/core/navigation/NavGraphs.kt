@@ -10,6 +10,7 @@ import com.darvi.filmhunter.presentation.auth.login.LoginScreen
 import com.darvi.filmhunter.presentation.auth.register.RegisterScreen
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.savedGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.homeGraph
+import com.darvi.filmhunter.presentation.core.navigation.bottomnav.matchGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.profileGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.searchGraph
 import com.darvi.filmhunter.presentation.detail.DetailScreen
@@ -42,6 +43,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
     navigation<AppGraph.Main>(startDestination = MainGraph.Home) {
         homeGraph(navController)
         searchGraph(navController)
+        matchGraph(navController)
         savedGraph(navController)
         profileGraph(navController)
         composable<MainGraph.Detail> { stackEntry ->

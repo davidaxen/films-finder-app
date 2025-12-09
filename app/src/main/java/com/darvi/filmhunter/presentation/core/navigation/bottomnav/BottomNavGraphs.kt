@@ -7,6 +7,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
 import com.darvi.filmhunter.presentation.core.navigation.HomeRoutes
 import com.darvi.filmhunter.presentation.core.navigation.MainGraph
+import com.darvi.filmhunter.presentation.core.navigation.MatchRoutes
 import com.darvi.filmhunter.presentation.core.navigation.ProfileRoutes
 import com.darvi.filmhunter.presentation.core.navigation.SavedRoutes
 import com.darvi.filmhunter.presentation.core.navigation.SearchRoutes
@@ -124,6 +125,13 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
                 },
                 onBackPress = { navController.popBackStack() }
             )
+        }
+    }
+}
+
+fun NavGraphBuilder.matchGraph(navController: NavController) {
+    navigation<MainGraph.Match>(startDestination = MatchRoutes.Main) {
+        composable<MatchRoutes.Main> {
         }
     }
 }
