@@ -1,5 +1,10 @@
 package com.darvi.filmhunter.presentation.core.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -54,13 +59,21 @@ fun NavigationWrapper(
 
     Scaffold(
         bottomBar = {
-            if (showBottomBar) BottomBar(destination) {
-                navController.navigate(it) {
-                    launchSingleTop = true
-                    restoreState = true
-                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            AnimatedVisibility(
+                visible = showBottomBar,
+                enter = fadeIn() + slideInVertically { it },
+                exit = fadeOut() + slideOutVertically { it },
+            ) {
+                BottomBar(destination) {
+                    navController.navigate(it) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                    }
                 }
             }
+//            if (showBottomBar) BottomBar(destination) {
+//            }
         }
     ) { padding ->
         Column(
@@ -68,7 +81,12 @@ fun NavigationWrapper(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            if (destination?.hierarchy?.any { it.hasRoute<MainGraph.Home>() } == true) {
+            AnimatedVisibility(
+                visible = destination?.hierarchy?.any { it.hasRoute<MainGraph.Home>() } == true,
+                enter = fadeIn() + slideInVertically { -it },
+                exit = fadeOut() + slideOutVertically { -it },
+            ) {
+
                 PrimaryTabRow(
                     selectedTabIndex = selectedTabRow.value,
                     containerColor = MaterialTheme.colorScheme.background,
