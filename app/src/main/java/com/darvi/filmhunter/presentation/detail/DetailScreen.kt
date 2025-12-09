@@ -11,13 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.darvi.filmhunter.presentation.core.components.FilmHunterCircularProgress
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.components.GoBackIconButton
+import com.darvi.filmhunter.presentation.core.model.FilmDetailUiModel
 import com.darvi.filmhunter.presentation.detail.components.DetailHeader
 import com.darvi.filmhunter.presentation.detail.components.DetailInfoSection
 import com.darvi.filmhunter.presentation.detail.components.GenresSection
@@ -33,7 +34,6 @@ import com.darvi.filmhunter.presentation.detail.components.OverviewSection
 import com.darvi.filmhunter.presentation.detail.components.RecommendationSection
 import com.darvi.filmhunter.presentation.detail.components.SeasonsSection
 import com.darvi.filmhunter.presentation.detail.components.WatchProvidersSection
-import com.darvi.filmhunter.presentation.core.model.FilmDetailUiModel
 import kotlin.math.min
 
 @Composable
@@ -48,11 +48,11 @@ fun DetailScreen(
 ) {
     val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
 
-    val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+    val listState = rememberLazyListState()
 
-    val seasonsListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+    val seasonsListState = rememberLazyListState()
 
-    val recommendationsListState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
+    val recommendationsListState = rememberLazyListState()
 
     LaunchedEffect(filmId) {
         detailViewModel.getDetail(filmId, filmType)

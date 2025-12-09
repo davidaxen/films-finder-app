@@ -8,12 +8,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.model.SearchMethod
 import com.darvi.filmhunter.presentation.search.components.ResultList
 
 @Composable
-fun QueryListScreen(
+fun HomeFilmsListScreen(
     resultListViewModel: ResultListViewModel = hiltViewModel(),
-    query: String,
+    searchMethod: String,
     filmType: Int,
     onFilmClick: (Int, Int) -> Unit,
     onBackPress: () -> Unit
@@ -21,17 +23,22 @@ fun QueryListScreen(
     val uiState by resultListViewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyGridState()
 
-    LaunchedEffect(query, filmType) {
+    LaunchedEffect(searchMethod, filmType) {
         if (uiState.filmsFound.isEmpty()) {
-            resultListViewModel.onQueryParamsLoad(q = query, filmType = filmType)
+            resultListViewModel.onSearchMethodParamsLoad(searchMethod, filmType)
         }
+    }
+
+    val title = when (uiState.filmTypeSelected) {
+        FilmType.MOVIE -> "Películas ${SearchMethod.fromValue(searchMethod)?.displayName}"
+        FilmType.SERIES -> "Series ${SearchMethod.fromValue(searchMethod)?.displayName}"
     }
 
     ResultList(
         modifier = Modifier.fillMaxSize(),
         films = uiState.filmsFound,
         listState = listState,
-        title = "\"${uiState.searchQuery}\"",
+        title = title,
         isSearching = uiState.isSearching,
         isLoadingMore = uiState.isLoadingMore,
         endReached = uiState.endReached,
@@ -39,4 +46,5 @@ fun QueryListScreen(
         loadNextPage = { resultListViewModel.loadNextPage() },
         onBackPress = onBackPress
     )
+
 }

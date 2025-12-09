@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.darvi.filmhunter.presentation.core.components.FilmHunterText
+import com.darvi.filmhunter.presentation.core.components.ItemsListRowHeader
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 import com.darvi.filmhunter.presentation.core.model.FilmUiModel
 
@@ -33,24 +33,31 @@ fun FilmListSection(
     modifier: Modifier = Modifier,
     title: String,
     list: List<FilmUiModel>,
-    onMovieClick: (FilmUiModel) -> Unit = {}
+    onSeeAllClick: () -> Unit,
+    onFilmClick: (filmId: Int, filmType: Int) -> Unit,
 ) {
     Column(
         modifier
             .fillMaxWidth()
             .fillMaxHeight(0.30f)
-            .padding(horizontal = 4.dp, vertical = 8.dp)
+            .padding(horizontal = 4.dp)
+            .padding(top = 4.dp, bottom = 8.dp)
     ) {
-        FilmHunterText(
-            text = title,
-            style = MaterialTheme.typography.titleMedium
-        )
+        ItemsListRowHeader(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 2.dp),
+            title = title,
+        ) {
+            onSeeAllClick()
+        }
+
         LazyRow {
             items(
                 items = list,
                 key = { it.id }
             ) { film ->
-                FilmListItem(film = film, onClick = { onMovieClick(film) })
+                FilmListItem(film = film, onClick = { onFilmClick(film.id, film.type.value) })
             }
         }
     }

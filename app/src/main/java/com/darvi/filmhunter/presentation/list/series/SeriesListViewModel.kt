@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.usecase.series.GetSeriesList
 import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.SeriesListSection
 import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,11 +29,12 @@ class SeriesListViewModel @Inject constructor(
         getSeriesList(SeriesListSection.POPULAR)
         getSeriesList(SeriesListSection.AIRING_TODAY)
         getSeriesList(SeriesListSection.TOP_RATED)
-        getSeriesList(SeriesListSection.ON_THE_AIR)
+//        getSeriesList(SeriesListSection.ON_THE_AIR)
     }
 
     private fun getSeriesList(listType: SeriesListSection) {
         viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isLoading = true) }
             val list = getList(listType.path).map { it.toUiModel() }
             when (listType) {
                 SeriesListSection.POPULAR -> _uiState.update { it.copy(popularSeries = list) }
@@ -40,20 +42,15 @@ class SeriesListViewModel @Inject constructor(
                 SeriesListSection.AIRING_TODAY -> _uiState.update { it.copy(airingTodaySeries = list) }
                 SeriesListSection.ON_THE_AIR -> _uiState.update { it.copy(onTheAirSeries = list) }
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
-}
-
-enum class SeriesListSection(val path: String) {
-    POPULAR("popular"),
-    TOP_RATED("top_rated"),
-    AIRING_TODAY("airing_today"),
-    ON_THE_AIR("on_the_air")
 }
 
 data class SeriesListUiState(
     val popularSeries: List<FilmUiModel> = emptyList(),
     val airingTodaySeries: List<FilmUiModel> = emptyList(),
     val onTheAirSeries: List<FilmUiModel> = emptyList(),
-    val topRatedSeries: List<FilmUiModel> = emptyList()
+    val topRatedSeries: List<FilmUiModel> = emptyList(),
+    val isLoading: Boolean = false
 )

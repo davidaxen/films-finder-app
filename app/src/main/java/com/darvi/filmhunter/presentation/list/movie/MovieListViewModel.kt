@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.usecase.movie.GetMoviesList
 import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.MovieListSection
 import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,13 +27,14 @@ class MovieListViewModel @Inject constructor(
 
     private fun getMoviesLists() {
         getMoviesList(MovieListSection.POPULAR)
-        getMoviesList(MovieListSection.UPCOMING)
         getMoviesList(MovieListSection.TOP_RATED)
         getMoviesList(MovieListSection.NOW_PLAYING)
+//        getMoviesList(MovieListSection.UPCOMING)
     }
 
     private fun getMoviesList(listType: MovieListSection) {
         viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isLoading = true) }
             val list = getList(listType.path).map { it.toUiModel() }
             when (listType) {
                 MovieListSection.POPULAR -> _uiState.update { it.copy(popularMovies = list) }
@@ -40,20 +42,15 @@ class MovieListViewModel @Inject constructor(
                 MovieListSection.NOW_PLAYING -> _uiState.update { it.copy(nowPlayingMovies = list) }
                 MovieListSection.UPCOMING -> _uiState.update { it.copy(upcomingMovies = list) }
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
-}
-
-enum class MovieListSection(val path: String) {
-    POPULAR("popular"),
-    TOP_RATED("top_rated"),
-    NOW_PLAYING("now_playing"),
-    UPCOMING("upcoming")
 }
 
 data class MovieListUiState(
     val popularMovies: List<FilmUiModel> = emptyList(),
     val upcomingMovies: List<FilmUiModel> = emptyList(),
     val nowPlayingMovies: List<FilmUiModel> = emptyList(),
-    val topRatedMovies: List<FilmUiModel> = emptyList()
+    val topRatedMovies: List<FilmUiModel> = emptyList(),
+    val isLoading: Boolean = false
 )

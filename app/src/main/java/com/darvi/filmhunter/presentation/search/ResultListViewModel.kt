@@ -3,12 +3,17 @@ package com.darvi.filmhunter.presentation.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.entity.WatchProvider
+import com.darvi.filmhunter.domain.usecase.movie.GetMoviesList
 import com.darvi.filmhunter.domain.usecase.movie.SearchMoviesByGenres
 import com.darvi.filmhunter.domain.usecase.movie.SearchMoviesByTitle
+import com.darvi.filmhunter.domain.usecase.series.GetSeriesList
 import com.darvi.filmhunter.domain.usecase.series.SearchSeriesByGenres
 import com.darvi.filmhunter.domain.usecase.series.SearchSeriesByTitle
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.core.model.FilmUiModel
+import com.darvi.filmhunter.presentation.core.model.MovieListSection
+import com.darvi.filmhunter.presentation.core.model.SearchMethod
+import com.darvi.filmhunter.presentation.core.model.SeriesListSection
 import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +29,8 @@ class ResultListViewModel @Inject constructor(
     private val searchMoviesByGenres: SearchMoviesByGenres,
     private val searchSeriesByTitle: SearchSeriesByTitle,
     private val searchSeriesByGenres: SearchSeriesByGenres,
+    private val getMoviesList: GetMoviesList,
+    private val getSeriesList: GetSeriesList
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ResultListUiState())
@@ -73,6 +80,26 @@ class ResultListViewModel @Inject constructor(
         loadPage(page = 1, isFirstPage = true)
     }
 
+    fun onSearchMethodParamsLoad(
+        searchMethod: String,
+        filmType: Int
+    ) {
+        if (searchMethod.isNotEmpty()) {
+            val type = if (filmType == FilmType.SERIES.value) FilmType.SERIES else FilmType.MOVIE
+            _uiState.update {
+                it.copy(
+                    isSearching = true,
+                    isLoadingMore = false,
+                    endReached = false,
+                    currentPage = 1,
+                    filmTypeSelected = type,
+                    searchMethod = SearchMethod.fromValue(searchMethod) ?: SearchMethod.POPULAR,
+                    filmsFound = emptyList()
+                )
+            }
+            loadPage(page = 1, isFirstPage = true)
+        }
+    }
 
     fun loadNextPage() {
         if (_uiState.value.isLoadingMore || _uiState.value.endReached || _uiState.value.isSearching) return
@@ -126,12 +153,24 @@ class ResultListViewModel @Inject constructor(
                         emptyList()
                     }
                 }
+
+                else -> when (state.filmTypeSelected) {
+                    FilmType.MOVIE -> getMoviesList(
+                        MovieListSection.fromSearchMethod(state.searchMethod.value).path,
+                        page
+                    ).map { it.toUiModel() }
+
+                    FilmType.SERIES -> getSeriesList(
+                        SeriesListSection.fromSearchMethod(state.searchMethod.value).path,
+                        page
+                    ).map { it.toUiModel() }
+                }
             }
 
 
             _uiState.update { state ->
                 val allMovies =
-                    if (isFirstPage) newFilmsList else state.filmsFound + newFilmsList
+                    (if (isFirstPage) newFilmsList else state.filmsFound + newFilmsList).distinctBy { it.id }
 
                 state.copy(
                     filmsFound = allMovies,
@@ -143,12 +182,6 @@ class ResultListViewModel @Inject constructor(
             }
         }
     }
-}
-
-
-enum class SearchMethod {
-    TITLE,
-    GENRE
 }
 
 data class ResultListUiState(
