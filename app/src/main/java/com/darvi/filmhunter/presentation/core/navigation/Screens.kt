@@ -36,6 +36,7 @@ interface SearchRoutes {
 
 interface MatchRoutes {
     @Serializable object Main
+    @Serializable object FilmTypeSelection
 }
 
 interface SavedRoutes {

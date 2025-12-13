@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import com.darvi.filmhunter.presentation.core.model.FilmType
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,9 +22,16 @@ class MatcherViewModel @Inject constructor() : ViewModel() {
             )
         }
     }
+
+    fun onFilmTypeSelected(filmType: FilmType) {
+        _uiState.update {
+            it.copy(selectedFilmType = filmType)
+        }
+    }
 }
 
 data class MatcherUiState(
     val code: String = "",
     val joinRoomEnabled: Boolean = false,
+    val selectedFilmType: FilmType? = null,
 )

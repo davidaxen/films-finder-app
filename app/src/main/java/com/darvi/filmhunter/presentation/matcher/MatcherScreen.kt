@@ -40,6 +40,7 @@ import com.darvi.filmhunter.presentation.core.components.FilmHunterTextField
 fun MatcherScreen(
     matcherViewModel: MatcherViewModel = hiltViewModel(),
     onJoinRoomClick: (String) -> Unit,
+    onCreateRoomClick: () -> Unit = {},
 ) {
     val uiState by matcherViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -84,7 +85,7 @@ fun MatcherScreen(
                 FilmHunterPrimaryButton(
                     text = "Crear nueva sala",
                     height = 40.dp,
-                    onClick = { /*onCreateRoomClick()*/ }
+                    onClick = onCreateRoomClick
                 )
             }
 

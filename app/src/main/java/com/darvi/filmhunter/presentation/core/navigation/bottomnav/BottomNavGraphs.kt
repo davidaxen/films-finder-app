@@ -14,6 +14,7 @@ import com.darvi.filmhunter.presentation.core.navigation.SearchRoutes
 import com.darvi.filmhunter.presentation.list.movie.MovieListScreen
 import com.darvi.filmhunter.presentation.list.series.SeriesListScreen
 import com.darvi.filmhunter.presentation.matcher.MatcherScreen
+import com.darvi.filmhunter.presentation.matcher.screens.FilmTypeSelectionScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -138,6 +139,19 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
 //                    navController.navigate(
 //                        MainGraph.Room(code = code)
 //                    )
+                },
+                onCreateRoomClick = {
+                    navController.navigate(MatchRoutes.FilmTypeSelection)
+                }
+            )
+        }
+        composable<MatchRoutes.FilmTypeSelection> {
+            FilmTypeSelectionScreen(
+                onFilmTypeSelected = {
+                    // TODO: Navigate to next screen with selected film type
+                },
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
