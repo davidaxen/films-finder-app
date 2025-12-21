@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.domain.entity.movie.MovieGenre
 import com.darvi.filmhunter.domain.entity.series.SeriesGenre
@@ -34,6 +35,7 @@ import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.components.GoBackIconButton
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.matcher.MatcherViewModel
+import com.darvi.filmhunter.presentation.matcher.SessionCreationState
 
 @Composable
 fun MatcherSummaryScreen(
@@ -142,7 +144,7 @@ fun MatcherSummaryScreen(
 
             FilmHunterPrimaryButton(
                 text = "Crear Sesión",
-                onClick = {
+                onClick = dropUnlessResumed {
                     matcherViewModel.createSession(
                         onSuccess = { session ->
                             Log.i("MatcherSummaryScreen", session.toString())
@@ -154,7 +156,8 @@ fun MatcherSummaryScreen(
                         }
                     )
                 },
-                enabled = currentUser != null && sessionCreationState !is com.darvi.filmhunter.presentation.matcher.SessionCreationState.Loading
+                enabled = currentUser != null && sessionCreationState !is SessionCreationState.Loading,
+                isLoading = sessionCreationState is SessionCreationState.Loading
             )
         }
     }

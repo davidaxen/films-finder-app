@@ -287,7 +287,12 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                     sharedViewModel.cancelSession(
                         sessionId = route.sessionId,
                         onSuccess = {
-                            navController.popBackStack(MainGraph.Match, inclusive = false)
+                            navController.navigate(MatchRoutes.Main) {
+                                popUpTo(MatchRoutes.Main) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
                         },
                         onError = { error ->
                             // TODO: Show error message
