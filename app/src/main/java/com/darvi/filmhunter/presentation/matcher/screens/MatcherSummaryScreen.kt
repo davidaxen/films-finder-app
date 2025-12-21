@@ -1,5 +1,6 @@
 package com.darvi.filmhunter.presentation.matcher.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,10 +38,12 @@ import com.darvi.filmhunter.presentation.matcher.MatcherViewModel
 @Composable
 fun MatcherSummaryScreen(
     matcherViewModel: MatcherViewModel = hiltViewModel(),
-    onCreateSession: () -> Unit,
+    onCreateSession: (String) -> Unit, // Pass session code
     onBackClick: () -> Unit = {},
 ) {
     val uiState by matcherViewModel.uiState.collectAsStateWithLifecycle()
+    val sessionCreationState by matcherViewModel.sessionCreationState.collectAsStateWithLifecycle()
+    val currentUser by matcherViewModel.currentUser.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
@@ -139,7 +142,19 @@ fun MatcherSummaryScreen(
 
             FilmHunterPrimaryButton(
                 text = "Crear Sesión",
-                onClick = onCreateSession
+                onClick = {
+                    matcherViewModel.createSession(
+                        onSuccess = { session ->
+                            Log.i("MatcherSummaryScreen", session.toString())
+                            onCreateSession(session.code)
+                        },
+                        onError = { error ->
+                            // TODO: Show error message
+                            Log.e("MatcherSummaryScreen", "Error creating session", error)
+                        }
+                    )
+                },
+                enabled = currentUser != null && sessionCreationState !is com.darvi.filmhunter.presentation.matcher.SessionCreationState.Loading
             )
         }
     }

@@ -1,17 +1,32 @@
 package com.darvi.filmhunter.presentation.matcher
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import com.darvi.filmhunter.data.util.Base32CodeGenerator
+import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
+import com.darvi.filmhunter.domain.entity.UserEntity
+import com.darvi.filmhunter.domain.usecase.auth.GetCurrentUser
+import com.darvi.filmhunter.domain.usecase.matcher.CreateMatcherSession
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import javax.inject.Inject
 
 @HiltViewModel
-class MatcherViewModel @Inject constructor() : ViewModel() {
+class MatcherViewModel @Inject constructor(
+    private val createMatcherSession: CreateMatcherSession,
+    getCurrentUser: GetCurrentUser
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MatcherUiState())
     val uiState: StateFlow<MatcherUiState> = _uiState
+    
+    private val _sessionCreationState = MutableStateFlow<SessionCreationState>(SessionCreationState.Idle)
+    val sessionCreationState: StateFlow<SessionCreationState> = _sessionCreationState
+
+    val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
 
     fun onCodeChanged(code: String) {
         if (code.length > 4) return
@@ -89,6 +104,64 @@ class MatcherViewModel @Inject constructor() : ViewModel() {
             )
         }
     }
+
+    fun createSession(onSuccess: (MatcherSessionEntity) -> Unit, onError: (Throwable) -> Unit) {
+        viewModelScope.launch {
+            val userId = currentUser.value?.id
+            if (userId == null) {
+                onError(Exception("Usuario no autenticado"))
+                return@launch
+            }
+
+            _sessionCreationState.value = SessionCreationState.Loading
+            
+            val code = Base32CodeGenerator.generateCode()
+            
+            // Build filters map
+            val filters = buildFiltersMap()
+            
+            createMatcherSession(code, userId, filters)
+                .onSuccess { session ->
+                    _sessionCreationState.value = SessionCreationState.Success(session)
+                    onSuccess(session)
+                }
+                .onFailure { error ->
+                    _sessionCreationState.value = SessionCreationState.Error(error)
+                    onError(error)
+                }
+        }
+    }
+
+    private fun buildFiltersMap(): Map<String, Any> {
+        val state = _uiState.value
+        val filters = mutableMapOf<String, Any>()
+        
+        // Add film type
+        filters["filmType"] = state.selectedFilmType.value
+        
+        // Add genres
+        val genres = when (state.selectedFilmType) {
+            FilmType.MOVIE -> state.selectedMovieGenres.toList()
+            FilmType.SERIES -> state.selectedSeriesGenres.toList()
+        }
+        filters["genres"] = genres
+        
+        // Add platforms
+        if (state.selectAllPlatforms) {
+            filters["platforms"] = "all"
+        } else {
+            filters["platforms"] = state.selectedPlatforms.toList()
+        }
+        
+        return filters
+    }
+}
+
+sealed class SessionCreationState {
+    data object Idle : SessionCreationState()
+    data object Loading : SessionCreationState()
+    data class Success(val session: MatcherSessionEntity) : SessionCreationState()
+    data class Error(val error: Throwable) : SessionCreationState()
 }
 
 data class MatcherUiState(

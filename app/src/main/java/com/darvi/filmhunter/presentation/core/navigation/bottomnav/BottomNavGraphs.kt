@@ -231,8 +231,10 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
             MatcherSummaryScreen(
                 matcherViewModel = sharedViewModel,
-                onCreateSession = {
-                    // TODO: Create session with selected preferences
+                onCreateSession = { sessionCode ->
+                    // TODO: Navigate to session room or show session code
+                    // For now, just navigate back to main matcher screen
+                    navController.popBackStack(MainGraph.Match, inclusive = false)
                 },
                 onBackClick = {
                     navController.popBackStack()
