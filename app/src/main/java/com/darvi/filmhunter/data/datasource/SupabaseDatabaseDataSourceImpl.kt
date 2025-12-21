@@ -83,4 +83,16 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
         
         return response
     }
+
+    override suspend fun cancelSession(sessionId: String) {
+        database
+            .from(Tables.SESSIONS)
+            .update ({
+                set("status", "cancelled")
+            }) {
+                filter {
+                    eq("id", sessionId)
+                }
+            }
+    }
 }

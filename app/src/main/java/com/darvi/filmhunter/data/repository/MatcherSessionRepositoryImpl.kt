@@ -75,5 +75,14 @@ class MatcherSessionRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun cancelSession(sessionId: String): Result<Unit> {
+        return try {
+            database.cancelSession(sessionId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
 

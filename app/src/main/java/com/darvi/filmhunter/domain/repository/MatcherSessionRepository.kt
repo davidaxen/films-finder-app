@@ -8,5 +8,7 @@ interface MatcherSessionRepository {
         createdBy: String,
         filters: Map<String, Any>
     ): Result<MatcherSessionEntity>
+    
+    suspend fun cancelSession(sessionId: String): Result<Unit>
 }
 

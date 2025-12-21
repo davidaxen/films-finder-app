@@ -11,4 +11,5 @@ interface SupabaseDatabaseDataSource {
     suspend fun getSavedFilmsId(filmType: String): List<FilmsSavedDTO>
     suspend fun createSession(session: SessionDTO): SessionDTO
     suspend fun addSessionMember(member: SessionMemberDTO): SessionMemberDTO
+    suspend fun cancelSession(sessionId: String)
 }

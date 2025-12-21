@@ -40,6 +40,7 @@ interface MatchRoutes {
     @Serializable object GenreSelection
     @Serializable object PlatformSelection
     @Serializable object Summary
+    @Serializable data class SessionWaiting(val sessionCode: String, val sessionId: String)
 }
 
 interface SavedRoutes {

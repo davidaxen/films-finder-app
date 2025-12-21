@@ -20,10 +20,12 @@ import com.darvi.filmhunter.presentation.list.movie.MovieListScreen
 import com.darvi.filmhunter.presentation.list.series.SeriesListScreen
 import com.darvi.filmhunter.presentation.matcher.MatcherScreen
 import com.darvi.filmhunter.presentation.matcher.MatcherViewModel
+import com.darvi.filmhunter.presentation.matcher.SessionCreationState
 import com.darvi.filmhunter.presentation.matcher.screens.FilmTypeSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.GenreSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.MatcherSummaryScreen
 import com.darvi.filmhunter.presentation.matcher.screens.PlatformSelectionScreen
+import com.darvi.filmhunter.presentation.matcher.screens.SessionWaitingScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -232,13 +234,66 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             MatcherSummaryScreen(
                 matcherViewModel = sharedViewModel,
                 onCreateSession = { sessionCode ->
-                    // TODO: Navigate to session room or show session code
-                    // For now, just navigate back to main matcher screen
-                    navController.popBackStack(MainGraph.Match, inclusive = false)
+                    // Get session ID from the created session
+                    val sessionState = sharedViewModel.sessionCreationState.value
+                    if (sessionState is SessionCreationState.Success) {
+                        navController.navigate(
+                            MatchRoutes.SessionWaiting(
+                                sessionCode = sessionCode,
+                                sessionId = sessionState.session.id
+                            )
+                        )
+                    }
                 },
                 onBackClick = {
                     navController.popBackStack()
                 }
+            )
+        }
+        composable<MatchRoutes.SessionWaiting>(
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            }
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            val route = backStackEntry.toRoute<MatchRoutes.SessionWaiting>()
+            SessionWaitingScreen(
+                sessionCode = route.sessionCode,
+                onCancelSession = {
+                    sharedViewModel.cancelSession(
+                        sessionId = route.sessionId,
+                        onSuccess = {
+                            navController.popBackStack(MainGraph.Match, inclusive = false)
+                        },
+                        onError = { error ->
+                            // TODO: Show error message
+                        }
+                    )
+                },
             )
         }
     }

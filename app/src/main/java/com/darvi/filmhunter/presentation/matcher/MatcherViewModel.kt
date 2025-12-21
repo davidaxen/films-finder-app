@@ -11,6 +11,7 @@ import com.darvi.filmhunter.data.util.Base32CodeGenerator
 import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.domain.entity.UserEntity
 import com.darvi.filmhunter.domain.usecase.auth.GetCurrentUser
+import com.darvi.filmhunter.domain.usecase.matcher.CancelMatcherSession
 import com.darvi.filmhunter.domain.usecase.matcher.CreateMatcherSession
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import javax.inject.Inject
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MatcherViewModel @Inject constructor(
     private val createMatcherSession: CreateMatcherSession,
+    private val cancelMatcherSession: CancelMatcherSession,
     getCurrentUser: GetCurrentUser
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MatcherUiState())
@@ -154,6 +156,18 @@ class MatcherViewModel @Inject constructor(
         }
         
         return filters
+    }
+
+    fun cancelSession(sessionId: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        viewModelScope.launch {
+            cancelMatcherSession(sessionId)
+                .onSuccess {
+                    onSuccess()
+                }
+                .onFailure { error ->
+                    onError(error)
+                }
+        }
     }
 }
 
