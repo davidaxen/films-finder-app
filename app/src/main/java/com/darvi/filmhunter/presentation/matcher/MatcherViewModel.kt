@@ -51,6 +51,44 @@ class MatcherViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+
+    fun onSelectAllPlatforms() {
+        _uiState.update {
+            it.copy(
+                selectAllPlatforms = true,
+                selectedPlatforms = emptySet()
+            )
+        }
+    }
+
+    fun onPlatformToggled(platformId: Int) {
+        _uiState.update { state ->
+            // If "all" is currently selected, deselect it and select only this platform
+            if (state.selectAllPlatforms) {
+                return@update state.copy(
+                    selectAllPlatforms = false,
+                    selectedPlatforms = setOf(platformId)
+                )
+            }
+
+            val isCurrentlySelected = state.selectedPlatforms.contains(platformId)
+            val updatedPlatforms = if (isCurrentlySelected) {
+                state.selectedPlatforms - platformId
+            } else {
+                state.selectedPlatforms + platformId
+            }
+
+            // If user selects all 3 platforms, automatically select "all" and clear individual selections
+            val allPlatformIds = setOf(8, 337, 1899) // Netflix, Disney+, HBO Max
+            val shouldSelectAll = updatedPlatforms.size == allPlatformIds.size && 
+                                  updatedPlatforms.containsAll(allPlatformIds)
+
+            state.copy(
+                selectAllPlatforms = shouldSelectAll,
+                selectedPlatforms = if (shouldSelectAll) emptySet() else updatedPlatforms
+            )
+        }
+    }
 }
 
 data class MatcherUiState(
@@ -59,4 +97,6 @@ data class MatcherUiState(
     val selectedFilmType: FilmType = FilmType.MOVIE,
     val selectedMovieGenres: Set<Int> = emptySet(),
     val selectedSeriesGenres: Set<Int> = emptySet(),
+    val selectAllPlatforms: Boolean = true,
+    val selectedPlatforms: Set<Int> = emptySet(),
 )

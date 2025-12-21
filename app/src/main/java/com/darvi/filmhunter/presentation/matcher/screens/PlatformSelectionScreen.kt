@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -23,23 +24,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.darvi.filmhunter.domain.entity.movie.MovieGenre
-import com.darvi.filmhunter.domain.entity.series.SeriesGenre
+import coil3.compose.AsyncImage
+import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.presentation.core.components.FilmHunterPrimaryButton
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.components.GoBackIconButton
-import com.darvi.filmhunter.presentation.core.model.FilmType
+import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
 import com.darvi.filmhunter.presentation.matcher.MatcherViewModel
 
 @Composable
-fun GenreSelectionScreen(
+fun PlatformSelectionScreen(
     matcherViewModel: MatcherViewModel = hiltViewModel(),
-    onGenresSelected: () -> Unit,
+    onPlatformsSelected: () -> Unit,
     onBackClick: () -> Unit = {},
 ) {
     val uiState by matcherViewModel.uiState.collectAsStateWithLifecycle()
@@ -70,7 +72,7 @@ fun GenreSelectionScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             FilmHunterText(
-                text = "Selecciona géneros",
+                text = "Selecciona plataformas",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -79,13 +81,25 @@ fun GenreSelectionScreen(
             )
 
             FilmHunterText(
-                text = "Elige uno o más géneros que te interesen",
+                text = "Elige todas las plataformas o selecciona 1 o 2 específicas",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // "All" button
+            PlatformCard(
+                title = "Todas",
+                isSelected = uiState.selectAllPlatforms,
+                onClick = {
+                    matcherViewModel.onSelectAllPlatforms()
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -93,59 +107,43 @@ fun GenreSelectionScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                when (uiState.selectedFilmType) {
-                    FilmType.MOVIE -> items(MovieGenre.entries) { genre ->
-                        GenreCard(
-                            genreName = genre.displayName,
-                            isSelected = uiState.selectedMovieGenres.contains(genre.id),
-                            onClick = {
-                                matcherViewModel.onGenreToggled(
-                                    genreId = genre.id
-                                )
-                            }
-                        )
-                    }
-                    FilmType.SERIES -> items(SeriesGenre.entries) { genre ->
-                        GenreCard(
-                            genreName = genre.displayName,
-                            isSelected = uiState.selectedSeriesGenres.contains(genre.id),
-                            onClick = {
-                                matcherViewModel.onGenreToggled(
-                                    genreId = genre.id
-                                )
-                            }
-                        )
-                    }
+                items(WatchProvider.entries) { provider ->
+                    PlatformCard(
+                        title = provider.title,
+                        logoPath = provider.logoPath,
+                        isSelected = uiState.selectedPlatforms.contains(provider.id),
+                        onClick = {
+                            matcherViewModel.onPlatformToggled(provider.id)
+                        }
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            val hasSelectedGenres = when (uiState.selectedFilmType) {
-                FilmType.MOVIE -> uiState.selectedMovieGenres.isNotEmpty()
-                FilmType.SERIES -> uiState.selectedSeriesGenres.isNotEmpty()
-            }
+            val hasSelection = uiState.selectAllPlatforms || uiState.selectedPlatforms.isNotEmpty()
 
             FilmHunterPrimaryButton(
                 text = "Continuar",
-                onClick = onGenresSelected,
-                enabled = hasSelectedGenres
+                onClick = onPlatformsSelected,
+                enabled = hasSelection
             )
         }
     }
 }
 
 @Composable
-private fun GenreCard(
-    genreName: String,
+private fun PlatformCard(
+    title: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    logoPath: String? = null
 ) {
     val shape = RoundedCornerShape(16.dp)
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(80.dp)
             .clip(shape)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
@@ -160,16 +158,29 @@ private fun GenreCard(
             defaultElevation = if (isSelected) 8.dp else 4.dp
         )
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
+            if (logoPath != null) {
+                AsyncImage(
+                    model = ImageUrlHelper.getOriginalUrl(logoPath),
+                    contentDescription = title,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Fit
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
             FilmHunterText(
-                text = genreName,
+                text = title,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
-                textAlign = TextAlign.Center,
                 color = if (isSelected) {
                     MaterialTheme.colorScheme.onPrimary
                 } else {

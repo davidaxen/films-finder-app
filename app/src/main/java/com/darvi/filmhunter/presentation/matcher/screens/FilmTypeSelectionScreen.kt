@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
@@ -68,12 +69,14 @@ fun FilmTypeSelectionScreen(
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
+                textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground
             )
                         
             FilmHunterText(
                 text = "Selecciona si quieres buscar películas o series",
                 style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
             
