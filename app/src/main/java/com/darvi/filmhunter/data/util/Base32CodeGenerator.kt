@@ -1,7 +1,5 @@
 package com.darvi.filmhunter.data.util
 
-import java.util.UUID
-
 object Base32CodeGenerator {
     private const val BASE32_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
     private const val CODE_LENGTH = 6
