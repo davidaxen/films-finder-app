@@ -1,5 +1,10 @@
 package com.darvi.filmhunter.presentation.core.navigation.bottomnav
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.runtime.remember
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -14,7 +19,9 @@ import com.darvi.filmhunter.presentation.core.navigation.SearchRoutes
 import com.darvi.filmhunter.presentation.list.movie.MovieListScreen
 import com.darvi.filmhunter.presentation.list.series.SeriesListScreen
 import com.darvi.filmhunter.presentation.matcher.MatcherScreen
+import com.darvi.filmhunter.presentation.matcher.MatcherViewModel
 import com.darvi.filmhunter.presentation.matcher.screens.FilmTypeSelectionScreen
+import com.darvi.filmhunter.presentation.matcher.screens.GenreSelectionScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -145,10 +152,54 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 }
             )
         }
-        composable<MatchRoutes.FilmTypeSelection> {
+        composable<MatchRoutes.FilmTypeSelection>(
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            }
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
             FilmTypeSelectionScreen(
+                matcherViewModel = sharedViewModel,
                 onFilmTypeSelected = {
-                    // TODO: Navigate to next screen with selected film type
+                    navController.navigate(MatchRoutes.GenreSelection)
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MatchRoutes.GenreSelection> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            GenreSelectionScreen(
+                matcherViewModel = sharedViewModel,
+                onGenresSelected = {
                 },
                 onBackClick = {
                     navController.popBackStack()

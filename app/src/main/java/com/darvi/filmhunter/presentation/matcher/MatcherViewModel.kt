@@ -28,10 +28,35 @@ class MatcherViewModel @Inject constructor() : ViewModel() {
             it.copy(selectedFilmType = filmType)
         }
     }
+
+    fun onGenreToggled(genreId: Int) {
+        _uiState.update { state ->
+            when (state.selectedFilmType) {
+                FilmType.MOVIE -> {
+                    val updatedGenres = if (state.selectedMovieGenres.contains(genreId)) {
+                        state.selectedMovieGenres - genreId
+                    } else {
+                        state.selectedMovieGenres + genreId
+                    }
+                    state.copy(selectedMovieGenres = updatedGenres)
+                }
+                FilmType.SERIES -> {
+                    val updatedGenres = if (state.selectedSeriesGenres.contains(genreId)) {
+                        state.selectedSeriesGenres - genreId
+                    } else {
+                        state.selectedSeriesGenres + genreId
+                    }
+                    state.copy(selectedSeriesGenres = updatedGenres)
+                }
+            }
+        }
+    }
 }
 
 data class MatcherUiState(
     val code: String = "",
     val joinRoomEnabled: Boolean = false,
-    val selectedFilmType: FilmType? = null,
+    val selectedFilmType: FilmType = FilmType.MOVIE,
+    val selectedMovieGenres: Set<Int> = emptySet(),
+    val selectedSeriesGenres: Set<Int> = emptySet(),
 )

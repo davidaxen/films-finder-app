@@ -49,7 +49,7 @@ fun NavigationWrapper(
         it.hasRoute<HomeRoutes.MoviesList>() ||
         it.hasRoute<HomeRoutes.SeriesList>() ||
         it.hasRoute<SearchRoutes.Main>() ||
-        it.hasRoute<MainGraph.Match>() ||
+        it.hasRoute<MatchRoutes.Main>() ||
         it.hasRoute<MainGraph.Saved>() ||
         it.hasRoute<MainGraph.Profile>()
     } == true

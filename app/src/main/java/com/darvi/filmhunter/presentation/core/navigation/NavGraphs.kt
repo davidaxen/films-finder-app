@@ -8,10 +8,10 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
 import com.darvi.filmhunter.presentation.auth.login.LoginScreen
 import com.darvi.filmhunter.presentation.auth.register.RegisterScreen
-import com.darvi.filmhunter.presentation.core.navigation.bottomnav.savedGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.homeGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.matchGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.profileGraph
+import com.darvi.filmhunter.presentation.core.navigation.bottomnav.savedGraph
 import com.darvi.filmhunter.presentation.core.navigation.bottomnav.searchGraph
 import com.darvi.filmhunter.presentation.detail.DetailScreen
 import com.darvi.filmhunter.presentation.detail.SeasonDetailScreen
@@ -40,7 +40,7 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
 }
 
 fun NavGraphBuilder.mainGraph(navController: NavController) {
-    navigation<AppGraph.Main>(startDestination = MainGraph.Home) {
+    navigation<AppGraph.Main>(startDestination = MainGraph.Match) {
         homeGraph(navController)
         searchGraph(navController)
         matchGraph(navController)
