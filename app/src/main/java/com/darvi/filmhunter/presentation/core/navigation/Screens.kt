@@ -39,6 +39,7 @@ interface MatchRoutes {
     @Serializable object FilmTypeSelection
     @Serializable object GenreSelection
     @Serializable object PlatformSelection
+    @Serializable object Summary
 }
 
 interface SavedRoutes {

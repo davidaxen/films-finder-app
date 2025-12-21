@@ -22,6 +22,7 @@ import com.darvi.filmhunter.presentation.matcher.MatcherScreen
 import com.darvi.filmhunter.presentation.matcher.MatcherViewModel
 import com.darvi.filmhunter.presentation.matcher.screens.FilmTypeSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.GenreSelectionScreen
+import com.darvi.filmhunter.presentation.matcher.screens.MatcherSummaryScreen
 import com.darvi.filmhunter.presentation.matcher.screens.PlatformSelectionScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
@@ -216,7 +217,22 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             PlatformSelectionScreen(
                 matcherViewModel = sharedViewModel,
                 onPlatformsSelected = {
-                    // TODO: Navigate to next screen with selected platforms
+                    navController.navigate(MatchRoutes.Summary)
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MatchRoutes.Summary> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            MatcherSummaryScreen(
+                matcherViewModel = sharedViewModel,
+                onCreateSession = {
+                    // TODO: Create session with selected preferences
                 },
                 onBackClick = {
                     navController.popBackStack()
