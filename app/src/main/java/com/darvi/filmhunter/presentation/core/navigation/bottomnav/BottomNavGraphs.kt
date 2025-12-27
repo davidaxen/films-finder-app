@@ -153,6 +153,12 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 navController.getBackStackEntry(MainGraph.Match)
             }
             val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            
+            // Reset ViewModel when navigating to main screen
+            LaunchedEffect(Unit) {
+                sharedViewModel.reset()
+            }
+            
             MatcherScreen(
                 onJoinRoomClick = { code ->
                     sharedViewModel.joinSession(

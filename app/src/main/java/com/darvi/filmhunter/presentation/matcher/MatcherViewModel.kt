@@ -301,6 +301,23 @@ class MatcherViewModel @Inject constructor(
         }
     }
     
+    fun reset() {
+        viewModelScope.launch(Dispatchers.IO) {
+            // Unsubscribe from any active listeners
+            _currentSession.value?.let { session ->
+                unsubscribeAllSessionListeners(session.id)
+            }
+            
+            _uiState.value = MatcherUiState()
+            _sessionCreationState.value = SessionCreationState.Idle
+            _sessionJoinState.value = SessionJoinState.Idle
+            _currentSession.value = null
+            _hasOtherUserJoined.value = false
+            _sessionBecameActive.value = false
+            _sessionCancelled.value = false
+        }
+    }
+    
     override fun onCleared() {
         super.onCleared()
         _currentSession.value?.let { session ->
