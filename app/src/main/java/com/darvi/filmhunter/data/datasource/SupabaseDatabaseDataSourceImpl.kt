@@ -31,6 +31,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
     private val dataSourceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val channels = mutableMapOf<String, RealtimeChannel>()
     private val _memberJoinedFlow = MutableSharedFlow<String>(replay = 0)
+    private val _sessionStatusFlow = MutableSharedFlow<String>(replay = 0)
     object Tables {
         const val SAVED_FILMS = "saved_films"
         const val SESSIONS = "sessions"
@@ -159,8 +160,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
         dataSourceScope.launch {
             try {
                 val channel = realtime.channel(channelKey)
-                Log.d("SupabaseDatabaseDataSourceImpl", "channel: $channel")
-                
+
                 // Listen for INSERT events on session_members table
                 channel.postgresChangeFlow<PostgresAction.Insert>(
                     schema = "public",
@@ -171,18 +171,14 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
                     // Check if the inserted user is not the current user
                     val userIdElement = change.record["user_id"]
                     val insertedUserId = (userIdElement as? JsonPrimitive)?.content
-                    
-                    Log.d("SupabaseDatabaseDataSourceImpl", "Change received - insertedUserId: $insertedUserId, currentUserId: $currentUserId")
-                    
+
                     if (insertedUserId != null && insertedUserId != currentUserId) {
-                        Log.d("SupabaseDatabaseDataSourceImpl", "Another user joined! Emitting sessionId: $sessionId")
                         _memberJoinedFlow.emit(sessionId)
                     }
                 }
                 .launchIn(dataSourceScope)
                 
                 channel.subscribe()
-                Log.d("SupabaseDatabaseDataSourceImpl", "Subscribed to channel: $channelKey")
                 channels[channelKey] = channel
             } catch (e: Exception) {
                 // Handle error silently or log it
@@ -194,6 +190,56 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
 
     override suspend fun unsubscribeFromSessionMembers(sessionId: String) {
         val channelKey = "session_members_$sessionId"
+        channels[channelKey]?.let { channel ->
+            try {
+                channel.unsubscribe()
+                channels.remove(channelKey)
+            } catch (e: Exception) {
+                // Handle error silently
+            }
+        }
+    }
+
+    override suspend fun subscribeToSessionStatus(sessionId: String): Flow<String> {
+        val channelKey = "session_status_$sessionId"
+        
+        // Unsubscribe if already subscribed
+        unsubscribeFromSessionStatus(sessionId)
+        
+        dataSourceScope.launch {
+            try {
+                val channel = realtime.channel(channelKey)
+
+                // Listen for UPDATE events on sessions table
+                channel.postgresChangeFlow<PostgresAction.Update>(
+                    schema = "public",
+                ) {
+                    table = "sessions"
+                }
+                .onEach { change ->
+                    // Check if the session status changed to "active"
+                    val statusElement = change.record["status"]
+                    val newStatus = (statusElement as? JsonPrimitive)?.content
+                    val updatedSessionId = (change.record["id"] as? JsonPrimitive)?.content
+
+                    if (newStatus == "active" && updatedSessionId == sessionId) {
+                        _sessionStatusFlow.emit(sessionId)
+                    }
+                }
+                .launchIn(dataSourceScope)
+                
+                channel.subscribe()
+                channels[channelKey] = channel
+            } catch (e: Exception) {
+                Log.e("SupabaseDatabaseDataSourceImpl", "Error subscribing to session status", e)
+            }
+        }
+        
+        return _sessionStatusFlow.asSharedFlow()
+    }
+
+    override suspend fun unsubscribeFromSessionStatus(sessionId: String) {
+        val channelKey = "session_status_$sessionId"
         channels[channelKey]?.let { channel ->
             try {
                 channel.unsubscribe()

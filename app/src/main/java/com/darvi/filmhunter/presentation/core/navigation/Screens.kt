@@ -41,6 +41,7 @@ interface MatchRoutes {
     @Serializable object PlatformSelection
     @Serializable object Summary
     @Serializable data class SessionWaiting(val sessionCode: String, val sessionId: String)
+    @Serializable data class Swiping(val sessionId: String)
 }
 
 interface SavedRoutes {

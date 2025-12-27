@@ -17,6 +17,8 @@ import com.darvi.filmhunter.domain.usecase.matcher.JoinMatcherSession
 import com.darvi.filmhunter.domain.usecase.matcher.InitiateMatcherSession
 import com.darvi.filmhunter.domain.usecase.matcher.SubscribeToSessionMembers
 import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeFromSessionMembers
+import com.darvi.filmhunter.domain.usecase.matcher.SubscribeToSessionStatus
+import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeFromSessionStatus
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -31,6 +33,8 @@ class MatcherViewModel @Inject constructor(
     private val initiateMatcherSession: InitiateMatcherSession,
     private val subscribeToSessionMembers: SubscribeToSessionMembers,
     private val unsubscribeFromSessionMembers: UnsubscribeFromSessionMembers,
+    private val subscribeToSessionStatus: SubscribeToSessionStatus,
+    private val unsubscribeFromSessionStatus: UnsubscribeFromSessionStatus,
     getCurrentUser: GetCurrentUser
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MatcherUiState())
@@ -47,6 +51,9 @@ class MatcherViewModel @Inject constructor(
     
     private val _hasOtherUserJoined = MutableStateFlow(false)
     val hasOtherUserJoined: StateFlow<Boolean> = _hasOtherUserJoined
+    
+    private val _sessionBecameActive = MutableStateFlow(false)
+    val sessionBecameActive: StateFlow<Boolean> = _sessionBecameActive
 
     val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
 
@@ -207,6 +214,8 @@ class MatcherViewModel @Inject constructor(
                 .onSuccess { session ->
                     _sessionJoinState.value = SessionJoinState.Success(session)
                     _currentSession.value = session
+                    // Subscribe to session status changes (for non-host users)
+                    startListeningToSessionStatus(session.id)
                     onSuccess(session)
                 }
                 .onFailure { error ->
@@ -228,10 +237,24 @@ class MatcherViewModel @Inject constructor(
         }
     }
     
+    private fun startListeningToSessionStatus(sessionId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            subscribeToSessionStatus(sessionId)
+                .onEach { activeSessionId ->
+                    if (activeSessionId == sessionId) {
+                        _sessionBecameActive.value = true
+                    }
+                }
+                .launchIn(viewModelScope)
+        }
+    }
+    
     fun initiateSession(sessionId: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         viewModelScope.launch {
             initiateMatcherSession(sessionId)
                 .onSuccess {
+                    // Session status changed to active, set the flag
+                    _sessionBecameActive.value = true
                     onSuccess()
                 }
                 .onFailure { error ->
@@ -245,6 +268,7 @@ class MatcherViewModel @Inject constructor(
         _currentSession.value?.let { session ->
             viewModelScope.launch(Dispatchers.IO) {
                 unsubscribeFromSessionMembers(session.id)
+                unsubscribeFromSessionStatus(session.id)
             }
         }
     }

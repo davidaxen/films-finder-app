@@ -171,7 +171,7 @@ fun SessionWaitingScreen(
             if (isHost) {
                 if (hasOtherUserJoined && onInitiateSession != null) {
                     FilmHunterPrimaryButton(
-                        text = "Iniciar Sesión",
+                        text = "Empezar Sesión",
                         onClick = dropUnlessResumed {
                             onInitiateSession()
                         },

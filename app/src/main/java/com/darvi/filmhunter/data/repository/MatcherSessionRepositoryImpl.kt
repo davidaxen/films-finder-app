@@ -162,5 +162,13 @@ class MatcherSessionRepositoryImpl @Inject constructor(
     override suspend fun unsubscribeFromSessionMembers(sessionId: String) {
         database.unsubscribeFromSessionMembers(sessionId)
     }
+
+    override suspend fun subscribeToSessionStatus(sessionId: String): Flow<String> {
+        return database.subscribeToSessionStatus(sessionId)
+    }
+
+    override suspend fun unsubscribeFromSessionStatus(sessionId: String) {
+        database.unsubscribeFromSessionStatus(sessionId)
+    }
 }
 

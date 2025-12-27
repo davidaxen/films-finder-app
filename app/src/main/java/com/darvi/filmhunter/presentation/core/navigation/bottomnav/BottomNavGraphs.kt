@@ -28,6 +28,7 @@ import com.darvi.filmhunter.presentation.matcher.screens.GenreSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.MatcherSummaryScreen
 import com.darvi.filmhunter.presentation.matcher.screens.PlatformSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.SessionWaitingScreen
+import com.darvi.filmhunter.presentation.matcher.screens.SwipingScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -301,12 +302,28 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             val currentUser by sharedViewModel.currentUser.collectAsStateWithLifecycle()
             val currentSession by sharedViewModel.currentSession.collectAsStateWithLifecycle()
             val hasOtherUserJoined by sharedViewModel.hasOtherUserJoined.collectAsStateWithLifecycle()
+            val sessionBecameActive by sharedViewModel.sessionBecameActive.collectAsStateWithLifecycle()
             
             // Determine if current user is the host
             val isHost = remember(route.sessionId, currentUser, currentSession) {
                 currentSession?.let { session ->
                     session.id == route.sessionId && session.createdBy == currentUser?.id
                 } ?: false
+            }
+            
+            // Navigate to SwipingScreen when session becomes active
+            androidx.compose.runtime.LaunchedEffect(sessionBecameActive) {
+                if (sessionBecameActive) {
+                    navController.navigate(
+                        MatchRoutes.Swiping(sessionId = route.sessionId)
+                    ) {
+                        // Clear the back stack up to Main
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                }
             }
             
             SessionWaitingScreen(
@@ -333,12 +350,10 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 } else null,
                 onInitiateSession = if (isHost && hasOtherUserJoined) {
                     {
-                        // TODO: Implement initiate session
                         sharedViewModel.initiateSession(
                             sessionId = route.sessionId,
                             onSuccess = {
-                                // Navigate to swiping screen or next screen
-                                // TODO: Navigate to swiping screen
+                                // Navigation will happen automatically via LaunchedEffect when sessionBecameActive becomes true
                             },
                             onError = { error ->
                                 // TODO: Show error message
@@ -347,6 +362,35 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                     }
                 } else null,
             )
+        }
+        composable<MatchRoutes.Swiping>(
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            }
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<MatchRoutes.Swiping>()
+            SwipingScreen(sessionId = route.sessionId)
         }
     }
 }
