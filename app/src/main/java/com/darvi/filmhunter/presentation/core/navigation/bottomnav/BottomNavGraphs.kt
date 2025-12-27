@@ -300,6 +300,7 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             val route = backStackEntry.toRoute<MatchRoutes.SessionWaiting>()
             val currentUser by sharedViewModel.currentUser.collectAsStateWithLifecycle()
             val currentSession by sharedViewModel.currentSession.collectAsStateWithLifecycle()
+            val hasOtherUserJoined by sharedViewModel.hasOtherUserJoined.collectAsStateWithLifecycle()
             
             // Determine if current user is the host
             val isHost = remember(route.sessionId, currentUser, currentSession) {
@@ -311,6 +312,7 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             SessionWaitingScreen(
                 sessionCode = route.sessionCode,
                 isHost = isHost,
+                hasOtherUserJoined = hasOtherUserJoined,
                 onCancelSession = if (isHost) {
                     {
                         sharedViewModel.cancelSession(
@@ -322,6 +324,21 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                                     }
                                     launchSingleTop = true
                                 }
+                            },
+                            onError = { error ->
+                                // TODO: Show error message
+                            }
+                        )
+                    }
+                } else null,
+                onInitiateSession = if (isHost && hasOtherUserJoined) {
+                    {
+                        // TODO: Implement initiate session
+                        sharedViewModel.initiateSession(
+                            sessionId = route.sessionId,
+                            onSuccess = {
+                                // Navigate to swiping screen or next screen
+                                // TODO: Navigate to swiping screen
                             },
                             onError = { error ->
                                 // TODO: Show error message

@@ -9,8 +9,11 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.realtime.realtime
 import javax.inject.Singleton
 
 @Module
@@ -25,6 +28,8 @@ object SupabaseModule {
         ) {
             install(Postgrest)
             install(Auth)
+            install(Realtime)
+            defaultLogLevel = LogLevel.DEBUG
         }
     }
 
@@ -36,7 +41,13 @@ object SupabaseModule {
 
     @Provides
     @Singleton
-    fun provideSupabaseDtabase(client: SupabaseClient): Postgrest {
+    fun provideSupabaseDatabase(client: SupabaseClient): Postgrest {
         return client.postgrest
+    }
+
+    @Provides
+    @Singleton
+    fun provideSupabaseRealtime(client: SupabaseClient): Realtime {
+        return client.realtime
     }
 }

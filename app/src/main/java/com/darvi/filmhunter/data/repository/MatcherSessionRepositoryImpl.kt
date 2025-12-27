@@ -5,6 +5,7 @@ import com.darvi.filmhunter.data.model.supabase.SessionDTO
 import com.darvi.filmhunter.data.model.supabase.SessionMemberDTO
 import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.domain.repository.MatcherSessionRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
@@ -143,6 +144,23 @@ class MatcherSessionRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun initiateSession(sessionId: String): Result<Unit> {
+        return try {
+            database.updateSessionStatus(sessionId, "active")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun subscribeToSessionMembers(sessionId: String, currentUserId: String): Flow<String> {
+        return database.subscribeToSessionMembers(sessionId, currentUserId)
+    }
+
+    override suspend fun unsubscribeFromSessionMembers(sessionId: String) {
+        database.unsubscribeFromSessionMembers(sessionId)
     }
 }
 

@@ -22,6 +22,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.realtime.Realtime
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -49,8 +50,8 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideSupabaseDatabaseDataSource(database: Postgrest): SupabaseDatabaseDataSource {
-        return SupabaseDatabaseDataSourceImpl(database)
+    fun provideSupabaseDatabaseDataSource(database: Postgrest, realtime: Realtime): SupabaseDatabaseDataSource {
+        return SupabaseDatabaseDataSourceImpl(database, realtime)
     }
 
     @Provides

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -45,7 +46,9 @@ import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 fun SessionWaitingScreen(
     sessionCode: String,
     isHost: Boolean = true,
+    hasOtherUserJoined: Boolean = false,
     onCancelSession: (() -> Unit)? = null,
+    onInitiateSession: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     var showCancelDialog by remember { mutableStateOf(false) }
@@ -130,19 +133,32 @@ fun SessionWaitingScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Waiting indicator
+            // Waiting indicator or success indicator
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(48.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 4.dp
-                )
+                if (hasOtherUserJoined && isHost) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Usuario unido",
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 4.dp
+                    )
+                }
 
                 FilmHunterText(
-                    text = if (isHost) "Esperando a que se una otro usuario..." else "Esperando a que el anfitrión inicie la sesión...",
+                    text = when {
+                        hasOtherUserJoined && isHost -> "¡Un usuario se ha unido! Listo para iniciar la sesión"
+                        isHost -> "Esperando a que se una otro usuario..."
+                        else -> "Esperando a que el anfitrión inicie la sesión..."
+                    },
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
@@ -151,15 +167,25 @@ fun SessionWaitingScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Cancel Session Button (only for host)
-            if (isHost && onCancelSession != null) {
-                FilmHunterSecondaryButton(
-                    text = "Cancelar Sesión",
-                    onClick = dropUnlessResumed {
-                        showCancelDialog = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+            // Initiate Session Button (when user has joined) or Cancel Session Button
+            if (isHost) {
+                if (hasOtherUserJoined && onInitiateSession != null) {
+                    FilmHunterPrimaryButton(
+                        text = "Iniciar Sesión",
+                        onClick = dropUnlessResumed {
+                            onInitiateSession()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else if (onCancelSession != null) {
+                    FilmHunterSecondaryButton(
+                        text = "Cancelar Sesión",
+                        onClick = dropUnlessResumed {
+                            showCancelDialog = true
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
 

@@ -3,6 +3,7 @@ package com.darvi.filmhunter.data.datasource
 import com.darvi.filmhunter.data.model.supabase.FilmsSavedDTO
 import com.darvi.filmhunter.data.model.supabase.SessionDTO
 import com.darvi.filmhunter.data.model.supabase.SessionMemberDTO
+import kotlinx.coroutines.flow.Flow
 
 interface SupabaseDatabaseDataSource {
     suspend fun saveFilm(filmId: Int, filmType: String)
@@ -14,4 +15,7 @@ interface SupabaseDatabaseDataSource {
     suspend fun cancelSession(sessionId: String)
     suspend fun joinSessionByCode(code: String): String
     suspend fun getSessionById(sessionId: String): SessionDTO
+    suspend fun updateSessionStatus(sessionId: String, status: String)
+    suspend fun subscribeToSessionMembers(sessionId: String, currentUserId: String): Flow<String>
+    suspend fun unsubscribeFromSessionMembers(sessionId: String)
 }

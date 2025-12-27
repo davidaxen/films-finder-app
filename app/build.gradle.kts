@@ -75,7 +75,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.okhttp)
 
     //Splash Screen
     implementation(libs.splash.screen)
@@ -92,6 +92,7 @@ dependencies {
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.supabase.auth.kt)
+    implementation(libs.supabase.realtime.kt)
 
     //DI
     implementation(libs.hilt.android)
