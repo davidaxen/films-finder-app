@@ -10,5 +10,7 @@ interface MatcherSessionRepository {
     ): Result<MatcherSessionEntity>
     
     suspend fun cancelSession(sessionId: String): Result<Unit>
+    
+    suspend fun joinSessionByCode(code: String, currentUserId: String): Result<MatcherSessionEntity>
 }
 

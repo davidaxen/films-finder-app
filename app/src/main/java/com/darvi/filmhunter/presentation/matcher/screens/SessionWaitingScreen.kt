@@ -44,7 +44,8 @@ import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 @Composable
 fun SessionWaitingScreen(
     sessionCode: String,
-    onCancelSession: () -> Unit,
+    isHost: Boolean = true,
+    onCancelSession: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     var showCancelDialog by remember { mutableStateOf(false) }
@@ -64,7 +65,7 @@ fun SessionWaitingScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             FilmHunterText(
-                text = "Sala creada",
+                text = if (isHost) "Sala creada" else "Unido a la sala",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -73,7 +74,11 @@ fun SessionWaitingScreen(
             )
 
             FilmHunterText(
-                text = "Comparte este código con tu amigo para que se una a la sesión",
+                text = if (isHost) {
+                    "Comparte este código con tu amigo para que se una a la sesión"
+                } else {
+                    "Te has unido a la sesión correctamente"
+                },
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
@@ -137,7 +142,7 @@ fun SessionWaitingScreen(
                 )
 
                 FilmHunterText(
-                    text = "Esperando a que se una otro usuario...",
+                    text = if (isHost) "Esperando a que se una otro usuario..." else "Esperando a que el anfitrión inicie la sesión...",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
@@ -146,18 +151,20 @@ fun SessionWaitingScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Cancel Session Button
-            FilmHunterSecondaryButton(
-                text = "Cancelar Sesión",
-                onClick = dropUnlessResumed {
-                    showCancelDialog = true
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Cancel Session Button (only for host)
+            if (isHost && onCancelSession != null) {
+                FilmHunterSecondaryButton(
+                    text = "Cancelar Sesión",
+                    onClick = dropUnlessResumed {
+                        showCancelDialog = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
-        // Cancel Confirmation Dialog
-        if (showCancelDialog) {
+        // Cancel Confirmation Dialog (only for host)
+        if (isHost && showCancelDialog && onCancelSession != null) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
                 title = {

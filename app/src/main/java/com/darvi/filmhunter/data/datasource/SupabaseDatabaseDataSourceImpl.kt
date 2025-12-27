@@ -5,6 +5,7 @@ import com.darvi.filmhunter.data.model.supabase.SessionDTO
 import com.darvi.filmhunter.data.model.supabase.SessionMemberDTO
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.rpc
 import javax.inject.Inject
 
 class SupabaseDatabaseDataSourceImpl @Inject constructor(
@@ -94,5 +95,26 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
                     eq("id", sessionId)
                 }
             }
+    }
+
+    override suspend fun joinSessionByCode(code: String): String {
+        val response = database
+            .rpc("join_session_by_code", parameters = mapOf("p_code" to code))
+            .decodeAs<String>()
+
+        return response
+    }
+
+    override suspend fun getSessionById(sessionId: String): SessionDTO {
+        val response = database
+            .from(Tables.SESSIONS)
+            .select {
+                filter {
+                    eq("id", sessionId)
+                }
+            }
+            .decodeSingle<SessionDTO>()
+
+        return response
     }
 }

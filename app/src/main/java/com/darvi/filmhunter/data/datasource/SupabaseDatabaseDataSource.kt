@@ -12,4 +12,6 @@ interface SupabaseDatabaseDataSource {
     suspend fun createSession(session: SessionDTO): SessionDTO
     suspend fun addSessionMember(member: SessionMemberDTO): SessionMemberDTO
     suspend fun cancelSession(sessionId: String)
+    suspend fun joinSessionByCode(code: String): String
+    suspend fun getSessionById(sessionId: String): SessionDTO
 }

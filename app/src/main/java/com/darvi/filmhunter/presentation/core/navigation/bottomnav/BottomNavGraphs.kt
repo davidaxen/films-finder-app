@@ -4,7 +4,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -144,12 +146,27 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
 
 fun NavGraphBuilder.matchGraph(navController: NavController) {
     navigation<MainGraph.Match>(startDestination = MatchRoutes.Main) {
-        composable<MatchRoutes.Main> {
+        composable<MatchRoutes.Main> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
             MatcherScreen(
                 onJoinRoomClick = { code ->
-//                    navController.navigate(
-//                        MainGraph.Room(code = code)
-//                    )
+                    sharedViewModel.joinSession(
+                        code = code,
+                        onSuccess = { session ->
+                            navController.navigate(
+                                MatchRoutes.SessionWaiting(
+                                    sessionCode = session.code,
+                                    sessionId = session.id
+                                )
+                            )
+                        },
+                        onError = { error ->
+
+                        }
+                    )
                 },
                 onCreateRoomClick = {
                     navController.navigate(MatchRoutes.FilmTypeSelection)
@@ -281,24 +298,37 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             }
             val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
             val route = backStackEntry.toRoute<MatchRoutes.SessionWaiting>()
+            val currentUser by sharedViewModel.currentUser.collectAsStateWithLifecycle()
+            val currentSession by sharedViewModel.currentSession.collectAsStateWithLifecycle()
+            
+            // Determine if current user is the host
+            val isHost = remember(route.sessionId, currentUser, currentSession) {
+                currentSession?.let { session ->
+                    session.id == route.sessionId && session.createdBy == currentUser?.id
+                } ?: false
+            }
+            
             SessionWaitingScreen(
                 sessionCode = route.sessionCode,
-                onCancelSession = {
-                    sharedViewModel.cancelSession(
-                        sessionId = route.sessionId,
-                        onSuccess = {
-                            navController.navigate(MatchRoutes.Main) {
-                                popUpTo(MatchRoutes.Main) {
-                                    inclusive = true
+                isHost = isHost,
+                onCancelSession = if (isHost) {
+                    {
+                        sharedViewModel.cancelSession(
+                            sessionId = route.sessionId,
+                            onSuccess = {
+                                navController.navigate(MatchRoutes.Main) {
+                                    popUpTo(MatchRoutes.Main) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
                                 }
-                                launchSingleTop = true
+                            },
+                            onError = { error ->
+                                // TODO: Show error message
                             }
-                        },
-                        onError = { error ->
-                            // TODO: Show error message
-                        }
-                    )
-                },
+                        )
+                    }
+                } else null,
             )
         }
     }

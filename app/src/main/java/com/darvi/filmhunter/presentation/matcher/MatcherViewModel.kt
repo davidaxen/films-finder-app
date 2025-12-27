@@ -13,6 +13,7 @@ import com.darvi.filmhunter.domain.entity.UserEntity
 import com.darvi.filmhunter.domain.usecase.auth.GetCurrentUser
 import com.darvi.filmhunter.domain.usecase.matcher.CancelMatcherSession
 import com.darvi.filmhunter.domain.usecase.matcher.CreateMatcherSession
+import com.darvi.filmhunter.domain.usecase.matcher.JoinMatcherSession
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import javax.inject.Inject
 
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class MatcherViewModel @Inject constructor(
     private val createMatcherSession: CreateMatcherSession,
     private val cancelMatcherSession: CancelMatcherSession,
+    private val joinMatcherSession: JoinMatcherSession,
     getCurrentUser: GetCurrentUser
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MatcherUiState())
@@ -27,6 +29,12 @@ class MatcherViewModel @Inject constructor(
     
     private val _sessionCreationState = MutableStateFlow<SessionCreationState>(SessionCreationState.Idle)
     val sessionCreationState: StateFlow<SessionCreationState> = _sessionCreationState
+    
+    private val _sessionJoinState = MutableStateFlow<SessionJoinState>(SessionJoinState.Idle)
+    val sessionJoinState: StateFlow<SessionJoinState> = _sessionJoinState
+    
+    private val _currentSession = MutableStateFlow<MatcherSessionEntity?>(null)
+    val currentSession: StateFlow<MatcherSessionEntity?> = _currentSession
 
     val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
 
@@ -125,6 +133,7 @@ class MatcherViewModel @Inject constructor(
             createMatcherSession(code, userId, filters)
                 .onSuccess { session ->
                     _sessionCreationState.value = SessionCreationState.Success(session)
+                    _currentSession.value = session
                     onSuccess(session)
                 }
                 .onFailure { error ->
@@ -169,6 +178,29 @@ class MatcherViewModel @Inject constructor(
                 }
         }
     }
+
+    fun joinSession(code: String, onSuccess: (MatcherSessionEntity) -> Unit, onError: (Throwable) -> Unit) {
+        viewModelScope.launch {
+            val userId = currentUser.value?.id
+            if (userId == null) {
+                onError(Exception("Usuario no autenticado"))
+                return@launch
+            }
+
+            _sessionJoinState.value = SessionJoinState.Loading
+            
+            joinMatcherSession(code, userId)
+                .onSuccess { session ->
+                    _sessionJoinState.value = SessionJoinState.Success(session)
+                    _currentSession.value = session
+                    onSuccess(session)
+                }
+                .onFailure { error ->
+                    _sessionJoinState.value = SessionJoinState.Error(error)
+                    onError(error)
+                }
+        }
+    }
 }
 
 sealed class SessionCreationState {
@@ -176,6 +208,13 @@ sealed class SessionCreationState {
     data object Loading : SessionCreationState()
     data class Success(val session: MatcherSessionEntity) : SessionCreationState()
     data class Error(val error: Throwable) : SessionCreationState()
+}
+
+sealed class SessionJoinState {
+    data object Idle : SessionJoinState()
+    data object Loading : SessionJoinState()
+    data class Success(val session: MatcherSessionEntity) : SessionJoinState()
+    data class Error(val error: Throwable) : SessionJoinState()
 }
 
 data class MatcherUiState(

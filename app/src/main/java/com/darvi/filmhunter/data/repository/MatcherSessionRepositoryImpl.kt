@@ -5,8 +5,16 @@ import com.darvi.filmhunter.data.model.supabase.SessionDTO
 import com.darvi.filmhunter.data.model.supabase.SessionMemberDTO
 import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.domain.repository.MatcherSessionRepository
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import javax.inject.Inject
@@ -80,6 +88,58 @@ class MatcherSessionRepositoryImpl @Inject constructor(
         return try {
             database.cancelSession(sessionId)
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun joinSessionByCode(code: String, currentUserId: String): Result<MatcherSessionEntity> {
+        return try {
+            // Call RPC to join session
+            val sessionId = database.joinSessionByCode(code)
+            
+            // Get session details
+            val sessionDTO = database.getSessionById(sessionId)
+            
+            // Convert filters JsonObject back to Map
+            val filtersMap = mutableMapOf<String, Any>()
+            sessionDTO.filters.forEach { (key, value) ->
+                when (value) {
+                    is JsonPrimitive -> {
+                        when {
+                            value.isString -> filtersMap[key] = value.content
+                            value.booleanOrNull != null -> filtersMap[key] = value.boolean
+                            value.intOrNull != null -> filtersMap[key] = value.int
+                            value.doubleOrNull != null -> filtersMap[key] = value.double
+                            else -> filtersMap[key] = value.content
+                        }
+                    }
+
+                    is JsonArray -> {
+                        filtersMap[key] = value.map { element ->
+                            when {
+                                element is JsonPrimitive -> {
+                                    element.intOrNull ?: element.content
+                                }
+
+                                else -> element.toString()
+                            }
+                        }
+                    }
+
+                    else -> filtersMap[key] = value.toString()
+                }
+            }
+            
+            Result.success(
+                MatcherSessionEntity(
+                    id = sessionDTO.id ?: "",
+                    code = sessionDTO.code,
+                    createdBy = sessionDTO.createdBy ?: "",
+                    status = sessionDTO.status,
+                    filters = filtersMap
+                )
+            )
         } catch (e: Exception) {
             Result.failure(e)
         }
