@@ -31,11 +31,11 @@ class MatcherViewModel @Inject constructor(
     val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
 
     fun onCodeChanged(code: String) {
-        if (code.length > 4) return
+        if (code.length > 6) return
         _uiState.update {
             it.copy(
                 code = code,
-                joinRoomEnabled = code.length == 4
+                joinRoomEnabled = code.length == 6
             )
         }
     }

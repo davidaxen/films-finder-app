@@ -112,7 +112,7 @@ fun MatcherScreen(
                 }
                 Spacer(Modifier.height(4.dp))
                 FilmHunterText(
-                    text = "Introduce un código de 4 dígitos para unirte a tu amigo.",
+                    text = "Introduce un código de 6 dígitos para unirte a tu amigo.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
@@ -123,7 +123,7 @@ fun MatcherScreen(
                         matcherViewModel.onCodeChanged(it)
                     },
                     singleLine = true,
-                    label = "Código de 4 dígitos",
+                    label = "Código de 6 dígitos",
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
@@ -131,6 +131,7 @@ fun MatcherScreen(
                         unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                         cursorColor = MaterialTheme.colorScheme.onSurface
                     ),
+                    forceMayus = true
                 )
                 Spacer(Modifier.height(18.dp))
                 FilmHunterPrimaryButton(

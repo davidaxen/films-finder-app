@@ -6,7 +6,7 @@ object Base32CodeGenerator {
 
     /**
      * Generates a Base32 code using only the specified characters
-     * Format: 6 characters (e.g., "FH-92KD")
+     * Format: 6 characters (e.g., "92KDAB")
      */
     fun generateCode(): String {
         val random = java.util.Random()
@@ -17,7 +17,7 @@ object Base32CodeGenerator {
             code.append(BASE32_CHARS[index])
         }
         
-        return "FH-${code.toString()}"
+        return code.toString()
     }
 }
 
