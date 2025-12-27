@@ -23,5 +23,7 @@ interface MatcherSessionRepository {
     suspend fun subscribeToSessionStatus(sessionId: String): Flow<String>
 
     suspend fun unsubscribeFromSessionStatus(sessionId: String)
+    
+    suspend fun unsubscribeAllSessionListeners(sessionId: String)
 }
 

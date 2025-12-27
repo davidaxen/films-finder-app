@@ -3,6 +3,7 @@ package com.darvi.filmhunter.presentation.core.navigation.bottomnav
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -303,6 +304,7 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             val currentSession by sharedViewModel.currentSession.collectAsStateWithLifecycle()
             val hasOtherUserJoined by sharedViewModel.hasOtherUserJoined.collectAsStateWithLifecycle()
             val sessionBecameActive by sharedViewModel.sessionBecameActive.collectAsStateWithLifecycle()
+            val sessionCancelled by sharedViewModel.sessionCancelled.collectAsStateWithLifecycle()
             
             // Determine if current user is the host
             val isHost = remember(route.sessionId, currentUser, currentSession) {
@@ -312,7 +314,7 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             }
             
             // Navigate to SwipingScreen when session becomes active
-            androidx.compose.runtime.LaunchedEffect(sessionBecameActive) {
+            LaunchedEffect(sessionBecameActive) {
                 if (sessionBecameActive) {
                     navController.navigate(
                         MatchRoutes.Swiping(sessionId = route.sessionId)
@@ -320,6 +322,18 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                         // Clear the back stack up to Main
                         popUpTo(MatchRoutes.Main) {
                             inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            
+            // Navigate non-host users back to main matcher screen when session is cancelled
+            LaunchedEffect(sessionCancelled) {
+                if (sessionCancelled && !isHost) {
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
                         }
                         launchSingleTop = true
                     }
@@ -389,7 +403,34 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 )
             }
         ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
             val route = backStackEntry.toRoute<MatchRoutes.Swiping>()
+            val sessionCancelled by sharedViewModel.sessionCancelled.collectAsStateWithLifecycle()
+            val currentUser by sharedViewModel.currentUser.collectAsStateWithLifecycle()
+            val currentSession by sharedViewModel.currentSession.collectAsStateWithLifecycle()
+            
+            // Determine if current user is the host
+            val isHost = remember(route.sessionId, currentUser, currentSession) {
+                currentSession?.let { session ->
+                    session.id == route.sessionId && session.createdBy == currentUser?.id
+                } ?: false
+            }
+            
+            // Navigate non-host users back to main matcher screen when session is cancelled
+            LaunchedEffect(sessionCancelled) {
+                if (sessionCancelled && !isHost) {
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            
             SwipingScreen(sessionId = route.sessionId)
         }
     }

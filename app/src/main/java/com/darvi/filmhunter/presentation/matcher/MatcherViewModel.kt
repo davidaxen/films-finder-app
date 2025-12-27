@@ -19,8 +19,10 @@ import com.darvi.filmhunter.domain.usecase.matcher.SubscribeToSessionMembers
 import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeFromSessionMembers
 import com.darvi.filmhunter.domain.usecase.matcher.SubscribeToSessionStatus
 import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeFromSessionStatus
+import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeAllSessionListeners
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -35,6 +37,7 @@ class MatcherViewModel @Inject constructor(
     private val unsubscribeFromSessionMembers: UnsubscribeFromSessionMembers,
     private val subscribeToSessionStatus: SubscribeToSessionStatus,
     private val unsubscribeFromSessionStatus: UnsubscribeFromSessionStatus,
+    private val unsubscribeAllSessionListeners: UnsubscribeAllSessionListeners,
     getCurrentUser: GetCurrentUser
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MatcherUiState())
@@ -54,6 +57,9 @@ class MatcherViewModel @Inject constructor(
     
     private val _sessionBecameActive = MutableStateFlow(false)
     val sessionBecameActive: StateFlow<Boolean> = _sessionBecameActive
+    
+    private val _sessionCancelled = MutableStateFlow(false)
+    val sessionCancelled: StateFlow<Boolean> = _sessionCancelled
 
     val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
 
@@ -189,13 +195,28 @@ class MatcherViewModel @Inject constructor(
     }
 
     fun cancelSession(sessionId: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            // First unsubscribe from all listeners
+            unsubscribeAllSessionListeners(sessionId)
+            
+            // Then cancel the session
             cancelMatcherSession(sessionId)
                 .onSuccess {
-                    onSuccess()
+                    // Update state on main thread
+
+                        _currentSession.value = null
+                        _hasOtherUserJoined.value = false
+                        _sessionBecameActive.value = false
+                        _sessionCancelled.value = false
+                        // Call onSuccess on main thread since it contains navigation
+                    withContext(Dispatchers.Main) {
+                        onSuccess()
+                    }
                 }
                 .onFailure { error ->
-                    onError(error)
+                    withContext(Dispatchers.Main) {
+                        onError(error)
+                    }
                 }
         }
     }
@@ -240,9 +261,16 @@ class MatcherViewModel @Inject constructor(
     private fun startListeningToSessionStatus(sessionId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             subscribeToSessionStatus(sessionId)
-                .onEach { activeSessionId ->
-                    if (activeSessionId == sessionId) {
+                .onEach { statusUpdate ->
+                    if (statusUpdate == sessionId) {
+                        // Session became active
                         _sessionBecameActive.value = true
+                    } else if (statusUpdate == "cancelled:$sessionId") {
+                        // Session was cancelled
+                        // Unsubscribe from all listeners first
+                        unsubscribeAllSessionListeners(sessionId)
+                        // Update state on main thread
+                        _sessionCancelled.value = true
                     }
                 }
                 .launchIn(viewModelScope)

@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -193,9 +194,12 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
         channels[channelKey]?.let { channel ->
             try {
                 channel.unsubscribe()
+                // Wait a bit to ensure unsubscribe completes
+                delay(100)
                 channels.remove(channelKey)
             } catch (e: Exception) {
-                // Handle error silently
+                Log.e("SupabaseDatabaseDataSourceImpl", "Error unsubscribing from session members", e)
+                channels.remove(channelKey)
             }
         }
     }
@@ -217,13 +221,18 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
                     table = "sessions"
                 }
                 .onEach { change ->
-                    // Check if the session status changed to "active"
+                    // Check if the session status changed to "active" or "cancelled"
                     val statusElement = change.record["status"]
                     val newStatus = (statusElement as? JsonPrimitive)?.content
                     val updatedSessionId = (change.record["id"] as? JsonPrimitive)?.content
 
-                    if (newStatus == "active" && updatedSessionId == sessionId) {
-                        _sessionStatusFlow.emit(sessionId)
+                    if (updatedSessionId == sessionId) {
+                        if (newStatus == "active") {
+                            _sessionStatusFlow.emit(sessionId)
+                        } else if (newStatus == "cancelled") {
+                            // Emit a special cancellation signal
+                            _sessionStatusFlow.emit("cancelled:$sessionId")
+                        }
                     }
                 }
                 .launchIn(dataSourceScope)
@@ -243,10 +252,20 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
         channels[channelKey]?.let { channel ->
             try {
                 channel.unsubscribe()
+                // Wait a bit to ensure unsubscribe completes
+                delay(100)
                 channels.remove(channelKey)
             } catch (e: Exception) {
-                // Handle error silently
+                Log.e("SupabaseDatabaseDataSourceImpl", "Error unsubscribing from session status", e)
+                channels.remove(channelKey)
             }
         }
+    }
+
+    override suspend fun unsubscribeAllSessionListeners(sessionId: String) {
+        // Unsubscribe from session members
+        unsubscribeFromSessionMembers(sessionId)
+        // Unsubscribe from session status
+        unsubscribeFromSessionStatus(sessionId)
     }
 }

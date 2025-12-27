@@ -170,13 +170,23 @@ fun SessionWaitingScreen(
             // Initiate Session Button (when user has joined) or Cancel Session Button
             if (isHost) {
                 if (hasOtherUserJoined && onInitiateSession != null) {
-                    FilmHunterPrimaryButton(
-                        text = "Empezar Sesión",
-                        onClick = dropUnlessResumed {
-                            onInitiateSession()
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Column(Modifier.fillMaxWidth()) {
+                        FilmHunterSecondaryButton(
+                            text = "Cancelar Sesión",
+                            onClick = dropUnlessResumed {
+                                showCancelDialog = true
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        FilmHunterPrimaryButton(
+                            text = "Empezar Sesión",
+                            onClick = dropUnlessResumed {
+                                onInitiateSession()
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 } else if (onCancelSession != null) {
                     FilmHunterSecondaryButton(
                         text = "Cancelar Sesión",

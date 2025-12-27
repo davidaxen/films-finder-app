@@ -170,5 +170,9 @@ class MatcherSessionRepositoryImpl @Inject constructor(
     override suspend fun unsubscribeFromSessionStatus(sessionId: String) {
         database.unsubscribeFromSessionStatus(sessionId)
     }
+
+    override suspend fun unsubscribeAllSessionListeners(sessionId: String) {
+        database.unsubscribeAllSessionListeners(sessionId)
+    }
 }
 
