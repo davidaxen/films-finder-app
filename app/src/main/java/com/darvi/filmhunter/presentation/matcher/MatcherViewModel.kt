@@ -159,8 +159,14 @@ class MatcherViewModel @Inject constructor(
                 .onSuccess { session ->
                     _sessionCreationState.value = SessionCreationState.Success(session)
                     _currentSession.value = session
+                    // Reset cancellation state when creating a new session
+                    _sessionCancelled.value = false
+                    _sessionBecameActive.value = false
+                    _hasOtherUserJoined.value = false
                     // Subscribe to Realtime for session_members changes
                     startListeningToSessionMembers(session.id, userId)
+                    // Also subscribe to session status for host (in case they want to listen)
+                    startListeningToSessionStatus(session.id)
                     onSuccess(session)
                 }
                 .onFailure { error ->
@@ -235,6 +241,10 @@ class MatcherViewModel @Inject constructor(
                 .onSuccess { session ->
                     _sessionJoinState.value = SessionJoinState.Success(session)
                     _currentSession.value = session
+                    // Reset cancellation state when joining a new session
+                    _sessionCancelled.value = false
+                    _sessionBecameActive.value = false
+                    _hasOtherUserJoined.value = false
                     // Subscribe to session status changes (for non-host users)
                     startListeningToSessionStatus(session.id)
                     onSuccess(session)
