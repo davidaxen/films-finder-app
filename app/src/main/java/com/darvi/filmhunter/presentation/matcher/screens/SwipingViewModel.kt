@@ -51,6 +51,10 @@ class SwipingViewModel @Inject constructor(
     private val shownMatches = mutableSetOf<Pair<Long, String>>()
     // Track if titles have been loaded to prevent reloading when navigating back
     private var titlesLoaded = false
+    // Track previous film for back functionality (only allow 1 back)
+    private var previousFilm: Any? = null // MovieDetailEntity or SeriesDetailEntity
+    private var previousTitle: Pair<Long, String>? = null
+    private var canGoBack = false
     
     val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
     
@@ -111,9 +115,14 @@ class SwipingViewModel @Inject constructor(
                         // Store remaining titles
                         _uiState.value = _uiState.value.copy(
                             remainingTitles = titles.drop(1),
-                            isLoading = false
+                            isLoading = false,
+                            canGoBack = false // First film, can't go back
                         )
                         titlesLoaded = true
+                        // Reset back tracking for new session
+                        previousFilm = null
+                        previousTitle = null
+                        canGoBack = false
                         // Preload next 8 films
                         preloadNextFilms(titles.drop(1).take(8), sessionId)
                         // Update preloaded poster URLs after preloading starts
@@ -123,7 +132,8 @@ class SwipingViewModel @Inject constructor(
                     } else {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            isEmpty = true
+                            isEmpty = true,
+                            canGoBack = false
                         )
                     }
                 }
@@ -299,13 +309,19 @@ class SwipingViewModel @Inject constructor(
         val sessionId = _uiState.value.sessionId ?: return
         val userId = currentUser.value?.id ?: return
         val currentTitle = _uiState.value.currentTitle ?: return
+        val currentFilm = _uiState.value.currentFilm
 
         viewModelScope.launch(Dispatchers.IO) {
+            val filmKey = Pair(currentTitle.first, currentTitle.second)
+            
+            // Remove old "like" from userSwipes if it exists (in case user is changing vote)
+            userSwipes[userId]?.remove(filmKey)
+            
+            // Save the new swipe (this will delete old swipe and insert new one)
             saveSessionSwipe(sessionId, userId, currentTitle.first, currentTitle.second, vote)
 
-            // Immediately track the current user's swipe if it's a "like" and check for match
+            // Track the new swipe if it's a "like" and check for match
             if (vote == "like") {
-                val filmKey = Pair(currentTitle.first, currentTitle.second)
                 // Ensure userSwipes has an entry for this user
                 if (userSwipes[userId] == null) {
                     userSwipes[userId] = mutableSetOf()
@@ -318,18 +334,54 @@ class SwipingViewModel @Inject constructor(
 
             val remaining = _uiState.value.remainingTitles
             if (remaining.isEmpty()) {
-                _uiState.value = _uiState.value.copy(currentFilm = null, currentTitle = null, isEmpty = true)
+                _uiState.value = _uiState.value.copy(
+                    currentFilm = null,
+                    currentTitle = null,
+                    isEmpty = true,
+                    canGoBack = false
+                )
                 return@launch
             }
+
+            // Store current film as previous before moving to next
+            previousFilm = currentFilm
+            previousTitle = currentTitle
+            canGoBack = true
 
             val nextTitle = remaining.first()
             // 1) "consumimos" el siguiente en el estado YA
             _uiState.value = _uiState.value.copy(
                 currentTitle = nextTitle,
-                remainingTitles = remaining.drop(1)
+                remainingTitles = remaining.drop(1),
+                canGoBack = true
             )
             // 2) ahora cargamos el film (usará remainingTitles correcto)
             loadTitleDetails(nextTitle, sessionId)
+        }
+    }
+    
+    fun goBack() {
+        if (!canGoBack || previousFilm == null || previousTitle == null) return
+        
+        val sessionId = _uiState.value.sessionId ?: return
+        val currentTitle = _uiState.value.currentTitle ?: return
+        
+        viewModelScope.launch(Dispatchers.IO) {
+            // Put current film back into remaining titles at the beginning
+            val updatedRemaining = listOf(currentTitle) + _uiState.value.remainingTitles
+            
+            // Restore previous film
+            _uiState.value = _uiState.value.copy(
+                currentFilm = previousFilm,
+                currentTitle = previousTitle,
+                remainingTitles = updatedRemaining,
+                canGoBack = false // After going back, can't go back again
+            )
+            
+            // Clear previous tracking (only allow 1 back)
+            previousFilm = null
+            previousTitle = null
+            canGoBack = false
         }
     }
     
@@ -362,7 +414,8 @@ data class SwipingUiState(
     val hasError: Boolean = false,
     val errorMessage: String? = null,
     val isEmpty: Boolean = false,
-    val match: MatchInfo? = null
+    val match: MatchInfo? = null,
+    val canGoBack: Boolean = false
 )
 
 data class MatchInfo(

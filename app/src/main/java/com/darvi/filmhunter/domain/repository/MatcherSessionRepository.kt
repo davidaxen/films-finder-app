@@ -32,6 +32,8 @@ interface MatcherSessionRepository {
     
     suspend fun insertSessionSwipe(sessionId: String, userId: String, tmdbId: Long, mediaType: String, vote: String): Result<Unit>
     
+    suspend fun deleteSessionSwipe(sessionId: String, userId: String, tmdbId: Long, mediaType: String): Result<Unit>
+    
     suspend fun getSessionMembers(sessionId: String): Result<List<String>> // Returns list of user IDs
     
     suspend fun getSessionSwipes(sessionId: String): Result<List<com.darvi.filmhunter.data.model.supabase.SessionSwipeDTO>>

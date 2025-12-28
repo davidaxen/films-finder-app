@@ -306,6 +306,19 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
             .decodeSingle<SessionSwipeDTO>()
     }
 
+    override suspend fun deleteSessionSwipe(sessionId: String, userId: String, tmdbId: Long, mediaType: String) {
+        database
+            .from(Tables.SESSION_SWIPES)
+            .delete {
+                filter {
+                    eq("session_id", sessionId)
+                    eq("user_id", userId)
+                    eq("tmdb_id", tmdbId)
+                    eq("media_type", mediaType)
+                }
+            }
+    }
+
     override suspend fun getSessionMembers(sessionId: String): List<SessionMemberDTO> {
         return database
             .from(Tables.SESSION_MEMBERS)

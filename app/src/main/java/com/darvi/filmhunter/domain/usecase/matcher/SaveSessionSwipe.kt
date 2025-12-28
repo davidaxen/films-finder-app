@@ -13,6 +13,17 @@ class SaveSessionSwipe @Inject constructor(
         mediaType: String,
         vote: String
     ): Result<Unit> {
+        // Delete existing swipe if any (to allow changing vote)
+        matcherSessionRepository.deleteSessionSwipe(
+            sessionId = sessionId,
+            userId = userId,
+            tmdbId = tmdbId,
+            mediaType = mediaType
+        ).onFailure {
+            // Ignore error if no existing swipe (it's fine)
+        }
+        
+        // Insert new swipe
         return matcherSessionRepository.insertSessionSwipe(
             sessionId = sessionId,
             userId = userId,

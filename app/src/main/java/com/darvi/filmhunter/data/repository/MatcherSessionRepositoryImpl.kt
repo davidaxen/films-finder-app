@@ -225,6 +225,20 @@ class MatcherSessionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteSessionSwipe(
+        sessionId: String,
+        userId: String,
+        tmdbId: Long,
+        mediaType: String
+    ): Result<Unit> {
+        return try {
+            database.deleteSessionSwipe(sessionId, userId, tmdbId, mediaType)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getSessionMembers(sessionId: String): Result<List<String>> {
         return try {
             val members = database.getSessionMembers(sessionId)

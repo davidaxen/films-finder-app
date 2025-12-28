@@ -26,6 +26,7 @@ interface SupabaseDatabaseDataSource {
     suspend fun insertSessionTitles(titles: List<SessionTitleDTO>)
     suspend fun getSessionTitles(sessionId: String): List<SessionTitleDTO>
     suspend fun insertSessionSwipe(swipe: SessionSwipeDTO)
+    suspend fun deleteSessionSwipe(sessionId: String, userId: String, tmdbId: Long, mediaType: String)
     suspend fun getSessionMembers(sessionId: String): List<SessionMemberDTO>
     suspend fun getSessionSwipes(sessionId: String): List<SessionSwipeDTO>
     suspend fun subscribeToSessionSwipes(sessionId: String): Flow<SessionSwipeDTO>
