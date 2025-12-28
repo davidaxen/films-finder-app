@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -158,14 +159,37 @@ fun SwipingScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     // Swipeable Film Card
-                    SwipeableCard(
-                        onSwipeLeft = { viewModel.onSwipe("dislike") },
-                        onSwipeRight = { viewModel.onSwipe("like") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .padding(horizontal = 16.dp)
-                    ) {
+                    var triggerSwipeLeft by remember { mutableStateOf(0) }
+                    var triggerSwipeRight by remember { mutableStateOf(0) }
+                    
+                    // Use current film as key to reset card state when film changes
+                    val currentFilmKey = remember(uiState.currentFilm) {
+                        when (val film = uiState.currentFilm) {
+                            is MovieDetailEntity -> film.id.toString()
+                            is SeriesDetailEntity -> film.id.toString()
+                            else -> null
+                        }
+                    }
+                    
+                    key(currentFilmKey) {
+                        SwipeableCard(
+                            onSwipeLeft = { viewModel.onSwipe("dislike") },
+                            onSwipeRight = { viewModel.onSwipe("like") },
+                            triggerSwipeLeft = triggerSwipeLeft > 0,
+                            triggerSwipeRight = triggerSwipeRight > 0,
+                            onSwipeTriggered = { direction: String ->
+                                // Reset trigger after swipe is triggered
+                                if (direction == "left") {
+                                    triggerSwipeLeft = 0
+                                } else {
+                                    triggerSwipeRight = 0
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(horizontal = 16.dp)
+                        ) {
                         Card(
                             modifier = Modifier.fillMaxSize(),
                             shape = RoundedCornerShape(24.dp),
@@ -310,7 +334,8 @@ fun SwipingScreen(
                             }
                         }
                         }
-                    }
+                    } // End of SwipeableCard content
+                    } // End of key block
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
@@ -324,7 +349,7 @@ fun SwipingScreen(
                     ) {
                         // Dislike Button
                         IconButton(
-                            onClick = dropUnlessResumed { viewModel.onSwipe("dislike") },
+                            onClick = dropUnlessResumed { triggerSwipeLeft++ },
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(CircleShape)
@@ -377,7 +402,7 @@ fun SwipingScreen(
                         
                         // Like Button
                         IconButton(
-                            onClick = dropUnlessResumed { viewModel.onSwipe("like") },
+                            onClick = dropUnlessResumed { triggerSwipeRight++ },
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(CircleShape)
@@ -396,7 +421,8 @@ fun SwipingScreen(
         }
         
         // Match Modal
-        uiState.match?.let { match ->
+        val match = uiState.match
+        if (match != null) {
             MatchModal(
                 match = match,
                 onDismiss = { viewModel.dismissMatch() }
@@ -409,6 +435,9 @@ fun SwipingScreen(
 private fun SwipeableCard(
     onSwipeLeft: () -> Unit,
     onSwipeRight: () -> Unit,
+    triggerSwipeLeft: Boolean = false,
+    triggerSwipeRight: Boolean = false,
+    onSwipeTriggered: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -440,6 +469,29 @@ private fun SwipeableCard(
     // Use raw values during drag for immediate response, animated values when snapping back
     val currentOffsetX = if (isDragging) offsetX else animatedOffsetX.value
     val currentRotation = if (isDragging) rotation else animatedRotation.value
+    
+    // Handle programmatic swipe triggers
+    LaunchedEffect(triggerSwipeLeft) {
+        if (triggerSwipeLeft && !isDragging) {
+            isDragging = false
+            offsetX = -swipeThreshold * 2f // Animate off screen to the left
+            // Wait for animation to complete before triggering swipe
+            delay(300)
+            onSwipeLeft()
+            onSwipeTriggered("left")
+        }
+    }
+    
+    LaunchedEffect(triggerSwipeRight) {
+        if (triggerSwipeRight && !isDragging) {
+            isDragging = false
+            offsetX = swipeThreshold * 2f // Animate off screen to the right
+            // Wait for animation to complete before triggering swipe
+            delay(300)
+            onSwipeRight()
+            onSwipeTriggered("right")
+        }
+    }
     
     Box(
         modifier = modifier
