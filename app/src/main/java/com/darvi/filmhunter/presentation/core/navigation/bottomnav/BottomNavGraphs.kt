@@ -30,6 +30,7 @@ import com.darvi.filmhunter.presentation.matcher.screens.MatcherSummaryScreen
 import com.darvi.filmhunter.presentation.matcher.screens.PlatformSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.SessionWaitingScreen
 import com.darvi.filmhunter.presentation.matcher.screens.SwipingScreen
+import com.darvi.filmhunter.presentation.matcher.screens.SwipingViewModel
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -413,6 +414,9 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 navController.getBackStackEntry(MainGraph.Match)
             }
             val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            // Scope SwipingViewModel to the Swiping route to preserve state
+            val swipingViewModel: SwipingViewModel =
+                hiltViewModel(backStackEntry)
             val route = backStackEntry.toRoute<MatchRoutes.Swiping>()
             val sessionCancelled by sharedViewModel.sessionCancelled.collectAsStateWithLifecycle()
             val currentUser by sharedViewModel.currentUser.collectAsStateWithLifecycle()
@@ -437,7 +441,15 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 }
             }
             
-            SwipingScreen(sessionId = route.sessionId)
+            SwipingScreen(
+                sessionId = route.sessionId,
+                viewModel = swipingViewModel,
+                onFilmInfoClick = { filmId, filmType ->
+                    navController.navigate(
+                        MainGraph.Detail(id = filmId, filmType = filmType)
+                    )
+                }
+            )
         }
     }
 }

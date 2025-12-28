@@ -49,6 +49,8 @@ class SwipingViewModel @Inject constructor(
     private val userSwipes = mutableMapOf<String, MutableSet<Pair<Long, String>>>() // userId -> Set<(tmdbId, mediaType)>
     // Track matches that have already been shown to prevent duplicates
     private val shownMatches = mutableSetOf<Pair<Long, String>>()
+    // Track if titles have been loaded to prevent reloading when navigating back
+    private var titlesLoaded = false
     
     val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
     
@@ -59,6 +61,11 @@ class SwipingViewModel @Inject constructor(
     )
     
     fun loadSessionTitles(sessionId: String) {
+        // Don't reload if titles are already loaded
+        if (titlesLoaded && _uiState.value.currentTitle != null) {
+            return
+        }
+        
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = _uiState.value.copy(isLoading = true)
             
@@ -106,6 +113,7 @@ class SwipingViewModel @Inject constructor(
                             remainingTitles = titles.drop(1),
                             isLoading = false
                         )
+                        titlesLoaded = true
                         // Preload next 8 films
                         preloadNextFilms(titles.drop(1).take(8), sessionId)
                         // Update preloaded poster URLs after preloading starts

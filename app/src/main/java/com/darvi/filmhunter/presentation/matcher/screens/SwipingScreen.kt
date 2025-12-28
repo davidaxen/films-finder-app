@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.dropUnlessResumed
+import com.darvi.filmhunter.presentation.core.model.FilmType
 import coil3.compose.SubcomposeAsyncImage
 import coil3.imageLoader
 import coil3.request.CachePolicy
@@ -58,7 +60,8 @@ import java.util.Locale
 @Composable
 fun SwipingScreen(
     sessionId: String,
-    viewModel: SwipingViewModel = hiltViewModel()
+    onFilmInfoClick: (Int, Int) -> Unit,
+    viewModel: SwipingViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -66,7 +69,13 @@ fun SwipingScreen(
     
     LaunchedEffect(sessionId) {
         viewModel.setSessionId(sessionId)
-        viewModel.loadSessionTitles(sessionId)
+    }
+    
+    // Load titles only once when sessionId changes and we don't have titles yet
+    LaunchedEffect(sessionId, uiState.currentTitle) {
+        if (uiState.currentTitle == null && !uiState.isLoading && !uiState.hasError) {
+            viewModel.loadSessionTitles(sessionId)
+        }
     }
     
     // Preload images for next 5 films
@@ -312,7 +321,42 @@ fun SwipingScreen(
                             )
                         }
                         
-                        Spacer(modifier = Modifier.width(32.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
+                        
+                        // Info Button
+                        val currentFilm = uiState.currentFilm
+                        val filmId = when (currentFilm) {
+                            is MovieDetailEntity -> currentFilm.id
+                            is SeriesDetailEntity -> currentFilm.id
+                            else -> null
+                        }
+                        val filmType = when (currentFilm) {
+                            is MovieDetailEntity -> FilmType.MOVIE.value
+                            is SeriesDetailEntity -> FilmType.SERIES.value
+                            else -> null
+                        }
+                        
+                        IconButton(
+                            onClick = dropUnlessResumed {
+                                if (filmId != null && filmType != null) {
+                                    onFilmInfoClick(filmId, filmType)
+                                }
+                            },
+                            enabled = filmId != null && filmType != null,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = "Info",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.width(16.dp))
                         
                         // Like Button
                         IconButton(
