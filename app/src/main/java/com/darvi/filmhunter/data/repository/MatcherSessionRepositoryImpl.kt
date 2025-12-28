@@ -157,6 +157,24 @@ class MatcherSessionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun finishSession(sessionId: String): Result<Unit> {
+        return try {
+            database.updateSessionStatus(sessionId, "finished")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun leaveSession(sessionId: String, userId: String): Result<Unit> {
+        return try {
+            database.leaveSession(sessionId, userId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun subscribeToSessionMembers(sessionId: String, currentUserId: String): Flow<String> {
         return database.subscribeToSessionMembers(sessionId, currentUserId)
     }

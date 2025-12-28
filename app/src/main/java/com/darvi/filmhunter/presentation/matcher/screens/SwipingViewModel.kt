@@ -6,9 +6,11 @@ import com.darvi.filmhunter.domain.entity.UserEntity
 import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
 import com.darvi.filmhunter.domain.usecase.auth.GetCurrentUser
+import com.darvi.filmhunter.domain.usecase.matcher.FinishMatcherSession
 import com.darvi.filmhunter.domain.usecase.matcher.GetSessionMembers
 import com.darvi.filmhunter.domain.usecase.matcher.GetSessionSwipes
 import com.darvi.filmhunter.domain.usecase.matcher.GetSessionTitles
+import com.darvi.filmhunter.domain.usecase.matcher.LeaveMatcherSession
 import com.darvi.filmhunter.domain.usecase.matcher.SaveSessionSwipe
 import com.darvi.filmhunter.domain.usecase.matcher.SubscribeToSessionSwipes
 import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeFromSessionSwipes
@@ -36,6 +38,8 @@ class SwipingViewModel @Inject constructor(
     private val getSessionSwipes: GetSessionSwipes,
     private val subscribeToSessionSwipes: SubscribeToSessionSwipes,
     private val unsubscribeFromSessionSwipes: UnsubscribeFromSessionSwipes,
+    private val finishMatcherSession: FinishMatcherSession,
+    private val leaveMatcherSession: LeaveMatcherSession,
     getCurrentUser: GetCurrentUser
 ) : ViewModel() {
     
@@ -391,6 +395,38 @@ class SwipingViewModel @Inject constructor(
     
     fun dismissMatch() {
         _uiState.value = _uiState.value.copy(match = null)
+    }
+    
+    fun finishSession(sessionId: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            finishMatcherSession(sessionId)
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        onSuccess()
+                    }
+                }
+                .onFailure { error ->
+                    withContext(Dispatchers.Main) {
+                        onError(error)
+                    }
+                }
+        }
+    }
+    
+    fun leaveSession(sessionId: String, userId: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            leaveMatcherSession(sessionId, userId)
+                .onSuccess {
+                    withContext(Dispatchers.Main) {
+                        onSuccess()
+                    }
+                }
+                .onFailure { error ->
+                    withContext(Dispatchers.Main) {
+                        onError(error)
+                    }
+                }
+        }
     }
     
     override fun onCleared() {

@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
 import coil3.compose.SubcomposeAsyncImage
 import coil3.imageLoader
@@ -61,6 +63,7 @@ import coil3.request.ImageRequest
 import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
 import com.darvi.filmhunter.presentation.core.components.FilmHunterPrimaryButton
+import com.darvi.filmhunter.presentation.core.components.FilmHunterSecondaryButton
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.core.modifiers.shimmerLoading
@@ -74,11 +77,16 @@ import kotlin.math.roundToInt
 fun SwipingScreen(
     sessionId: String,
     onFilmInfoClick: (Int, Int) -> Unit,
-    viewModel: SwipingViewModel
+    viewModel: SwipingViewModel,
+    isHost: Boolean = false,
+    onFinishSession: () -> Unit = {},
+    onLeaveSession: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val imageLoader = context.imageLoader
+    var showEndSessionDialog by remember { mutableStateOf(false) }
     
     LaunchedEffect(sessionId) {
         viewModel.setSessionId(sessionId)
@@ -445,8 +453,67 @@ fun SwipingScreen(
                                 modifier = Modifier.size(32.dp)
                             )
                         }
+                        
+                        Spacer(modifier = Modifier.width(16.dp))
+                        
+                        // End Session Button
+                        IconButton(
+                            onClick = dropUnlessResumed { showEndSessionDialog = true },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.errorContainer)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ExitToApp,
+                                contentDescription = "End Session",
+                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
                 }
+            }
+        }
+        
+        // End Session Dialog
+        if (showEndSessionDialog) {
+            if (isHost) {
+                FinishSessionDialog(
+                    onConfirm = {
+                        showEndSessionDialog = false
+                        viewModel.finishSession(
+                            sessionId = sessionId,
+                            onSuccess = {
+                                onFinishSession()
+                            },
+                            onError = { error: Throwable ->
+                                // TODO: Show error message
+                            }
+                        )
+                    },
+                    onDismiss = { showEndSessionDialog = false }
+                )
+            } else {
+                LeaveSessionDialog(
+                    onConfirm = {
+                        showEndSessionDialog = false
+                        val userId = currentUser?.id
+                        if (userId != null) {
+                            viewModel.leaveSession(
+                                sessionId = sessionId,
+                                userId = userId,
+                                onSuccess = {
+                                    onLeaveSession()
+                                },
+                                onError = { error: Throwable ->
+                                    // TODO: Show error message
+                                }
+                            )
+                        }
+                    },
+                    onDismiss = { showEndSessionDialog = false }
+                )
             }
         }
         
@@ -653,6 +720,82 @@ private fun MatchModal(
         confirmButton = {
             FilmHunterPrimaryButton(
                 text = "Continuar",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(24.dp)
+    )
+}
+
+@Composable
+private fun FinishSessionDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            FilmHunterText(
+                text = "Finalizar Sesión",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        text = {
+            FilmHunterText(
+                text = "¿Estás seguro de que quieres finalizar la sesión? Todos los usuarios serán redirigidos al inicio.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            FilmHunterPrimaryButton(
+                text = "Finalizar",
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        dismissButton = {
+            FilmHunterSecondaryButton(
+                text = "Cancelar",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(24.dp)
+    )
+}
+
+@Composable
+private fun LeaveSessionDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            FilmHunterText(
+                text = "Salir de la Sesión",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        text = {
+            FilmHunterText(
+                text = "¿Estás seguro de que quieres salir de esta sesión?",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            FilmHunterPrimaryButton(
+                text = "Salir",
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        dismissButton = {
+            FilmHunterSecondaryButton(
+                text = "Cancelar",
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth()
             )

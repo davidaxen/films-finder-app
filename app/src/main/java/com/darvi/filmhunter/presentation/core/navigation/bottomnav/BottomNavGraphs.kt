@@ -419,6 +419,7 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 hiltViewModel(backStackEntry)
             val route = backStackEntry.toRoute<MatchRoutes.Swiping>()
             val sessionCancelled by sharedViewModel.sessionCancelled.collectAsStateWithLifecycle()
+            val sessionFinished by sharedViewModel.sessionFinished.collectAsStateWithLifecycle()
             val currentUser by sharedViewModel.currentUser.collectAsStateWithLifecycle()
             val currentSession by sharedViewModel.currentSession.collectAsStateWithLifecycle()
             
@@ -441,13 +442,44 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 }
             }
             
+            // Navigate non-host users back to main matcher screen when session is finished
+            LaunchedEffect(sessionFinished) {
+                if (sessionFinished && !isHost) {
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            
             SwipingScreen(
                 sessionId = route.sessionId,
                 viewModel = swipingViewModel,
+                isHost = isHost,
                 onFilmInfoClick = { filmId, filmType ->
                     navController.navigate(
                         MainGraph.Detail(id = filmId, filmType = filmType)
                     )
+                },
+                onFinishSession = {
+                    // Navigate back to main matcher screen
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                onLeaveSession = {
+                    // Navigate back to main matcher screen
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
             )
         }

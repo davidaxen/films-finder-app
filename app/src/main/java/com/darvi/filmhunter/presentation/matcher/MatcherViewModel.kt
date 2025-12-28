@@ -50,8 +50,7 @@ class MatcherViewModel @Inject constructor(
     val sessionCreationState: StateFlow<SessionCreationState> = _sessionCreationState
     
     private val _sessionJoinState = MutableStateFlow<SessionJoinState>(SessionJoinState.Idle)
-    val sessionJoinState: StateFlow<SessionJoinState> = _sessionJoinState
-    
+
     private val _currentSession = MutableStateFlow<MatcherSessionEntity?>(null)
     val currentSession: StateFlow<MatcherSessionEntity?> = _currentSession
     
@@ -63,6 +62,9 @@ class MatcherViewModel @Inject constructor(
     
     private val _sessionCancelled = MutableStateFlow(false)
     val sessionCancelled: StateFlow<Boolean> = _sessionCancelled
+    
+    private val _sessionFinished = MutableStateFlow(false)
+    val sessionFinished: StateFlow<Boolean> = _sessionFinished
 
     val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
 
@@ -162,8 +164,9 @@ class MatcherViewModel @Inject constructor(
                 .onSuccess { session ->
                     _sessionCreationState.value = SessionCreationState.Success(session)
                     _currentSession.value = session
-                    // Reset cancellation state when creating a new session
+                    // Reset cancellation and finished state when creating a new session
                     _sessionCancelled.value = false
+                    _sessionFinished.value = false
                     _sessionBecameActive.value = false
                     _hasOtherUserJoined.value = false
                     
@@ -241,6 +244,7 @@ class MatcherViewModel @Inject constructor(
                         _hasOtherUserJoined.value = false
                         _sessionBecameActive.value = false
                         _sessionCancelled.value = false
+                        _sessionFinished.value = false
                         // Call onSuccess on main thread since it contains navigation
                     withContext(Dispatchers.Main) {
                         onSuccess()
@@ -268,8 +272,9 @@ class MatcherViewModel @Inject constructor(
                 .onSuccess { session ->
                     _sessionJoinState.value = SessionJoinState.Success(session)
                     _currentSession.value = session
-                    // Reset cancellation state when joining a new session
+                    // Reset cancellation and finished state when joining a new session
                     _sessionCancelled.value = false
+                    _sessionFinished.value = false
                     _sessionBecameActive.value = false
                     _hasOtherUserJoined.value = false
                     // Subscribe to session status changes (for non-host users)
@@ -299,15 +304,29 @@ class MatcherViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             subscribeToSessionStatus(sessionId)
                 .onEach { statusUpdate ->
-                    if (statusUpdate == sessionId) {
-                        // Session became active
-                        _sessionBecameActive.value = true
-                    } else if (statusUpdate == "cancelled:$sessionId") {
-                        // Session was cancelled
-                        // Unsubscribe from all listeners first
-                        unsubscribeAllSessionListeners(sessionId)
-                        // Update state on main thread
-                        _sessionCancelled.value = true
+                    when {
+                        statusUpdate == sessionId -> {
+                            // Session became active
+                            _sessionBecameActive.value = true
+                        }
+                        statusUpdate == "cancelled:$sessionId" -> {
+                            // Session was cancelled
+                            // Unsubscribe from all listeners first
+                            unsubscribeAllSessionListeners(sessionId)
+                            // Update state on main thread
+                            withContext(Dispatchers.Main) {
+                                _sessionCancelled.value = true
+                            }
+                        }
+                        statusUpdate == "finished:$sessionId" -> {
+                            // Session was finished
+                            // Unsubscribe from all listeners first
+                            unsubscribeAllSessionListeners(sessionId)
+                            // Update state on main thread
+                            withContext(Dispatchers.Main) {
+                                _sessionFinished.value = true
+                            }
+                        }
                     }
                 }
                 .launchIn(viewModelScope)
@@ -342,6 +361,7 @@ class MatcherViewModel @Inject constructor(
             _hasOtherUserJoined.value = false
             _sessionBecameActive.value = false
             _sessionCancelled.value = false
+            _sessionFinished.value = false
         }
     }
     

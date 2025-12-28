@@ -158,6 +158,19 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
             }
     }
 
+    override suspend fun leaveSession(sessionId: String, userId: String) {
+        database
+            .from(Tables.SESSION_MEMBERS)
+            .update ({
+                set("state", "left")
+            }) {
+                filter {
+                    eq("session_id", sessionId)
+                    eq("user_id", userId)
+                }
+            }
+    }
+
     override suspend fun subscribeToSessionMembers(sessionId: String, currentUserId: String): Flow<String> {
         val channelKey = "${Tables.SESSION_MEMBERS}_$sessionId"
         
@@ -227,17 +240,24 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
                     table = Tables.SESSIONS
                 }
                 .onEach { change ->
-                    // Check if the session status changed to "active" or "cancelled"
+                    // Check if the session status changed to "active", "cancelled", or "finished"
                     val statusElement = change.record["status"]
                     val newStatus = (statusElement as? JsonPrimitive)?.content
                     val updatedSessionId = (change.record["id"] as? JsonPrimitive)?.content
 
                     if (updatedSessionId == sessionId) {
-                        if (newStatus == "active") {
-                            _sessionStatusFlow.emit(sessionId)
-                        } else if (newStatus == "cancelled") {
-                            // Emit a special cancellation signal
-                            _sessionStatusFlow.emit("cancelled:$sessionId")
+                        when (newStatus) {
+                            "active" -> {
+                                _sessionStatusFlow.emit(sessionId)
+                            }
+                            "cancelled" -> {
+                                // Emit a special cancellation signal
+                                _sessionStatusFlow.emit("cancelled:$sessionId")
+                            }
+                            "finished" -> {
+                                // Emit a special finished signal
+                                _sessionStatusFlow.emit("finished:$sessionId")
+                            }
                         }
                     }
                 }

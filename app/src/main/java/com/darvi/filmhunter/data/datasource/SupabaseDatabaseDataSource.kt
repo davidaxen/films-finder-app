@@ -18,6 +18,7 @@ interface SupabaseDatabaseDataSource {
     suspend fun joinSessionByCode(code: String): String
     suspend fun getSessionById(sessionId: String): SessionDTO
     suspend fun updateSessionStatus(sessionId: String, status: String)
+    suspend fun leaveSession(sessionId: String, userId: String)
     suspend fun subscribeToSessionMembers(sessionId: String, currentUserId: String): Flow<String>
     suspend fun unsubscribeFromSessionMembers(sessionId: String)
     suspend fun subscribeToSessionStatus(sessionId: String): Flow<String>

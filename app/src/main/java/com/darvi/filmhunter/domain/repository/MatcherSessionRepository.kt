@@ -16,6 +16,10 @@ interface MatcherSessionRepository {
     
     suspend fun initiateSession(sessionId: String): Result<Unit>
     
+    suspend fun finishSession(sessionId: String): Result<Unit>
+    
+    suspend fun leaveSession(sessionId: String, userId: String): Result<Unit>
+    
     suspend fun subscribeToSessionMembers(sessionId: String, currentUserId: String): Flow<String>
 
     suspend fun unsubscribeFromSessionMembers(sessionId: String)
