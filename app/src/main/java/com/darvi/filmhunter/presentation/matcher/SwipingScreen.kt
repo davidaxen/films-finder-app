@@ -3,6 +3,7 @@ package com.darvi.filmhunter.presentation.matcher
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -201,9 +202,21 @@ fun SwipingScreen(
                                 .fillMaxWidth()
                                 .weight(1f)
                                 .padding(horizontal = 16.dp)
-                        ) {
+                        ) { borderColor ->
                             Card(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .then(
+                                        if (borderColor != null) {
+                                            Modifier.border(
+                                                width = 4.dp,
+                                                color = borderColor,
+                                                shape = RoundedCornerShape(24.dp)
+                                            )
+                                        } else {
+                                            Modifier
+                                        }
+                                    ),
                                 shape = RoundedCornerShape(24.dp),
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surface
@@ -520,7 +533,7 @@ private fun SwipeableCard(
     triggerSwipeLeft: Boolean = false,
     triggerSwipeRight: Boolean = false,
     onSwipeTriggered: (String) -> Unit = {},
-    content: @Composable () -> Unit
+    content: @Composable (borderColor: Color?) -> Unit
 ) {
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
@@ -550,6 +563,13 @@ private fun SwipeableCard(
     // Use raw values during drag for immediate response, animated values when snapping back
     val currentOffsetX = if (isDragging) offsetX else animatedOffsetX.value
     val currentRotation = if (isDragging) rotation else animatedRotation.value
+    
+    // Calculate border color based on swipe direction and threshold
+    val borderColor = when {
+        currentOffsetX > swipeThreshold -> Color.Green // Green for like
+        currentOffsetX < -swipeThreshold -> Color.Red // Red for dislike
+        else -> null // No border when threshold not reached
+    }
     
     // Handle programmatic swipe triggers
     LaunchedEffect(triggerSwipeLeft) {
@@ -622,7 +642,7 @@ private fun SwipeableCard(
                 )
             }
     ) {
-        content()
+        content(borderColor)
     }
 }
 
