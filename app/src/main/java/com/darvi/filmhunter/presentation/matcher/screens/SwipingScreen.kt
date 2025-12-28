@@ -20,9 +20,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.RotateLeft
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
@@ -37,6 +37,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -168,8 +170,8 @@ fun SwipingScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     // Swipeable Film Card
-                    var triggerSwipeLeft by remember { mutableStateOf(0) }
-                    var triggerSwipeRight by remember { mutableStateOf(0) }
+                    var triggerSwipeLeft by remember { mutableIntStateOf(0) }
+                    var triggerSwipeRight by remember { mutableIntStateOf(0) }
                     
                     // Use current film as key to reset card state when film changes
                     val currentFilmKey = remember(uiState.currentFilm) {
@@ -372,7 +374,7 @@ fun SwipingScreen(
                                 )
                         ) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.RotateLeft,
                                 contentDescription = "Back",
                                 tint = if (uiState.canGoBack) {
                                     MaterialTheme.colorScheme.onSecondaryContainer
@@ -465,7 +467,7 @@ fun SwipingScreen(
                                 .background(MaterialTheme.colorScheme.errorContainer)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.ExitToApp,
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                 contentDescription = "End Session",
                                 tint = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.size(24.dp)
@@ -487,9 +489,7 @@ fun SwipingScreen(
                             onSuccess = {
                                 onFinishSession()
                             },
-                            onError = { error: Throwable ->
-                                // TODO: Show error message
-                            }
+                            onError = { }
                         )
                     },
                     onDismiss = { showEndSessionDialog = false }
@@ -506,9 +506,7 @@ fun SwipingScreen(
                                 onSuccess = {
                                     onLeaveSession()
                                 },
-                                onError = { error: Throwable ->
-                                    // TODO: Show error message
-                                }
+                                onError = { }
                             )
                         }
                     },
@@ -530,17 +528,17 @@ fun SwipingScreen(
 
 @Composable
 private fun SwipeableCard(
+    modifier: Modifier = Modifier,
     onSwipeLeft: () -> Unit,
     onSwipeRight: () -> Unit,
     triggerSwipeLeft: Boolean = false,
     triggerSwipeRight: Boolean = false,
     onSwipeTriggered: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
-    var offsetX by remember { mutableStateOf(0f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
     var isDragging by remember { mutableStateOf(false) }
     
     // Threshold for triggering swipe (in dp, converted to pixels)

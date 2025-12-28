@@ -200,7 +200,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
                 
                 channel.subscribe()
                 channels[channelKey] = channel
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Handle error silently or log it
             }
         }

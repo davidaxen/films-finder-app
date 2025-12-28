@@ -115,7 +115,7 @@ class SwipingViewModel @Inject constructor(
                 .onSuccess { titles ->
                     if (titles.isNotEmpty()) {
                         // Load first title details
-                        loadTitleDetails(titles[0], sessionId)
+                        loadTitleDetails(titles[0])
                         // Store remaining titles
                         _uiState.value = _uiState.value.copy(
                             remainingTitles = titles.drop(1),
@@ -128,7 +128,7 @@ class SwipingViewModel @Inject constructor(
                         previousTitle = null
                         canGoBack = false
                         // Preload next 8 films
-                        preloadNextFilms(titles.drop(1).take(8), sessionId)
+                        preloadNextFilms(titles.drop(1).take(8))
                         // Update preloaded poster URLs after preloading starts
                         _uiState.value = _uiState.value.copy(
                             preloadedPosterUrls = preloadedFilms.take(8).mapNotNull { it.posterUrl }
@@ -169,17 +169,15 @@ class SwipingViewModel @Inject constructor(
                         userSwipes[userId]?.add(filmKey)
                         
                         // Check for match
-                        checkForMatch(sessionId, filmKey)
+                        checkForMatch(filmKey)
                     }
                 }
-                .catch { e ->
-                    // Handle error silently
-                }
+                .catch { }
                 .launchIn(viewModelScope)
         }
     }
     
-    private suspend fun checkForMatch(sessionId: String, filmKey: Pair<Long, String>) {
+    private suspend fun checkForMatch(filmKey: Pair<Long, String>) {
         // Skip if we've already shown this match
         if (shownMatches.contains(filmKey)) return
         
@@ -203,7 +201,7 @@ class SwipingViewModel @Inject constructor(
                 } else {
                     getSeriesById(filmKey.first.toInt())
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 return // If we can't load the film, skip showing the match
             }
             
@@ -220,7 +218,7 @@ class SwipingViewModel @Inject constructor(
         }
     }
     
-    private suspend fun loadTitleDetails(title: Pair<Long, String>, sessionId: String) {
+    private suspend fun loadTitleDetails(title: Pair<Long, String>) {
         try {
             // Check if film is already preloaded
             val preloaded = preloadedFilms.firstOrNull { it.title == title }
@@ -247,14 +245,14 @@ class SwipingViewModel @Inject constructor(
             val remaining = _uiState.value.remainingTitles
             if (remaining.isNotEmpty() && preloadedFilms.size < 8) {
                 val titlesToPreload = remaining.take(8 - preloadedFilms.size)
-                preloadNextFilms(titlesToPreload, sessionId)
+                preloadNextFilms(titlesToPreload)
             } else {
                 // Update preloaded poster URLs
                 _uiState.value = _uiState.value.copy(
                     preloadedPosterUrls = preloadedFilms.take(8).mapNotNull { it.posterUrl }
                 )
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // If loading fails, skip to next title
             _uiState.value = _uiState.value.copy(
                 hasError = true,
@@ -263,7 +261,7 @@ class SwipingViewModel @Inject constructor(
         }
     }
     
-    private fun preloadNextFilms(titles: List<Pair<Long, String>>, sessionId: String) {
+    private fun preloadNextFilms(titles: List<Pair<Long, String>>) {
         if (titles.isEmpty()) return
         
         viewModelScope.launch(Dispatchers.IO) {
@@ -302,7 +300,7 @@ class SwipingViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         preloadedPosterUrls = preloadedFilms.take(8).mapNotNull { it.posterUrl }
                     )
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Silently fail preloading - we'll load it when needed
                 }
             }
@@ -333,7 +331,7 @@ class SwipingViewModel @Inject constructor(
                 userSwipes[userId]?.add(filmKey)
                 
                 // Check for match immediately
-                checkForMatch(sessionId, filmKey)
+                checkForMatch(filmKey)
             }
 
             val remaining = _uiState.value.remainingTitles
@@ -360,14 +358,13 @@ class SwipingViewModel @Inject constructor(
                 canGoBack = true
             )
             // 2) ahora cargamos el film (usará remainingTitles correcto)
-            loadTitleDetails(nextTitle, sessionId)
+            loadTitleDetails(nextTitle)
         }
     }
     
     fun goBack() {
         if (!canGoBack || previousFilm == null || previousTitle == null) return
         
-        val sessionId = _uiState.value.sessionId ?: return
         val currentTitle = _uiState.value.currentTitle ?: return
         
         viewModelScope.launch(Dispatchers.IO) {
