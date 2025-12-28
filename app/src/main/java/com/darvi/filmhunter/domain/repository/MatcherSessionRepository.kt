@@ -45,5 +45,11 @@ interface MatcherSessionRepository {
     suspend fun subscribeToSessionSwipes(sessionId: String): Flow<com.darvi.filmhunter.data.model.supabase.SessionSwipeDTO>
     
     suspend fun unsubscribeFromSessionSwipes(sessionId: String)
+    
+    suspend fun getUserSessions(userId: String): Result<List<MatcherSessionEntity>>
+    
+    suspend fun getMatchedFilms(sessionId: String): Result<List<Pair<Long, String>>>
+    
+    suspend fun getSessionById(sessionId: String): Result<MatcherSessionEntity>
 }
 

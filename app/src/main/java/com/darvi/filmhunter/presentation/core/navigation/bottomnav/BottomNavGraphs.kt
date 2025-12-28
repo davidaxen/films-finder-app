@@ -31,6 +31,8 @@ import com.darvi.filmhunter.presentation.matcher.screens.PlatformSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.SessionWaitingScreen
 import com.darvi.filmhunter.presentation.matcher.SwipingScreen
 import com.darvi.filmhunter.presentation.matcher.SwipingViewModel
+import com.darvi.filmhunter.presentation.matcher.sessions.SessionDetailScreen
+import com.darvi.filmhunter.presentation.matcher.sessions.SessionsHistoryScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -177,6 +179,9 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                 },
                 onCreateRoomClick = {
                     navController.navigate(MatchRoutes.FilmTypeSelection)
+                },
+                onSessionsHistoryClick = {
+                    navController.navigate(MatchRoutes.SessionsHistory)
                 }
             )
         }
@@ -472,6 +477,39 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                         }
                         launchSingleTop = true
                     }
+                }
+            )
+        }
+        composable<MatchRoutes.SessionsHistory> {
+            SessionsHistoryScreen(
+                onSessionClick = { session ->
+                    navController.navigate(
+                        MatchRoutes.SessionDetail(sessionId = session.id)
+                    )
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MatchRoutes.SessionDetail> { backStackEntry ->
+            val route = backStackEntry.toRoute<MatchRoutes.SessionDetail>()
+            // Pass session with just ID - ViewModel will load full details
+            SessionDetailScreen(
+                session = com.darvi.filmhunter.domain.entity.MatcherSessionEntity(
+                    id = route.sessionId,
+                    code = "",
+                    createdBy = "",
+                    status = "",
+                    filters = emptyMap()
+                ),
+                onFilmClick = { filmId, filmType ->
+                    navController.navigate(
+                        MainGraph.Detail(id = filmId, filmType = filmType)
+                    )
+                },
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }

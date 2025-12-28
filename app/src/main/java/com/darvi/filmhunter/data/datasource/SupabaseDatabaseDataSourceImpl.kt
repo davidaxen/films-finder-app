@@ -432,4 +432,68 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getUserSessions(userId: String): List<SessionDTO> {
+        // Get all sessions where the user is a member (either created by them or joined)
+        val memberSessions = database
+            .from(Tables.SESSION_MEMBERS)
+            .select {
+                filter {
+                    eq("user_id", userId)
+                }
+            }
+            .decodeList<SessionMemberDTO>()
+
+        // Get unique session IDs
+        val sessionIds = memberSessions.map { it.sessionId }.distinct()
+
+        if (sessionIds.isEmpty()) {
+            return emptyList()
+        }
+
+        // Fetch all sessions
+        return database
+            .from(Tables.SESSIONS)
+            .select {
+                filter {
+                    isIn("id", sessionIds)
+                }
+                order("created_at", Order.DESCENDING)
+            }
+            .decodeList<SessionDTO>()
+    }
+
+    override suspend fun getMatchedFilms(sessionId: String): List<Pair<Long, String>> {
+        // Get all "like" swipes for this session
+        val likes = database
+            .from(Tables.SESSION_SWIPES)
+            .select {
+                filter {
+                    eq("session_id", sessionId)
+                    eq("vote", "like")
+                }
+            }
+            .decodeList<SessionSwipeDTO>()
+
+        // Group by (tmdbId, mediaType) and count how many users liked each
+        val filmLikes = mutableMapOf<Pair<Long, String>, MutableSet<String>>()
+        
+        likes.forEach { swipe ->
+            val filmKey = Pair(swipe.tmdbId, swipe.mediaType)
+            if (filmLikes[filmKey] == null) {
+                filmLikes[filmKey] = mutableSetOf()
+            }
+            filmLikes[filmKey]?.add(swipe.userId)
+        }
+
+        // Get session members to know how many users are in the session
+        val members = getSessionMembers(sessionId)
+        val memberCount = members.size
+
+        // Return films that were liked by all members (matched films)
+        return filmLikes
+            .filter { (_, userIds) -> userIds.size == memberCount }
+            .keys
+            .toList()
+    }
 }

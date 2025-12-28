@@ -11,27 +11,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.darvi.filmhunter.presentation.core.components.FilmHunterPrimaryButton
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.components.FilmHunterTextField
@@ -41,6 +47,7 @@ fun MatcherScreen(
     matcherViewModel: MatcherViewModel = hiltViewModel(),
     onJoinRoomClick: (String) -> Unit,
     onCreateRoomClick: () -> Unit = {},
+    onSessionsHistoryClick: () -> Unit = {},
 ) {
     val uiState by matcherViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -52,8 +59,25 @@ fun MatcherScreen(
     ) {
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Row(Modifier.fillMaxWidth()) {
+                Spacer(Modifier.weight(1f))
+                IconButton(
+                    onClick = dropUnlessResumed { onSessionsHistoryClick() },
+                    modifier = Modifier
+                        .clip(CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.History,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(4.dp))
+
             MatchCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -88,6 +112,8 @@ fun MatcherScreen(
                     onClick = onCreateRoomClick
                 )
             }
+
+            Spacer(Modifier.height(16.dp))
 
             // JOIN ROOM
             MatchCard(
@@ -141,6 +167,8 @@ fun MatcherScreen(
                     enabled = uiState.joinRoomEnabled,
                 )
             }
+
+            Spacer(Modifier.height(16.dp))
 
             // HOW IT WORKS
             MatchCard(

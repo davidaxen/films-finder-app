@@ -32,4 +32,6 @@ interface SupabaseDatabaseDataSource {
     suspend fun getSessionSwipes(sessionId: String): List<SessionSwipeDTO>
     suspend fun subscribeToSessionSwipes(sessionId: String): Flow<SessionSwipeDTO>
     suspend fun unsubscribeFromSessionSwipes(sessionId: String)
+    suspend fun getUserSessions(userId: String): List<SessionDTO>
+    suspend fun getMatchedFilms(sessionId: String): List<Pair<Long, String>> // Returns list of (tmdbId, mediaType) pairs
 }

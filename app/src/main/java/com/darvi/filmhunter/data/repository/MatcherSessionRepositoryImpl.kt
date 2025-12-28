@@ -282,5 +282,102 @@ class MatcherSessionRepositoryImpl @Inject constructor(
     override suspend fun unsubscribeFromSessionSwipes(sessionId: String) {
         database.unsubscribeFromSessionSwipes(sessionId)
     }
+
+    override suspend fun getUserSessions(userId: String): Result<List<MatcherSessionEntity>> {
+        return try {
+            val sessions = database.getUserSessions(userId)
+            val entities = sessions.map { sessionDTO ->
+                // Convert filters JsonObject to Map<String, Any>
+                val filtersMap = mutableMapOf<String, Any>()
+                sessionDTO.filters.let { jsonObject ->
+                    jsonObject.forEach { (key, value) ->
+                        when (value) {
+                            is JsonPrimitive -> {
+                                when {
+                                    value.isString -> filtersMap[key] = value.content
+                                    value.booleanOrNull != null -> filtersMap[key] = value.boolean
+                                    value.intOrNull != null -> filtersMap[key] = value.int
+                                    value.doubleOrNull != null -> filtersMap[key] = value.double
+                                    else -> filtersMap[key] = value.content
+                                }
+                            }
+
+                            is JsonArray -> {
+                                filtersMap[key] = value.map { element ->
+                                    (element as? JsonPrimitive)?.content ?: element.toString()
+                                }
+                            }
+
+                            else -> filtersMap[key] = value.toString()
+                        }
+                    }
+                }
+                
+                MatcherSessionEntity(
+                    id = sessionDTO.id ?: "",
+                    code = sessionDTO.code,
+                    createdBy = sessionDTO.createdBy ?: "",
+                    status = sessionDTO.status,
+                    filters = filtersMap
+                )
+            }
+            Result.success(entities)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getMatchedFilms(sessionId: String): Result<List<Pair<Long, String>>> {
+        return try {
+            val matchedFilms = database.getMatchedFilms(sessionId)
+            Result.success(matchedFilms)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getSessionById(sessionId: String): Result<MatcherSessionEntity> {
+        return try {
+            val sessionDTO = database.getSessionById(sessionId)
+            
+            // Convert filters JsonObject to Map<String, Any>
+            val filtersMap = mutableMapOf<String, Any>()
+            sessionDTO.filters?.let { jsonObject ->
+                jsonObject.forEach { (key, value) ->
+                    when (value) {
+                        is JsonPrimitive -> {
+                            when {
+                                value.isString -> filtersMap[key] = value.content
+                                value.booleanOrNull != null -> filtersMap[key] = value.boolean
+                                value.intOrNull != null -> filtersMap[key] = value.int
+                                value.doubleOrNull != null -> filtersMap[key] = value.double
+                                else -> filtersMap[key] = value.content
+                            }
+                        }
+                        is JsonArray -> {
+                            filtersMap[key] = value.map { element ->
+                                (element as? JsonPrimitive)?.intOrNull
+                                    ?: (element as? JsonPrimitive)?.content
+                                    ?: element.toString()
+                            }
+                        }
+                        else -> filtersMap[key] = value.toString()
+                    }
+                }
+            }
+            
+            Result.success(
+                MatcherSessionEntity(
+                    id = sessionDTO.id ?: "",
+                    code = sessionDTO.code,
+                    createdBy = sessionDTO.createdBy ?: "",
+                    status = sessionDTO.status,
+                    filters = filtersMap
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
 
