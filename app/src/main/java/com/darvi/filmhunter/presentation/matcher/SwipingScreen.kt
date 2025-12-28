@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.presentation.matcher.screens
+package com.darvi.filmhunter.presentation.matcher
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -24,7 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.RotateLeft
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -201,55 +202,69 @@ fun SwipingScreen(
                                 .weight(1f)
                                 .padding(horizontal = 16.dp)
                         ) {
-                        Card(
-                            modifier = Modifier.fillMaxSize(),
-                            shape = RoundedCornerShape(24.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                        ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            // Poster Image
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(2f/3f)
-                                    .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                            Card(
+                                modifier = Modifier.fillMaxSize(),
+                                shape = RoundedCornerShape(24.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                             ) {
-                                val posterPath = when (val film = uiState.currentFilm) {
-                                    is MovieDetailEntity -> film.posterPath
-                                    is SeriesDetailEntity -> film.posterPath
-                                    else -> null
-                                }
-                                
-                                val filmTitle = when (val film = uiState.currentFilm) {
-                                    is MovieDetailEntity -> film.title
-                                    is SeriesDetailEntity -> film.title
-                                    else -> ""
-                                }
-                                
-                                val imageUrl = posterPath?.let { ImageUrlHelper.getOriginalUrl(it) }
-                                
-                                if (imageUrl != null) {
-                                    var isLoading by remember { mutableStateOf(true) }
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    // Poster Image
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(2f/3f)
+                                            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                                    ) {
+                                        val posterPath = when (val film = uiState.currentFilm) {
+                                            is MovieDetailEntity -> film.posterPath
+                                            is SeriesDetailEntity -> film.posterPath
+                                            else -> null
+                                        }
 
-                                    // Use SubcomposeAsyncImage for instant display from cache
-                                    SubcomposeAsyncImage(
-                                        model = ImageRequest.Builder(context)
-                                            .data(imageUrl)
-                                            .memoryCachePolicy(CachePolicy.ENABLED)
-                                            .diskCachePolicy(CachePolicy.ENABLED)
-                                            .build(),
-                                        contentDescription = filmTitle,
-                                        contentScale = ContentScale.Crop, // Fill width to prevent top cropping
-                                        modifier = Modifier.shimmerLoading(isVisible = isLoading).matchParentSize(),
-                                        onLoading = { isLoading = true },
-                                        onSuccess = { isLoading = false },
-                                        error = {
+                                        val filmTitle = when (val film = uiState.currentFilm) {
+                                            is MovieDetailEntity -> film.title
+                                            is SeriesDetailEntity -> film.title
+                                            else -> ""
+                                        }
+
+                                        val imageUrl = posterPath?.let { ImageUrlHelper.getOriginalUrl(it) }
+
+                                        if (imageUrl != null) {
+                                            var isLoading by remember { mutableStateOf(true) }
+
+                                            // Use SubcomposeAsyncImage for instant display from cache
+                                            SubcomposeAsyncImage(
+                                                model = ImageRequest.Builder(context)
+                                                    .data(imageUrl)
+                                                    .memoryCachePolicy(CachePolicy.ENABLED)
+                                                    .diskCachePolicy(CachePolicy.ENABLED)
+                                                    .build(),
+                                                contentDescription = filmTitle,
+                                                contentScale = ContentScale.Crop, // Fill width to prevent top cropping
+                                                modifier = Modifier.shimmerLoading(isVisible = isLoading).matchParentSize(),
+                                                onLoading = { isLoading = true },
+                                                onSuccess = { isLoading = false },
+                                                error = {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxSize()
+                                                            .background(MaterialTheme.colorScheme.surface),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        FilmHunterText(
+                                                            text = "Error al cargar imagen",
+                                                            textAlign = TextAlign.Center
+                                                        )
+                                                    }
+                                                }
+                                            )
+                                        } else {
                                             Box(
                                                 modifier = Modifier
                                                     .fillMaxSize()
@@ -257,95 +272,66 @@ fun SwipingScreen(
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 FilmHunterText(
-                                                    text = "Error al cargar imagen",
+                                                    text = "Imagen no disponible",
                                                     textAlign = TextAlign.Center
                                                 )
                                             }
                                         }
-                                    )
-                                } else {
-                                    Box(
+                                    }
+
+                                    // Film Info
+                                    Column(
                                         modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(MaterialTheme.colorScheme.surface),
-                                        contentAlignment = Alignment.Center
+                                            .fillMaxWidth()
+                                            .padding(12.dp)
+                                            .weight(0.30f)
                                     ) {
+                                        val title = when (val film = uiState.currentFilm) {
+                                            is MovieDetailEntity -> film.title
+                                            is SeriesDetailEntity -> film.title
+                                            else -> ""
+                                        }
+
                                         FilmHunterText(
-                                            text = "Imagen no disponible",
-                                            textAlign = TextAlign.Center
+                                            text = title,
+                                            style = MaterialTheme.typography.headlineMedium.copy(
+                                                fontWeight = FontWeight.Bold
+                                            ),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        val voteAverage = when (val film = uiState.currentFilm) {
+                                            is MovieDetailEntity -> film.voteAverage
+                                            is SeriesDetailEntity -> film.voteAverage
+                                            else -> 0.0
+                                        }
+
+                                        val releaseDate = when (val film = uiState.currentFilm) {
+                                            is MovieDetailEntity -> film.releaseDate
+                                            is SeriesDetailEntity -> film.releaseDate
+                                            else -> ""
+                                        }
+
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            FilmHunterText(
+                                                text = "⭐ ${String.format(Locale.getDefault(),"%.1f", voteAverage)}",
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
+                                            Spacer(modifier = Modifier.width(16.dp))
+                                            FilmHunterText(
+                                                text = releaseDate,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        }
                                     }
                                 }
                             }
-                            
-                            // Film Info
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp)
-                                    .weight(0.30f)
-                            ) {
-                                val title = when (val film = uiState.currentFilm) {
-                                    is MovieDetailEntity -> film.title
-                                    is SeriesDetailEntity -> film.title
-                                    else -> ""
-                                }
-                                
-                                FilmHunterText(
-                                    text = title,
-                                    style = MaterialTheme.typography.headlineMedium.copy(
-                                        fontWeight = FontWeight.Bold
-                                    ),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                
-                                Spacer(modifier = Modifier.height(8.dp))
-                                
-                                /*val overview = when (val film = uiState.currentFilm) {
-                                    is MovieDetailEntity -> film.overview
-                                    is SeriesDetailEntity -> film.overview
-                                    else -> ""
-                                }
-                                
-                                FilmHunterText(
-                                    text = overview,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    maxLines = 4,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                
-                                Spacer(modifier = Modifier.height(8.dp))*/
-                                
-                                val voteAverage = when (val film = uiState.currentFilm) {
-                                    is MovieDetailEntity -> film.voteAverage
-                                    is SeriesDetailEntity -> film.voteAverage
-                                    else -> 0.0
-                                }
-                                
-                                val releaseDate = when (val film = uiState.currentFilm) {
-                                    is MovieDetailEntity -> film.releaseDate
-                                    is SeriesDetailEntity -> film.releaseDate
-                                    else -> ""
-                                }
-                                
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    FilmHunterText(
-                                        text = "⭐ ${String.format(Locale.getDefault(),"%.1f", voteAverage)}",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    FilmHunterText(
-                                        text = releaseDate,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                            }
-                        }
-                        }
-                    } // End of SwipeableCard content
+                        } // End of SwipeableCard content
                     } // End of key block
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -354,8 +340,8 @@ fun SwipingScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 32.dp, vertical = 24.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
+                            .padding(horizontal = 12.dp, vertical = 24.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         // Back Button
@@ -367,7 +353,7 @@ fun SwipingScreen(
                                 .clip(CircleShape)
                                 .background(
                                     if (uiState.canGoBack) {
-                                        MaterialTheme.colorScheme.secondaryContainer
+                                        MaterialTheme.colorScheme.surface
                                     } else {
                                         MaterialTheme.colorScheme.surfaceVariant
                                     }
@@ -377,7 +363,7 @@ fun SwipingScreen(
                                 imageVector = Icons.AutoMirrored.Filled.RotateLeft,
                                 contentDescription = "Back",
                                 tint = if (uiState.canGoBack) {
-                                    MaterialTheme.colorScheme.onSecondaryContainer
+                                    Color.Blue.copy(alpha = 0.40f)
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
                                 },
@@ -393,12 +379,12 @@ fun SwipingScreen(
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.errorContainer)
+                                .background(MaterialTheme.colorScheme.surface)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Dislike",
-                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                tint = Color.Red,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
@@ -428,30 +414,30 @@ fun SwipingScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .background(MaterialTheme.colorScheme.surface)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Info,
+                                imageVector = Icons.Outlined.Info,
                                 contentDescription = "Info",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = Color.Yellow,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
                         
                         Spacer(modifier = Modifier.width(16.dp))
-                        
+
                         // Like Button
                         IconButton(
                             onClick = dropUnlessResumed { triggerSwipeRight++ },
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .background(MaterialTheme.colorScheme.surface)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Favorite,
                                 contentDescription = "Like",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                tint = Color.Green,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
@@ -464,12 +450,12 @@ fun SwipingScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.errorContainer)
+                                .background(MaterialTheme.colorScheme.surface)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                 contentDescription = "End Session",
-                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                tint = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -664,7 +650,8 @@ private fun MatchModal(
         onDismissRequest = onDismiss,
         title = {
             FilmHunterText(
-                text = "¡Es un Match! 🎉",
+                modifier = Modifier.fillMaxWidth(),
+                text = "🎉 ¡Es un Match! 🎉",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -747,15 +734,15 @@ private fun FinishSessionDialog(
             )
         },
         confirmButton = {
-            FilmHunterPrimaryButton(
+            FilmHunterSecondaryButton(
                 text = "Finalizar",
                 onClick = onConfirm,
                 modifier = Modifier.fillMaxWidth()
             )
         },
         dismissButton = {
-            FilmHunterSecondaryButton(
-                text = "Cancelar",
+            FilmHunterPrimaryButton(
+                text = "Continuar",
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -785,15 +772,15 @@ private fun LeaveSessionDialog(
             )
         },
         confirmButton = {
-            FilmHunterPrimaryButton(
+            FilmHunterSecondaryButton(
                 text = "Salir",
                 onClick = onConfirm,
                 modifier = Modifier.fillMaxWidth()
             )
         },
         dismissButton = {
-            FilmHunterSecondaryButton(
-                text = "Cancelar",
+            FilmHunterPrimaryButton(
+                text = "Continuar",
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth()
             )

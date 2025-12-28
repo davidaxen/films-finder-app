@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.presentation.matcher.screens
+package com.darvi.filmhunter.presentation.matcher
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -364,7 +364,7 @@ class SwipingViewModel @Inject constructor(
     
     fun goBack() {
         if (!canGoBack || previousFilm == null || previousTitle == null) return
-        
+
         val currentTitle = _uiState.value.currentTitle ?: return
         
         viewModelScope.launch(Dispatchers.IO) {

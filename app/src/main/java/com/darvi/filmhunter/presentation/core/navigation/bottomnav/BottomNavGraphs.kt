@@ -29,8 +29,8 @@ import com.darvi.filmhunter.presentation.matcher.screens.GenreSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.MatcherSummaryScreen
 import com.darvi.filmhunter.presentation.matcher.screens.PlatformSelectionScreen
 import com.darvi.filmhunter.presentation.matcher.screens.SessionWaitingScreen
-import com.darvi.filmhunter.presentation.matcher.screens.SwipingScreen
-import com.darvi.filmhunter.presentation.matcher.screens.SwipingViewModel
+import com.darvi.filmhunter.presentation.matcher.SwipingScreen
+import com.darvi.filmhunter.presentation.matcher.SwipingViewModel
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
