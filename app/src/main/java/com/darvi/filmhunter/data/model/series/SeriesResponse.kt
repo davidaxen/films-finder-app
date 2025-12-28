@@ -6,7 +6,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SeriesResponse(
-    val results: List<SeriesModel>
+    val results: List<SeriesModel>,
+    @SerialName("total_pages")
+    val totalPages: Int,
+    @SerialName("total_results")
+    val totalResults: Int
 )
 
 @Serializable

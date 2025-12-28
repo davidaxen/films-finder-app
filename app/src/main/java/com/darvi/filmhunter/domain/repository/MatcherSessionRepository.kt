@@ -25,5 +25,11 @@ interface MatcherSessionRepository {
     suspend fun unsubscribeFromSessionStatus(sessionId: String)
     
     suspend fun unsubscribeAllSessionListeners(sessionId: String)
+    
+    suspend fun insertSessionTitles(sessionId: String, titles: List<Pair<Long, String>>): Result<Unit>
+    
+    suspend fun getSessionTitles(sessionId: String): Result<List<Pair<Long, String>>>
+    
+    suspend fun insertSessionSwipe(sessionId: String, userId: String, tmdbId: Long, mediaType: String, vote: String): Result<Unit>
 }
 

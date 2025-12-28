@@ -20,6 +20,8 @@ import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeFromSessionMembers
 import com.darvi.filmhunter.domain.usecase.matcher.SubscribeToSessionStatus
 import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeFromSessionStatus
 import com.darvi.filmhunter.domain.usecase.matcher.UnsubscribeAllSessionListeners
+import com.darvi.filmhunter.domain.entity.WatchProvider
+import com.darvi.filmhunter.domain.usecase.matcher.FetchAndStoreSessionTitles
 import com.darvi.filmhunter.presentation.core.model.FilmType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,6 +40,7 @@ class MatcherViewModel @Inject constructor(
     private val subscribeToSessionStatus: SubscribeToSessionStatus,
     private val unsubscribeFromSessionStatus: UnsubscribeFromSessionStatus,
     private val unsubscribeAllSessionListeners: UnsubscribeAllSessionListeners,
+    private val fetchAndStoreSessionTitles: FetchAndStoreSessionTitles,
     getCurrentUser: GetCurrentUser
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MatcherUiState())
@@ -163,6 +166,30 @@ class MatcherViewModel @Inject constructor(
                     _sessionCancelled.value = false
                     _sessionBecameActive.value = false
                     _hasOtherUserJoined.value = false
+                    
+                    // Fetch and store titles in background
+                    viewModelScope.launch(Dispatchers.IO) {
+                        val state = _uiState.value
+                        val filmType = state.selectedFilmType
+                        val genres = when (filmType) {
+                            FilmType.MOVIE -> state.selectedMovieGenres.toList()
+                            FilmType.SERIES -> state.selectedSeriesGenres.toList()
+                        }
+                        val platforms = if (state.selectAllPlatforms) {
+                            // Get all platform IDs from WatchProvider enum
+                            WatchProvider.entries.map { it.id }
+                        } else {
+                            state.selectedPlatforms.toList()
+                        }
+                        
+                        fetchAndStoreSessionTitles(
+                            sessionId = session.id,
+                            filmType = filmType,
+                            genres = genres,
+                            platforms = platforms
+                        )
+                    }
+                    
                     // Subscribe to Realtime for session_members changes
                     startListeningToSessionMembers(session.id, userId)
                     // Also subscribe to session status for host (in case they want to listen)

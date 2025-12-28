@@ -3,6 +3,8 @@ package com.darvi.filmhunter.data.repository
 import com.darvi.filmhunter.data.datasource.SupabaseDatabaseDataSource
 import com.darvi.filmhunter.data.model.supabase.SessionDTO
 import com.darvi.filmhunter.data.model.supabase.SessionMemberDTO
+import com.darvi.filmhunter.data.model.supabase.SessionSwipeDTO
+import com.darvi.filmhunter.data.model.supabase.SessionTitleDTO
 import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.domain.repository.MatcherSessionRepository
 import kotlinx.coroutines.flow.Flow
@@ -173,6 +175,54 @@ class MatcherSessionRepositoryImpl @Inject constructor(
 
     override suspend fun unsubscribeAllSessionListeners(sessionId: String) {
         database.unsubscribeAllSessionListeners(sessionId)
+    }
+
+    override suspend fun insertSessionTitles(sessionId: String, titles: List<Pair<Long, String>>): Result<Unit> {
+        return try {
+            val titleDTOs = titles.mapIndexed { index, (tmdbId, mediaType) ->
+                SessionTitleDTO(
+                    sessionId = sessionId,
+                    tmdbId = tmdbId,
+                    mediaType = mediaType,
+                    pos = index
+                )
+            }
+            database.insertSessionTitles(titleDTOs)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getSessionTitles(sessionId: String): Result<List<Pair<Long, String>>> {
+        return try {
+            val titles = database.getSessionTitles(sessionId)
+            Result.success(titles.map { it.tmdbId to it.mediaType })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun insertSessionSwipe(
+        sessionId: String,
+        userId: String,
+        tmdbId: Long,
+        mediaType: String,
+        vote: String
+    ): Result<Unit> {
+        return try {
+            val swipeDTO = SessionSwipeDTO(
+                sessionId = sessionId,
+                userId = userId,
+                tmdbId = tmdbId,
+                mediaType = mediaType,
+                vote = vote
+            )
+            database.insertSessionSwipe(swipeDTO)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
 

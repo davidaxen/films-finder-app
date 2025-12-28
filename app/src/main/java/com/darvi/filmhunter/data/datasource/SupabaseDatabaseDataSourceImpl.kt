@@ -4,8 +4,11 @@ import android.util.Log
 import com.darvi.filmhunter.data.model.supabase.FilmsSavedDTO
 import com.darvi.filmhunter.data.model.supabase.SessionDTO
 import com.darvi.filmhunter.data.model.supabase.SessionMemberDTO
+import com.darvi.filmhunter.data.model.supabase.SessionSwipeDTO
+import com.darvi.filmhunter.data.model.supabase.SessionTitleDTO
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.Realtime
@@ -37,6 +40,8 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
         const val SAVED_FILMS = "saved_films"
         const val SESSIONS = "sessions"
         const val SESSION_MEMBERS = "session_members"
+        const val SESSION_TITLES = "session_titles"
+        const val SESSION_SWIPES = "session_swipes"
     }
 
     override suspend fun saveFilm(filmId: Int, filmType: String) {
@@ -153,7 +158,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
     }
 
     override suspend fun subscribeToSessionMembers(sessionId: String, currentUserId: String): Flow<String> {
-        val channelKey = "session_members_$sessionId"
+        val channelKey = "${Tables.SESSION_MEMBERS}_$sessionId"
         
         // Unsubscribe if already subscribed
         unsubscribeFromSessionMembers(sessionId)
@@ -166,7 +171,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
                 channel.postgresChangeFlow<PostgresAction.Insert>(
                     schema = "public",
                 ) {
-                    table = "session_members"
+                    table = Tables.SESSION_MEMBERS
                 }
                 .onEach { change ->
                     // Check if the inserted user is not the current user
@@ -190,7 +195,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
     }
 
     override suspend fun unsubscribeFromSessionMembers(sessionId: String) {
-        val channelKey = "session_members_$sessionId"
+        val channelKey = "${Tables.SESSION_MEMBERS}_$sessionId"
         channels[channelKey]?.let { channel ->
             try {
                 channel.unsubscribe()
@@ -218,7 +223,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
                 channel.postgresChangeFlow<PostgresAction.Update>(
                     schema = "public",
                 ) {
-                    table = "sessions"
+                    table = Tables.SESSIONS
                 }
                 .onEach { change ->
                     // Check if the session status changed to "active" or "cancelled"
@@ -267,5 +272,34 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
         unsubscribeFromSessionMembers(sessionId)
         // Unsubscribe from session status
         unsubscribeFromSessionStatus(sessionId)
+    }
+
+    override suspend fun insertSessionTitles(titles: List<SessionTitleDTO>) {
+        if (titles.isNotEmpty()) {
+            database
+                .from(Tables.SESSION_TITLES)
+                .insert(titles)
+        }
+    }
+
+    override suspend fun getSessionTitles(sessionId: String): List<SessionTitleDTO> {
+        return database
+            .from(Tables.SESSION_TITLES)
+            .select {
+                filter {
+                    eq("session_id", sessionId)
+                }
+                order("pos", order = Order.ASCENDING)
+            }
+            .decodeList<SessionTitleDTO>()
+    }
+
+    override suspend fun insertSessionSwipe(swipe: SessionSwipeDTO) {
+        database
+            .from(Tables.SESSION_SWIPES)
+            .insert(swipe) {
+                select()
+            }
+            .decodeSingle<SessionSwipeDTO>()
     }
 }
