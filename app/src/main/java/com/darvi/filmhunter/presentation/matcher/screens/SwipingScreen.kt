@@ -152,6 +152,7 @@ fun SwipingScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f)
+                                    .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                             ) {
                                 val posterPath = when (val film = uiState.currentFilm) {
                                     is MovieDetailEntity -> film.posterPath
@@ -176,7 +177,7 @@ fun SwipingScreen(
                                             .diskCachePolicy(CachePolicy.ENABLED)
                                             .build(),
                                         contentDescription = filmTitle,
-                                        contentScale = ContentScale.Crop,
+                                        contentScale = ContentScale.FillBounds, // Fill width to prevent top cropping
                                         modifier = Modifier.fillMaxSize(),
                                         loading = {
                                             // Show nothing while loading - image should be cached
@@ -209,22 +210,6 @@ fun SwipingScreen(
                                         )
                                     }
                                 }
-                                
-                                // Gradient overlay at bottom
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
-                                        .align(Alignment.BottomCenter)
-                                        .background(
-                                            Brush.verticalGradient(
-                                                colors = listOf(
-                                                    Color.Transparent,
-                                                    MaterialTheme.colorScheme.surface
-                                                )
-                                            )
-                                        )
-                                )
                             }
                             
                             // Film Info
