@@ -13,6 +13,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
+import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.presentation.core.navigation.HomeRoutes
 import com.darvi.filmhunter.presentation.core.navigation.MainGraph
 import com.darvi.filmhunter.presentation.core.navigation.MatchRoutes
@@ -496,7 +497,7 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
             val route = backStackEntry.toRoute<MatchRoutes.SessionDetail>()
             // Pass session with just ID - ViewModel will load full details
             SessionDetailScreen(
-                session = com.darvi.filmhunter.domain.entity.MatcherSessionEntity(
+                session = MatcherSessionEntity(
                     id = route.sessionId,
                     code = "",
                     createdBy = "",

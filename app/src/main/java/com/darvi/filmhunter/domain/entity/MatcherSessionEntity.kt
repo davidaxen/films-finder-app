@@ -5,5 +5,6 @@ data class MatcherSessionEntity(
     val code: String,
     val createdBy: String,
     val status: String,
-    val filters: Map<String, Any>
+    val filters: Map<String, Any>,
+    val createdAt: String? = null
 )

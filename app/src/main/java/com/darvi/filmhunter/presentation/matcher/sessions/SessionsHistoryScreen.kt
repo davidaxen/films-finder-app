@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
+import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.domain.entity.movie.MovieGenre
 import com.darvi.filmhunter.domain.entity.series.SeriesGenre
@@ -40,12 +41,13 @@ import com.darvi.filmhunter.presentation.core.model.FilmType
 @Composable
 fun SessionsHistoryScreen(
     viewModel: SessionsHistoryViewModel = hiltViewModel(),
-    onSessionClick: (com.darvi.filmhunter.domain.entity.MatcherSessionEntity) -> Unit,
+    onSessionClick: (MatcherSessionEntity) -> Unit,
     onBackClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
+        if (uiState.hasLoaded) return@LaunchedEffect
         viewModel.loadSessions()
     }
 
@@ -109,11 +111,12 @@ fun SessionsHistoryScreen(
                             )
                         }
                     }
-                    items(uiState.sessions) { session ->
+                    items(uiState.sessions) { sessionWithMatch ->
                         SessionCard(
-                            session = session,
+                            session = sessionWithMatch.session,
+                            matchCount = sessionWithMatch.matchCount,
                             onClick = dropUnlessResumed {
-                                onSessionClick(session)
+                                onSessionClick(sessionWithMatch.session)
                             }
                         )
                     }
@@ -125,7 +128,8 @@ fun SessionsHistoryScreen(
 
 @Composable
 private fun SessionCard(
-    session: com.darvi.filmhunter.domain.entity.MatcherSessionEntity,
+    session: MatcherSessionEntity,
+    matchCount: Int,
     onClick: () -> Unit
 ) {
     Card(
@@ -141,14 +145,37 @@ private fun SessionCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Code
-            FilmHunterText(
-                text = "Código: ${session.code}",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold
+            // Code and Match Count
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FilmHunterText(
+                    text = "Código: ${session.code}",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    )
                 )
-            )
+                FilmHunterText(
+                    text = "$matchCount ${if (matchCount == 1) "coincidencia" else "coincidencias"}",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
+
+            // Creation Date
+            session.createdAt?.let { createdAt ->
+                val dateOnly = createdAt.take(10) // Extract YYYY-MM-DD from ISO format
+                FilmHunterText(
+                    text = "Fecha: $dateOnly",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
 
             // Film Type
             val filmTypeValue = session.filters["filmType"] as? Int ?: 0

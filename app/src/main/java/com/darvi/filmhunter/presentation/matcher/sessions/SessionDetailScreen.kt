@@ -38,6 +38,7 @@ import androidx.lifecycle.compose.dropUnlessResumed
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.domain.entity.WatchProvider
 import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.movie.MovieGenre
@@ -52,7 +53,7 @@ import java.util.Locale
 
 @Composable
 fun SessionDetailScreen(
-    session: com.darvi.filmhunter.domain.entity.MatcherSessionEntity,
+    session: MatcherSessionEntity,
     viewModel: SessionDetailViewModel = hiltViewModel(),
     onFilmClick: (Int, Int) -> Unit,
     onBackClick: () -> Unit
@@ -120,7 +121,7 @@ fun SessionDetailScreen(
                     // Matched Films Section
                     item {
                         FilmHunterText(
-                            text = "Películas Matcheadas",
+                            text = "Películas Coincididas",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold
                             )

@@ -345,7 +345,6 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
             .select {
                 filter {
                     eq("session_id", sessionId)
-                    eq("state", "joined")
                 }
             }
             .decodeList<SessionMemberDTO>()
@@ -451,12 +450,13 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
             return emptyList()
         }
 
-        // Fetch all sessions
+        // Fetch all sessions with status "finished" only
         return database
             .from(Tables.SESSIONS)
             .select {
                 filter {
                     isIn("id", sessionIds)
+                    eq("status", "finished")
                 }
                 order("created_at", Order.DESCENDING)
             }
@@ -464,6 +464,15 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getMatchedFilms(sessionId: String): List<Pair<Long, String>> {
+        // Get all session members with "joined" state
+        val members = getSessionMembers(sessionId)
+        val memberUserIds = members.map { it.userId }.toSet()
+        
+        // If no members or only one member, no matches possible
+        if (memberUserIds.size < 2) {
+            return emptyList()
+        }
+
         // Get all "like" swipes for this session
         val likes = database
             .from(Tables.SESSION_SWIPES)
@@ -475,24 +484,27 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
             }
             .decodeList<SessionSwipeDTO>()
 
-        // Group by (tmdbId, mediaType) and count how many users liked each
+        // Group by (tmdbId, mediaType) and collect userIds who liked each film
+        // Only count swipes from current session members
         val filmLikes = mutableMapOf<Pair<Long, String>, MutableSet<String>>()
         
         likes.forEach { swipe ->
-            val filmKey = Pair(swipe.tmdbId, swipe.mediaType)
-            if (filmLikes[filmKey] == null) {
-                filmLikes[filmKey] = mutableSetOf()
+            // Only count swipes from current session members
+            if (memberUserIds.contains(swipe.userId)) {
+                val filmKey = Pair(swipe.tmdbId, swipe.mediaType)
+                if (filmLikes[filmKey] == null) {
+                    filmLikes[filmKey] = mutableSetOf()
+                }
+                filmLikes[filmKey]?.add(swipe.userId)
             }
-            filmLikes[filmKey]?.add(swipe.userId)
         }
 
-        // Get session members to know how many users are in the session
-        val members = getSessionMembers(sessionId)
-        val memberCount = members.size
-
-        // Return films that were liked by all members (matched films)
+        // Return films that were liked by ALL current members (matched films)
         return filmLikes
-            .filter { (_, userIds) -> userIds.size == memberCount }
+            .filter { (_, userIds) -> 
+                // Check that all member user IDs are in the set of users who liked this film
+                userIds.containsAll(memberUserIds)
+            }
             .keys
             .toList()
     }

@@ -79,7 +79,8 @@ class MatcherSessionRepositoryImpl @Inject constructor(
                     code = createdSession.code,
                     createdBy = createdSession.createdBy ?: "",
                     status = createdSession.status,
-                    filters = filters
+                    filters = filters,
+                    createdAt = createdSession.createdAt
                 )
             )
         } catch (e: Exception) {
@@ -140,7 +141,8 @@ class MatcherSessionRepositoryImpl @Inject constructor(
                     code = sessionDTO.code,
                     createdBy = sessionDTO.createdBy ?: "",
                     status = sessionDTO.status,
-                    filters = filtersMap
+                    filters = filtersMap,
+                    createdAt = sessionDTO.createdAt
                 )
             )
         } catch (e: Exception) {
@@ -318,7 +320,8 @@ class MatcherSessionRepositoryImpl @Inject constructor(
                     code = sessionDTO.code,
                     createdBy = sessionDTO.createdBy ?: "",
                     status = sessionDTO.status,
-                    filters = filtersMap
+                    filters = filtersMap,
+                    createdAt = sessionDTO.createdAt
                 )
             }
             Result.success(entities)
@@ -342,7 +345,7 @@ class MatcherSessionRepositoryImpl @Inject constructor(
             
             // Convert filters JsonObject to Map<String, Any>
             val filtersMap = mutableMapOf<String, Any>()
-            sessionDTO.filters?.let { jsonObject ->
+            sessionDTO.filters.let { jsonObject ->
                 jsonObject.forEach { (key, value) ->
                     when (value) {
                         is JsonPrimitive -> {
@@ -354,6 +357,7 @@ class MatcherSessionRepositoryImpl @Inject constructor(
                                 else -> filtersMap[key] = value.content
                             }
                         }
+
                         is JsonArray -> {
                             filtersMap[key] = value.map { element ->
                                 (element as? JsonPrimitive)?.intOrNull
@@ -361,6 +365,7 @@ class MatcherSessionRepositoryImpl @Inject constructor(
                                     ?: element.toString()
                             }
                         }
+
                         else -> filtersMap[key] = value.toString()
                     }
                 }
@@ -372,7 +377,8 @@ class MatcherSessionRepositoryImpl @Inject constructor(
                     code = sessionDTO.code,
                     createdBy = sessionDTO.createdBy ?: "",
                     status = sessionDTO.status,
-                    filters = filtersMap
+                    filters = filtersMap,
+                    createdAt = sessionDTO.createdAt
                 )
             )
         } catch (e: Exception) {

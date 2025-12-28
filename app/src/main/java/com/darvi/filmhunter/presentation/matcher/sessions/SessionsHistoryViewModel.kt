@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.domain.entity.UserEntity
 import com.darvi.filmhunter.domain.usecase.auth.GetCurrentUser
+import com.darvi.filmhunter.domain.usecase.matcher.GetMatchedFilms
 import com.darvi.filmhunter.domain.usecase.matcher.GetUserSessions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SessionsHistoryViewModel @Inject constructor(
     private val getUserSessions: GetUserSessions,
+    private val getMatchedFilms: GetMatchedFilms,
     getCurrentUser: GetCurrentUser
 ) : ViewModel() {
     
@@ -32,9 +34,19 @@ class SessionsHistoryViewModel @Inject constructor(
             
             getUserSessions(userId)
                 .onSuccess { sessions ->
+                    // Load match counts for each session
+                    val sessionsWithMatches = sessions.map { session ->
+                        val matchCount = getMatchedFilms(session.id)
+                            .getOrNull()
+                            ?.size
+                            ?: 0
+                        SessionWithMatchCount(session, matchCount)
+                    }
+                    
                     _uiState.value = _uiState.value.copy(
-                        sessions = sessions,
+                        sessions = sessionsWithMatches,
                         isLoading = false,
+                        hasLoaded = true,
                         hasError = false
                     )
                 }
@@ -49,8 +61,14 @@ class SessionsHistoryViewModel @Inject constructor(
     }
 }
 
+data class SessionWithMatchCount(
+    val session: MatcherSessionEntity,
+    val matchCount: Int
+)
+
 data class SessionsHistoryUiState(
-    val sessions: List<MatcherSessionEntity> = emptyList(),
+    val sessions: List<SessionWithMatchCount> = emptyList(),
+    val hasLoaded: Boolean = false,
     val isLoading: Boolean = false,
     val hasError: Boolean = false,
     val errorMessage: String? = null
