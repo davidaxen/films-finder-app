@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,12 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -41,14 +42,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.dropUnlessResumed
-import coil3.ImageLoader
 import coil3.compose.SubcomposeAsyncImage
+import coil3.imageLoader
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
+import com.darvi.filmhunter.presentation.core.modifiers.shimmerLoading
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
+import java.util.Locale
 
 @Composable
 fun SwipingScreen(
@@ -57,7 +60,7 @@ fun SwipingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val imageLoader = remember { ImageLoader(context) }
+    val imageLoader = context.imageLoader
     
     LaunchedEffect(sessionId) {
         viewModel.setSessionId(sessionId)
@@ -65,7 +68,7 @@ fun SwipingScreen(
     }
     
     // Preload images for next 5 films
-    LaunchedEffect(uiState.preloadedPosterUrls) {
+    LaunchedEffect(uiState.currentTitle,uiState.preloadedPosterUrls) {
         uiState.preloadedPosterUrls.forEach { posterUrl ->
             val preloadRequest = ImageRequest.Builder(context)
                 .data(posterUrl)
@@ -145,13 +148,14 @@ fun SwipingScreen(
                         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                     ) {
                         Column(
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             // Poster Image
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .weight(1f)
+                                    .aspectRatio(2f/3f)
                                     .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                             ) {
                                 val posterPath = when (val film = uiState.currentFilm) {
@@ -169,6 +173,8 @@ fun SwipingScreen(
                                 val imageUrl = posterPath?.let { ImageUrlHelper.getOriginalUrl(it) }
                                 
                                 if (imageUrl != null) {
+                                    var isLoading by remember { mutableStateOf(true) }
+
                                     // Use SubcomposeAsyncImage for instant display from cache
                                     SubcomposeAsyncImage(
                                         model = ImageRequest.Builder(context)
@@ -177,12 +183,10 @@ fun SwipingScreen(
                                             .diskCachePolicy(CachePolicy.ENABLED)
                                             .build(),
                                         contentDescription = filmTitle,
-                                        contentScale = ContentScale.FillBounds, // Fill width to prevent top cropping
-                                        modifier = Modifier.fillMaxSize(),
-                                        loading = {
-                                            // Show nothing while loading - image should be cached
-                                            Box(modifier = Modifier.fillMaxSize())
-                                        },
+                                        contentScale = ContentScale.Crop, // Fill width to prevent top cropping
+                                        modifier = Modifier.shimmerLoading(isVisible = isLoading).matchParentSize(),
+                                        onLoading = { isLoading = true },
+                                        onSuccess = { isLoading = false },
                                         error = {
                                             Box(
                                                 modifier = Modifier
@@ -216,7 +220,8 @@ fun SwipingScreen(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(24.dp)
+                                    .padding(12.dp)
+                                    .weight(0.30f)
                             ) {
                                 val title = when (val film = uiState.currentFilm) {
                                     is MovieDetailEntity -> film.title
@@ -229,13 +234,13 @@ fun SwipingScreen(
                                     style = MaterialTheme.typography.headlineMedium.copy(
                                         fontWeight = FontWeight.Bold
                                     ),
-                                    maxLines = 2,
+                                    maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 
                                 Spacer(modifier = Modifier.height(8.dp))
                                 
-                                val overview = when (val film = uiState.currentFilm) {
+                                /*val overview = when (val film = uiState.currentFilm) {
                                     is MovieDetailEntity -> film.overview
                                     is SeriesDetailEntity -> film.overview
                                     else -> ""
@@ -248,7 +253,7 @@ fun SwipingScreen(
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(8.dp))*/
                                 
                                 val voteAverage = when (val film = uiState.currentFilm) {
                                     is MovieDetailEntity -> film.voteAverage
@@ -266,7 +271,7 @@ fun SwipingScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     FilmHunterText(
-                                        text = "⭐ ${String.format("%.1f", voteAverage)}",
+                                        text = "⭐ ${String.format(Locale.getDefault(),"%.1f", voteAverage)}",
                                         style = MaterialTheme.typography.bodyLarge
                                     )
                                     Spacer(modifier = Modifier.width(16.dp))
@@ -279,7 +284,7 @@ fun SwipingScreen(
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     
                     // Action Buttons
                     Row(

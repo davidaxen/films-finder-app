@@ -169,7 +169,7 @@ fun MatcherScreen(
                     HowItWorksItem("1. Crea una sala y comparte el código con quién quieres ver una serie/película.")
                     HowItWorksItem("2. Ambos os unís a la misma sala.")
                     HowItWorksItem("3. Deslizad series/películas (derecha = me gusta, izquierda = pasar).")
-                    HowItWorksItem("4. Si ambos marcáis una serie/película con 'me gusta', ¡ya tenemos una serie/película para ver!")
+                    HowItWorksItem("4. Si ambos marcáis una serie/película con 'me gusta', ¡Ya tenéis una serie/película para ver!")
                 }
             }
         }

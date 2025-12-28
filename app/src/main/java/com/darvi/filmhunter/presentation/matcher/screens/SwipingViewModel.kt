@@ -30,7 +30,7 @@ class SwipingViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SwipingUiState())
     val uiState: StateFlow<SwipingUiState> = _uiState
     
-    // Preloaded films queue (next 5 films with their details)
+    // Preloaded films queue (next 8 films with their details)
     private val preloadedFilms = mutableListOf<PreloadedFilm>()
     
     val currentUser: StateFlow<UserEntity?> = getCurrentUser() as StateFlow<UserEntity?>
@@ -55,11 +55,11 @@ class SwipingViewModel @Inject constructor(
                             remainingTitles = titles.drop(1),
                             isLoading = false
                         )
-                        // Preload next 5 films
-                        preloadNextFilms(titles.drop(1).take(5), sessionId)
+                        // Preload next 8 films
+                        preloadNextFilms(titles.drop(1).take(8), sessionId)
                         // Update preloaded poster URLs after preloading starts
                         _uiState.value = _uiState.value.copy(
-                            preloadedPosterUrls = preloadedFilms.take(5).mapNotNull { it.posterUrl }
+                            preloadedPosterUrls = preloadedFilms.take(8).mapNotNull { it.posterUrl }
                         )
                     } else {
                         _uiState.value = _uiState.value.copy(
@@ -98,18 +98,18 @@ class SwipingViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 currentFilm = film,
                 currentTitle = title,
-                preloadedPosterUrls = preloadedFilms.take(5).mapNotNull { it.posterUrl }
+                preloadedPosterUrls = preloadedFilms.take(8).mapNotNull { it.posterUrl }
             )
             
             // Preload next films if needed
             val remaining = _uiState.value.remainingTitles
-            if (remaining.isNotEmpty() && preloadedFilms.size < 5) {
-                val titlesToPreload = remaining.take(5 - preloadedFilms.size)
+            if (remaining.isNotEmpty() && preloadedFilms.size < 8) {
+                val titlesToPreload = remaining.take(8 - preloadedFilms.size)
                 preloadNextFilms(titlesToPreload, sessionId)
             } else {
                 // Update preloaded poster URLs
                 _uiState.value = _uiState.value.copy(
-                    preloadedPosterUrls = preloadedFilms.take(5).mapNotNull { it.posterUrl }
+                    preloadedPosterUrls = preloadedFilms.take(8).mapNotNull { it.posterUrl }
                 )
             }
         } catch (e: Exception) {
@@ -158,7 +158,7 @@ class SwipingViewModel @Inject constructor(
                     
                     // Update UI state with preloaded poster URLs
                     _uiState.value = _uiState.value.copy(
-                        preloadedPosterUrls = preloadedFilms.take(5).mapNotNull { it.posterUrl }
+                        preloadedPosterUrls = preloadedFilms.take(8).mapNotNull { it.posterUrl }
                     )
                 } catch (e: Exception) {
                     // Silently fail preloading - we'll load it when needed
@@ -168,39 +168,27 @@ class SwipingViewModel @Inject constructor(
     }
     
     fun onSwipe(vote: String) {
-        val currentTitle = _uiState.value.currentTitle
-        val sessionId = _uiState.value.sessionId
-        val userId = currentUser.value?.id
-        
-        if (currentTitle != null && sessionId != null && userId != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                saveSessionSwipe(
-                    sessionId = sessionId,
-                    userId = userId,
-                    tmdbId = currentTitle.first,
-                    mediaType = currentTitle.second,
-                    vote = vote
-                )
+        val sessionId = _uiState.value.sessionId ?: return
+        val userId = currentUser.value?.id ?: return
+        val currentTitle = _uiState.value.currentTitle ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            saveSessionSwipe(sessionId, userId, currentTitle.first, currentTitle.second, vote)
+
+            val remaining = _uiState.value.remainingTitles
+            if (remaining.isEmpty()) {
+                _uiState.value = _uiState.value.copy(currentFilm = null, currentTitle = null, isEmpty = true)
+                return@launch
             }
-        }
-        
-        // Move to next title
-        val remaining = _uiState.value.remainingTitles
-        if (remaining.isNotEmpty()) {
-            viewModelScope.launch(Dispatchers.IO) {
-                loadTitleDetails(remaining[0], sessionId ?: "")
-                _uiState.value = _uiState.value.copy(
-                    remainingTitles = remaining.drop(1),
-                    currentTitle = remaining[0]
-                )
-            }
-        } else {
-            // No more titles
+
+            val nextTitle = remaining.first()
+            // 1) “consumimos” el siguiente en el estado YA
             _uiState.value = _uiState.value.copy(
-                currentFilm = null,
-                currentTitle = null,
-                isEmpty = true
+                currentTitle = nextTitle,
+                remainingTitles = remaining.drop(1)
             )
+            // 2) ahora cargamos el film (usará remainingTitles correcto)
+            loadTitleDetails(nextTitle, sessionId)
         }
     }
     
@@ -214,7 +202,7 @@ data class SwipingUiState(
     val currentFilm: Any? = null, // MovieDetailEntity or SeriesDetailEntity
     val currentTitle: Pair<Long, String>? = null,
     val remainingTitles: List<Pair<Long, String>> = emptyList(),
-    val preloadedPosterUrls: List<String> = emptyList(), // Poster URLs of next 5 preloaded films
+    val preloadedPosterUrls: List<String> = emptyList(), // Poster URLs of next 8 preloaded films
     val isLoading: Boolean = false,
     val hasError: Boolean = false,
     val errorMessage: String? = null,
