@@ -1,6 +1,9 @@
 package com.darvi.filmhunter.presentation.matcher.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,19 +36,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.dropUnlessResumed
-import com.darvi.filmhunter.presentation.core.model.FilmType
 import coil3.compose.SubcomposeAsyncImage
 import coil3.imageLoader
 import coil3.request.CachePolicy
@@ -53,9 +60,13 @@ import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
 import com.darvi.filmhunter.presentation.core.components.FilmHunterPrimaryButton
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
+import com.darvi.filmhunter.presentation.core.model.FilmType
 import com.darvi.filmhunter.presentation.core.modifiers.shimmerLoading
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun SwipingScreen(
@@ -146,18 +157,23 @@ fun SwipingScreen(
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Film Card
-                    Card(
+                    // Swipeable Film Card
+                    SwipeableCard(
+                        onSwipeLeft = { viewModel.onSwipe("dislike") },
+                        onSwipeRight = { viewModel.onSwipe("like") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        shape = RoundedCornerShape(24.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                            .padding(horizontal = 16.dp)
                     ) {
+                        Card(
+                            modifier = Modifier.fillMaxSize(),
+                            shape = RoundedCornerShape(24.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                        ) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.SpaceBetween
@@ -293,6 +309,7 @@ fun SwipingScreen(
                                 }
                             }
                         }
+                        }
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -385,6 +402,94 @@ fun SwipingScreen(
                 onDismiss = { viewModel.dismissMatch() }
             )
         }
+    }
+}
+
+@Composable
+private fun SwipeableCard(
+    onSwipeLeft: () -> Unit,
+    onSwipeRight: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    val density = LocalDensity.current
+    val coroutineScope = rememberCoroutineScope()
+    var offsetX by remember { mutableStateOf(0f) }
+    var isDragging by remember { mutableStateOf(false) }
+    
+    // Threshold for triggering swipe (in dp, converted to pixels)
+    val swipeThreshold = with(density) { 150.dp.toPx() }
+    
+    // Calculate rotation based on offset (max 15 degrees)
+    val rotation = (offsetX / swipeThreshold) * 15f
+    
+    // Animate only when not dragging - use raw offset during drag for immediate response
+    val animatedOffsetX = animateFloatAsState(
+        targetValue = offsetX,
+        animationSpec = if (isDragging) tween(0) else tween(300),
+        label = "offset"
+    )
+    
+    // Animate rotation only when not dragging
+    val animatedRotation = animateFloatAsState(
+        targetValue = rotation,
+        animationSpec = if (isDragging) tween(0) else tween(300),
+        label = "rotation"
+    )
+    
+    // Use raw values during drag for immediate response, animated values when snapping back
+    val currentOffsetX = if (isDragging) offsetX else animatedOffsetX.value
+    val currentRotation = if (isDragging) rotation else animatedRotation.value
+    
+    Box(
+        modifier = modifier
+            .offset { IntOffset(currentOffsetX.roundToInt(), 0) }
+            .graphicsLayer {
+                rotationZ = currentRotation
+            }
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = {
+                        isDragging = true
+                    },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        offsetX += dragAmount.x
+                    },
+                    onDragEnd = {
+                        isDragging = false
+                        // Check if threshold is reached
+                        when {
+                            offsetX > swipeThreshold -> {
+                                // Swipe right - like
+                                offsetX = swipeThreshold * 2f // Animate off screen
+                                onSwipeRight()
+                                // Reset after animation
+                                coroutineScope.launch {
+                                    delay(300)
+                                    offsetX = 0f
+                                }
+                            }
+                            offsetX < -swipeThreshold -> {
+                                // Swipe left - dislike
+                                offsetX = -swipeThreshold * 2f // Animate off screen
+                                onSwipeLeft()
+                                // Reset after animation
+                                coroutineScope.launch {
+                                    delay(300)
+                                    offsetX = 0f
+                                }
+                            }
+                            else -> {
+                                // Snap back to center
+                                offsetX = 0f
+                            }
+                        }
+                    }
+                )
+            }
+    ) {
+        content()
     }
 }
 
