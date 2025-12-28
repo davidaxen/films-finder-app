@@ -224,5 +224,31 @@ class MatcherSessionRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun getSessionMembers(sessionId: String): Result<List<String>> {
+        return try {
+            val members = database.getSessionMembers(sessionId)
+            Result.success(members.map { it.userId })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getSessionSwipes(sessionId: String): Result<List<SessionSwipeDTO>> {
+        return try {
+            val swipes = database.getSessionSwipes(sessionId)
+            Result.success(swipes)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun subscribeToSessionSwipes(sessionId: String): Flow<SessionSwipeDTO> {
+        return database.subscribeToSessionSwipes(sessionId)
+    }
+
+    override suspend fun unsubscribeFromSessionSwipes(sessionId: String) {
+        database.unsubscribeFromSessionSwipes(sessionId)
+    }
 }
 

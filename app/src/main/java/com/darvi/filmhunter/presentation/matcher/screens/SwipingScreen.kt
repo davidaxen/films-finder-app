@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,6 +49,7 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
+import com.darvi.filmhunter.presentation.core.components.FilmHunterPrimaryButton
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 import com.darvi.filmhunter.presentation.core.modifiers.shimmerLoading
 import com.darvi.filmhunter.presentation.core.util.ImageUrlHelper
@@ -331,5 +333,100 @@ fun SwipingScreen(
                 }
             }
         }
+        
+        // Match Modal
+        uiState.match?.let { match ->
+            MatchModal(
+                match = match,
+                onDismiss = { viewModel.dismissMatch() }
+            )
+        }
     }
+}
+
+@Composable
+private fun MatchModal(
+    match: MatchInfo,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    
+    val filmTitle = when (val film = match.film) {
+        is MovieDetailEntity -> film.title
+        is SeriesDetailEntity -> film.title
+        else -> ""
+    }
+    
+    val posterPath = when (val film = match.film) {
+        is MovieDetailEntity -> film.posterPath
+        is SeriesDetailEntity -> film.posterPath
+        else -> null
+    }
+    val posterUrl = posterPath?.let { ImageUrlHelper.getOriginalUrl(it) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            FilmHunterText(
+                text = "¡Es un Match! 🎉",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                FilmHunterText(
+                    text = "Ambos han dado like a:",
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Film Poster
+                if (posterUrl != null) {
+                    SubcomposeAsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(posterUrl)
+                            .memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED)
+                            .build(),
+                        contentDescription = filmTitle,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                FilmHunterText(
+                    text = filmTitle,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+        confirmButton = {
+            FilmHunterPrimaryButton(
+                text = "Continuar",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(24.dp)
+    )
 }

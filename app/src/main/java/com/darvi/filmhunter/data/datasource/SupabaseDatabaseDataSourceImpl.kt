@@ -36,6 +36,7 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
     private val channels = mutableMapOf<String, RealtimeChannel>()
     private val _memberJoinedFlow = MutableSharedFlow<String>(replay = 0)
     private val _sessionStatusFlow = MutableSharedFlow<String>(replay = 0)
+    private val _sessionSwipesFlow = MutableSharedFlow<SessionSwipeDTO>(replay = 0)
     object Tables {
         const val SAVED_FILMS = "saved_films"
         const val SESSIONS = "sessions"
@@ -272,6 +273,8 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
         unsubscribeFromSessionMembers(sessionId)
         // Unsubscribe from session status
         unsubscribeFromSessionStatus(sessionId)
+        // Unsubscribe from session swipes
+        unsubscribeFromSessionSwipes(sessionId)
     }
 
     override suspend fun insertSessionTitles(titles: List<SessionTitleDTO>) {
@@ -301,5 +304,99 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
                 select()
             }
             .decodeSingle<SessionSwipeDTO>()
+    }
+
+    override suspend fun getSessionMembers(sessionId: String): List<SessionMemberDTO> {
+        return database
+            .from(Tables.SESSION_MEMBERS)
+            .select {
+                filter {
+                    eq("session_id", sessionId)
+                    eq("state", "joined")
+                }
+            }
+            .decodeList<SessionMemberDTO>()
+    }
+
+    override suspend fun getSessionSwipes(sessionId: String): List<SessionSwipeDTO> {
+        return database
+            .from(Tables.SESSION_SWIPES)
+            .select {
+                filter {
+                    eq("session_id", sessionId)
+                    eq("vote", "like") // Only get likes for match detection
+                }
+            }
+            .decodeList<SessionSwipeDTO>()
+    }
+
+    override suspend fun subscribeToSessionSwipes(sessionId: String): Flow<SessionSwipeDTO> {
+        val channelKey = "session_swipes_$sessionId"
+        
+        // Unsubscribe if already subscribed
+        unsubscribeFromSessionSwipes(sessionId)
+
+        dataSourceScope.launch {
+            try {
+                val channel = realtime.channel(channelKey)
+
+                // Listen for INSERT events on session_swipes table
+                channel.postgresChangeFlow<PostgresAction.Insert>(
+                    schema = "public",
+                ) {
+                    table = Tables.SESSION_SWIPES
+                }
+                .onEach { change ->
+                    try {
+                        val swipeId = (change.record["id"] as? JsonPrimitive)?.content
+                        val sessionIdValue = (change.record["session_id"] as? JsonPrimitive)?.content
+                        val userId = (change.record["user_id"] as? JsonPrimitive)?.content
+                        val tmdbId = (change.record["tmdb_id"] as? JsonPrimitive)?.content?.toLongOrNull()
+                        val mediaType = (change.record["media_type"] as? JsonPrimitive)?.content
+                        val vote = (change.record["vote"] as? JsonPrimitive)?.content
+                        val createdAt = (change.record["created_at"] as? JsonPrimitive)?.content
+
+                        if (sessionIdValue == sessionId && userId != null && tmdbId != null && mediaType != null && vote != null) {
+                            val swipe = SessionSwipeDTO(
+                                id = swipeId,
+                                sessionId = sessionIdValue,
+                                userId = userId,
+                                tmdbId = tmdbId,
+                                mediaType = mediaType,
+                                vote = vote,
+                                createdAt = createdAt
+                            )
+
+                            _sessionSwipesFlow.emit(swipe)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("SupabaseDatabaseDataSourceImpl", "Error parsing swipe", e)
+                    }
+                }
+                .launchIn(dataSourceScope)
+                
+                channel.subscribe()
+                channels[channelKey] = channel
+            } catch (e: Exception) {
+                Log.e("SupabaseDatabaseDataSourceImpl", "Error subscribing to session swipes", e)
+            }
+        }
+        
+        return _sessionSwipesFlow.asSharedFlow()
+    }
+
+    override suspend fun unsubscribeFromSessionSwipes(sessionId: String) {
+        val channelKey = "session_swipes_$sessionId"
+        channels[channelKey]?.let { channel ->
+            try {
+                channel.unsubscribe()
+                // Wait a bit to ensure unsubscribe completes
+                delay(100)
+                channels.remove(channelKey)
+            } catch (e: Exception) {
+                Log.e("SupabaseDatabaseDataSourceImpl", "Error unsubscribing from session swipes", e)
+                channels.remove(channelKey)
+            }
+        }
     }
 }
