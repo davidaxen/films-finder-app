@@ -172,9 +172,7 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                                 )
                             )
                         },
-                        onError = { error ->
-
-                        }
+                        onError = { }
                     )
                 },
                 onCreateRoomClick = {
@@ -363,9 +361,7 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                                     launchSingleTop = true
                                 }
                             },
-                            onError = { error ->
-                                // TODO: Show error message
-                            }
+                            onError = { }
                         )
                     }
                 } else null,
@@ -373,12 +369,8 @@ fun NavGraphBuilder.matchGraph(navController: NavController) {
                     {
                         sharedViewModel.initiateSession(
                             sessionId = route.sessionId,
-                            onSuccess = {
-                                // Navigation will happen automatically via LaunchedEffect when sessionBecameActive becomes true
-                            },
-                            onError = { error ->
-                                // TODO: Show error message
-                            }
+                            onSuccess = { },
+                            onError = { }
                         )
                     }
                 } else null,
