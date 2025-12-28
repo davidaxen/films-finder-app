@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,11 +39,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.dropUnlessResumed
-import coil3.compose.AsyncImage
+import coil3.ImageLoader
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.CachePolicy
 import coil3.request.ImageRequest
-import coil3.request.crossfade
 import com.darvi.filmhunter.domain.entity.movie.MovieDetailEntity
 import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
@@ -54,10 +56,24 @@ fun SwipingScreen(
     viewModel: SwipingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val imageLoader = remember { ImageLoader(context) }
     
     LaunchedEffect(sessionId) {
         viewModel.setSessionId(sessionId)
         viewModel.loadSessionTitles(sessionId)
+    }
+    
+    // Preload images for next 5 films
+    LaunchedEffect(uiState.preloadedPosterUrls) {
+        uiState.preloadedPosterUrls.forEach { posterUrl ->
+            val preloadRequest = ImageRequest.Builder(context)
+                .data(posterUrl)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build()
+            imageLoader.enqueue(preloadRequest)
+        }
     }
     
     Box(
@@ -152,14 +168,33 @@ fun SwipingScreen(
                                 val imageUrl = posterPath?.let { ImageUrlHelper.getOriginalUrl(it) }
                                 
                                 if (imageUrl != null) {
-                                    AsyncImage(
-                                        model = ImageRequest.Builder(LocalContext.current)
+                                    // Use SubcomposeAsyncImage for instant display from cache
+                                    SubcomposeAsyncImage(
+                                        model = ImageRequest.Builder(context)
                                             .data(imageUrl)
-                                            .crossfade(true)
+                                            .memoryCachePolicy(CachePolicy.ENABLED)
+                                            .diskCachePolicy(CachePolicy.ENABLED)
                                             .build(),
                                         contentDescription = filmTitle,
                                         contentScale = ContentScale.Crop,
-                                        modifier = Modifier.fillMaxSize()
+                                        modifier = Modifier.fillMaxSize(),
+                                        loading = {
+                                            // Show nothing while loading - image should be cached
+                                            Box(modifier = Modifier.fillMaxSize())
+                                        },
+                                        error = {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .background(MaterialTheme.colorScheme.surface),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                FilmHunterText(
+                                                    text = "Error al cargar imagen",
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                        }
                                     )
                                 } else {
                                     Box(
