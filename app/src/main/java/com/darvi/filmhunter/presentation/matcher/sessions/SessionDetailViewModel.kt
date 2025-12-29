@@ -7,6 +7,8 @@ import com.darvi.filmhunter.domain.usecase.matcher.GetMatchedFilms
 import com.darvi.filmhunter.domain.usecase.matcher.GetSessionById
 import com.darvi.filmhunter.domain.usecase.movie.GetMovieById
 import com.darvi.filmhunter.domain.usecase.series.GetSeriesById
+import com.darvi.filmhunter.presentation.core.model.FilmDetailUiModel
+import com.darvi.filmhunter.presentation.core.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,16 +46,18 @@ class SessionDetailViewModel @Inject constructor(
             // Load matched films
             getMatchedFilms(fullSession.id)
                 .onSuccess { matchedFilmKeys ->
-                    // Load details for each matched film
-                    val matchedFilms = mutableListOf<Any>() // MovieDetailEntity or SeriesDetailEntity
+                    // Load details for each matched film and convert to FilmDetailUiModel
+                    val matchedFilms = mutableListOf<FilmDetailUiModel>()
                     
                     matchedFilmKeys.forEach { (tmdbId, mediaType) ->
                         when (mediaType) {
                             "movie" -> {
-                                matchedFilms.add(getMovieById(tmdbId.toInt()))
+                                val movie = getMovieById(tmdbId.toInt())
+                                matchedFilms.add(movie.toUiModel())
                             }
                             "tv" -> {
-                                matchedFilms.add(getSeriesById(tmdbId.toInt()))
+                                val series = getSeriesById(tmdbId.toInt())
+                                matchedFilms.add(series.toUiModel())
                             }
                         }
                     }
@@ -77,7 +81,7 @@ class SessionDetailViewModel @Inject constructor(
 
 data class SessionDetailUiState(
     val session: MatcherSessionEntity? = null,
-    val matchedFilms: List<Any> = emptyList(), // List of MovieDetailEntity or SeriesDetailEntity
+    val matchedFilms: List<FilmDetailUiModel> = emptyList(),
     val isLoading: Boolean = false,
     val hasError: Boolean = false,
     val errorMessage: String? = null
