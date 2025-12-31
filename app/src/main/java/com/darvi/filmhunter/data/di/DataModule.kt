@@ -35,8 +35,8 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideSessionRepository(dataSource: SupabaseAuthDataSource): SessionRepository {
-        return SessionRepositoryImpl(dataSource)
+    fun provideSessionRepository(dataSource: SupabaseAuthDataSource, databaseDataSource: SupabaseDatabaseDataSource): SessionRepository {
+        return SessionRepositoryImpl(dataSource, databaseDataSource)
     }
 
     @Provides
