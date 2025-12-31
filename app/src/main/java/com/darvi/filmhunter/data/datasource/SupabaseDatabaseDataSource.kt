@@ -8,6 +8,7 @@ import com.darvi.filmhunter.data.model.supabase.SessionTitleDTO
 import kotlinx.coroutines.flow.Flow
 
 interface SupabaseDatabaseDataSource {
+    suspend fun getUserNameById(id: String): String?
     suspend fun saveFilm(filmId: Int, filmType: String)
     suspend fun removeSavedFilm(filmId: Int, filmType: String)
     suspend fun isFilmSaved(filmId: Int, filmType: String): Boolean

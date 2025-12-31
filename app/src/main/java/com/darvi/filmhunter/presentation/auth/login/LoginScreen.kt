@@ -1,5 +1,6 @@
 package com.darvi.filmhunter.presentation.auth.login
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -16,7 +18,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,24 +60,32 @@ fun LoginScreen(
         }
     }
 
-    Scaffold { padding ->
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+            .padding(horizontal = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceAround
+    ) {
+        // App Logo
+        Image(
+            painter = painterResource(id = R.drawable.film_hunter_logo),
+            contentDescription = stringResource(id = R.string.app_name),
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.size(200.dp)
+        )
+
+        // Form Fields
         Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .padding(padding)
-                .padding(horizontal = 16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
             FilmHunterText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
                 text = stringResource(id = R.string.login_title),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground
             )
-
             FilmHunterTextField(
                 value = state.email,
                 onValueChange = { loginViewModel.onEmailChanged(it) },
@@ -117,15 +128,7 @@ fun LoginScreen(
                 ),
             )
 
-            Spacer(Modifier.height(8.dp))
-
-            FilmHunterPrimaryButton(
-                text = stringResource(id = R.string.login_cta),
-                onClick = { loginViewModel.onClick() },
-                enabled = !state.isLoading && state.isLoginEnabled,
-                isLoading = state.isLoading
-            )
-
+            // Forgot Password Link
             TextButton(
                 onClick = navigateToForgotPassword,
                 enabled = !state.isLoading,
@@ -134,10 +137,28 @@ fun LoginScreen(
                 FilmHunterText(text = stringResource(id = R.string.login_forgot_password))
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
+
+            // Login Button
+            FilmHunterPrimaryButton(
+                text = stringResource(id = R.string.login_cta),
+                onClick = { loginViewModel.onClick() },
+                enabled = !state.isLoading && state.isLoginEnabled,
+                isLoading = state.isLoading
+            )
+        }
+
+
+
+        // Divider with Register Section
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp),
+                modifier = Modifier.padding(vertical = 8.dp),
                 color = MaterialTheme.colorScheme.outlineVariant
             )
 
@@ -148,4 +169,5 @@ fun LoginScreen(
             )
         }
     }
+
 }

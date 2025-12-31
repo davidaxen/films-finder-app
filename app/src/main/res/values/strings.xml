@@ -12,4 +12,18 @@
     <string name="login_create_account">Crear cuenta</string>
     <string name="login_show_password">Mostrar contraseña</string>
     <string name="login_hide_password">Ocultar contraseña</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Crear cuenta</string>
+    <string name="register_email_label">Correo</string>
+    <string name="register_email_placeholder">tu@email.com</string>
+    <string name="register_password_label">Contraseña</string>
+    <string name="register_password_placeholder">••••••••</string>
+    <string name="register_repeat_password_label">Repetir contraseña</string>
+    <string name="register_repeat_password_placeholder">••••••••</string>
+    <string name="register_cta">Registrar</string>
+    <string name="register_show_password">Mostrar contraseña</string>
+    <string name="register_hide_password">Ocultar contraseña</string>
+    <string name="register_already_have_account">Ya tengo cuenta</string>
+
 </resources>

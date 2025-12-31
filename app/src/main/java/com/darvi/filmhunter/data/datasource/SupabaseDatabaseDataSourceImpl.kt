@@ -6,7 +6,9 @@ import com.darvi.filmhunter.data.model.supabase.SessionDTO
 import com.darvi.filmhunter.data.model.supabase.SessionMemberDTO
 import com.darvi.filmhunter.data.model.supabase.SessionSwipeDTO
 import com.darvi.filmhunter.data.model.supabase.SessionTitleDTO
+import com.darvi.filmhunter.data.model.supabase.UserNameDTO
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.rpc
@@ -15,17 +17,17 @@ import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 import javax.inject.Inject
 
 class SupabaseDatabaseDataSourceImpl @Inject constructor(
@@ -38,11 +40,31 @@ class SupabaseDatabaseDataSourceImpl @Inject constructor(
     private val _sessionStatusFlow = MutableSharedFlow<String>(replay = 0)
     private val _sessionSwipesFlow = MutableSharedFlow<SessionSwipeDTO>(replay = 0)
     object Tables {
+        const val USERS = "users"
         const val SAVED_FILMS = "saved_films"
         const val SESSIONS = "sessions"
         const val SESSION_MEMBERS = "session_members"
         const val SESSION_TITLES = "session_titles"
         const val SESSION_SWIPES = "session_swipes"
+    }
+
+    override suspend fun getUserNameById(id: String): String? {
+        return try {
+            val result = database
+                .from(Tables.USERS)
+                .select(
+                    columns = Columns.list("name")
+                ) {
+                    filter {
+                        eq("id", id)
+                    }
+                }
+                .decodeList<UserNameDTO>()
+
+            result.firstOrNull()?.name
+        } catch (_: Exception) {
+            null
+        }
     }
 
     override suspend fun saveFilm(filmId: Int, filmType: String) {

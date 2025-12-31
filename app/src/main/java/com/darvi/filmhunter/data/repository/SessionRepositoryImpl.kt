@@ -1,6 +1,7 @@
 package com.darvi.filmhunter.data.repository
 
 import com.darvi.filmhunter.data.datasource.SupabaseAuthDataSource
+import com.darvi.filmhunter.data.datasource.SupabaseDatabaseDataSource
 import com.darvi.filmhunter.data.model.UserModel
 import com.darvi.filmhunter.data.model.toDomain
 import com.darvi.filmhunter.domain.entity.SessionState
@@ -16,7 +17,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class SessionRepositoryImpl @Inject constructor(
-    private val authDataSource: SupabaseAuthDataSource
+    private val authDataSource: SupabaseAuthDataSource,
+    private val databaseDataSource: SupabaseDatabaseDataSource
 ): SessionRepository {
     private val _currentUser = MutableStateFlow<UserEntity?>(null)
     override fun getCurrentUser(): StateFlow<UserEntity?> = _currentUser
@@ -28,10 +30,11 @@ class SessionRepositoryImpl @Inject constructor(
                 when (status) {
                     is SessionStatus.Authenticated -> {
                         val user = status.session.user?.let {
+                            val name = databaseDataSource.getUserNameById(it.id) ?: ""
                             UserModel(
                                 uid = it.id,
                                 email = it.email ?: "",
-                                displayName = (it.userMetadata?.get("name") ?: "") as String
+                                displayName = name
                             ).toDomain()
                         }
 
@@ -50,8 +53,9 @@ class SessionRepositoryImpl @Inject constructor(
             .distinctUntilChanged()
     }
 
-    override fun setCurrentUser(user: UserEntity) {
-        _currentUser.value = user
+    override suspend fun setCurrentUser(user: UserEntity) {
+        val name = databaseDataSource.getUserNameById(user.id) ?: ""
+        _currentUser.value = user.copy(name = name)
     }
 
     override suspend fun signOut() {
