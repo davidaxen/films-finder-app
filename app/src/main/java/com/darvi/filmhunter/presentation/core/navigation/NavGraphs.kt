@@ -93,7 +93,7 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
 }
 
 fun NavGraphBuilder.mainGraph(navController: NavController) {
-    navigation<AppGraph.Main>(startDestination = MainGraph.Match) {
+    navigation<AppGraph.Main>(startDestination = MainGraph.Home) {
         homeGraph(navController)
         searchGraph(navController)
         matchGraph(navController)

@@ -22,10 +22,12 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -33,6 +35,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,14 +45,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.darvi.filmhunter.presentation.core.components.FilmHunterPrimaryButton
+import com.darvi.filmhunter.presentation.core.components.FilmHunterSecondaryButton
 import com.darvi.filmhunter.presentation.core.components.FilmHunterText
 
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = hiltViewModel(),
-    optionGroups: List<ProfileOptionGroup> = getDefaultProfileOptions(viewModel::onSignOut)
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    
+    val optionGroups = remember {
+        getDefaultProfileOptions { showLogoutDialog = true }
+    }
+
+    // Show logout dialog when requested
+    if (showLogoutDialog) {
+        LogoutConfirmationDialog(
+            onConfirm = {
+                showLogoutDialog = false
+                viewModel.onSignOut()
+            },
+            onDismiss = {
+                showLogoutDialog = false
+            }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -243,12 +267,54 @@ private fun ProfileOptionItem(
     }
 }
 
+@Composable
+private fun LogoutConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            FilmHunterText(
+                text = "Cerrar sesión",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        text = {
+            FilmHunterText(
+                text = "¿Estás seguro de que quieres cerrar sesión?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        confirmButton = {
+            FilmHunterSecondaryButton(
+                text = "Cerrar sesión",
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        dismissButton = {
+            FilmHunterPrimaryButton(
+                text = "Cancelar",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(24.dp)
+    )
+}
+
 /**
  * Default profile options - easily customizable and extensible
  * To add new options, simply add them to the appropriate group or create a new group
  */
 private fun getDefaultProfileOptions(
-    onSignOut: () -> Unit
+    onShowLogoutDialog: () -> Unit
 ): List<ProfileOptionGroup> {
     return listOf(
         ProfileOptionGroup(
@@ -257,7 +323,7 @@ private fun getDefaultProfileOptions(
                 ProfileOption(
                     id = "edit_profile",
                     title = "Editar perfil",
-                    icon = Icons.Filled.AccountCircle,
+                    icon = Icons.Filled.Edit,
                     onClick = { /* TODO: Navigate to edit profile */ }
                 ),
                 ProfileOption(
@@ -309,7 +375,7 @@ private fun getDefaultProfileOptions(
                     id = "logout",
                     title = "Cerrar sesión",
                     icon = Icons.AutoMirrored.Filled.ExitToApp,
-                    onClick = onSignOut,
+                    onClick = onShowLogoutDialog,
                     usePrimaryColor = true
                 )
             )
