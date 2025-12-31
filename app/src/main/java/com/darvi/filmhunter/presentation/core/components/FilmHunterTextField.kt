@@ -32,11 +32,18 @@ fun FilmHunterTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    forceMayus: Boolean = false
 ) {
     OutlinedTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = {
+            if (forceMayus) {
+                onValueChange(it.uppercase())
+            } else {
+                onValueChange(it)
+            }
+        },
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
         singleLine = singleLine,

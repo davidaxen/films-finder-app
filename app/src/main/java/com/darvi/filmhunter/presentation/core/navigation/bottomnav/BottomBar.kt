@@ -22,6 +22,7 @@ fun BottomBar(
         listOf(
             BottomBarDestination.Home,
             BottomBarDestination.Search,
+            BottomBarDestination.Match,
             BottomBarDestination.Fav,
             BottomBarDestination.Profile,
         )

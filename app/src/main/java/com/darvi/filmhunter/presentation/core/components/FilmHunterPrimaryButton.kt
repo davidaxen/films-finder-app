@@ -9,6 +9,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -16,6 +17,7 @@ fun FilmHunterPrimaryButton(
     modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
+    height: Dp = 48.dp,
     enabled: Boolean = true,
     isLoading: Boolean = false
 ) {
@@ -24,7 +26,7 @@ fun FilmHunterPrimaryButton(
         enabled = enabled,
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp),
+            .height(height),
         shape = MaterialTheme.shapes.large,
         colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface

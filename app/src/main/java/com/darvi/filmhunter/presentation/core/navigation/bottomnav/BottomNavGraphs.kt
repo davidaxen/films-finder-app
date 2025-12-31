@@ -1,17 +1,39 @@
 package com.darvi.filmhunter.presentation.core.navigation.bottomnav
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
+import com.darvi.filmhunter.domain.entity.MatcherSessionEntity
 import com.darvi.filmhunter.presentation.core.navigation.HomeRoutes
 import com.darvi.filmhunter.presentation.core.navigation.MainGraph
+import com.darvi.filmhunter.presentation.core.navigation.MatchRoutes
 import com.darvi.filmhunter.presentation.core.navigation.ProfileRoutes
 import com.darvi.filmhunter.presentation.core.navigation.SavedRoutes
 import com.darvi.filmhunter.presentation.core.navigation.SearchRoutes
 import com.darvi.filmhunter.presentation.list.movie.MovieListScreen
 import com.darvi.filmhunter.presentation.list.series.SeriesListScreen
+import com.darvi.filmhunter.presentation.matcher.MatcherScreen
+import com.darvi.filmhunter.presentation.matcher.MatcherViewModel
+import com.darvi.filmhunter.presentation.matcher.SessionCreationState
+import com.darvi.filmhunter.presentation.matcher.screens.FilmTypeSelectionScreen
+import com.darvi.filmhunter.presentation.matcher.screens.GenreSelectionScreen
+import com.darvi.filmhunter.presentation.matcher.screens.MatcherSummaryScreen
+import com.darvi.filmhunter.presentation.matcher.screens.PlatformSelectionScreen
+import com.darvi.filmhunter.presentation.matcher.screens.SessionWaitingScreen
+import com.darvi.filmhunter.presentation.matcher.SwipingScreen
+import com.darvi.filmhunter.presentation.matcher.SwipingViewModel
+import com.darvi.filmhunter.presentation.matcher.sessions.SessionDetailScreen
+import com.darvi.filmhunter.presentation.matcher.sessions.SessionsHistoryScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -123,6 +145,373 @@ fun NavGraphBuilder.searchGraph(navController: NavController) {
                     )
                 },
                 onBackPress = { navController.popBackStack() }
+            )
+        }
+    }
+}
+
+fun NavGraphBuilder.matchGraph(navController: NavController) {
+    navigation<MainGraph.Match>(startDestination = MatchRoutes.Main) {
+        composable<MatchRoutes.Main> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            
+            // Reset ViewModel when navigating to main screen
+            LaunchedEffect(Unit) {
+                sharedViewModel.reset()
+            }
+            
+            MatcherScreen(
+                onJoinRoomClick = { code ->
+                    sharedViewModel.joinSession(
+                        code = code,
+                        onSuccess = { session ->
+                            navController.navigate(
+                                MatchRoutes.SessionWaiting(
+                                    sessionCode = session.code,
+                                    sessionId = session.id
+                                )
+                            )
+                        },
+                        onError = { }
+                    )
+                },
+                onCreateRoomClick = {
+                    navController.navigate(MatchRoutes.FilmTypeSelection)
+                },
+                onSessionsHistoryClick = {
+                    navController.navigate(MatchRoutes.SessionsHistory)
+                }
+            )
+        }
+        composable<MatchRoutes.FilmTypeSelection>(
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            }
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            FilmTypeSelectionScreen(
+                matcherViewModel = sharedViewModel,
+                onFilmTypeSelected = {
+                    navController.navigate(MatchRoutes.GenreSelection)
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MatchRoutes.GenreSelection> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            GenreSelectionScreen(
+                matcherViewModel = sharedViewModel,
+                onGenresSelected = {
+                    navController.navigate(MatchRoutes.PlatformSelection)
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MatchRoutes.PlatformSelection> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            PlatformSelectionScreen(
+                matcherViewModel = sharedViewModel,
+                onPlatformsSelected = {
+                    navController.navigate(MatchRoutes.Summary)
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MatchRoutes.Summary> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            MatcherSummaryScreen(
+                matcherViewModel = sharedViewModel,
+                onCreateSession = { sessionCode ->
+                    // Get session ID from the created session
+                    val sessionState = sharedViewModel.sessionCreationState.value
+                    if (sessionState is SessionCreationState.Success) {
+                        navController.navigate(
+                            MatchRoutes.SessionWaiting(
+                                sessionCode = sessionCode,
+                                sessionId = sessionState.session.id
+                            )
+                        )
+                    }
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MatchRoutes.SessionWaiting>(
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            }
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            val route = backStackEntry.toRoute<MatchRoutes.SessionWaiting>()
+            val currentUser by sharedViewModel.currentUser.collectAsStateWithLifecycle()
+            val currentSession by sharedViewModel.currentSession.collectAsStateWithLifecycle()
+            val hasOtherUserJoined by sharedViewModel.hasOtherUserJoined.collectAsStateWithLifecycle()
+            val sessionBecameActive by sharedViewModel.sessionBecameActive.collectAsStateWithLifecycle()
+            val sessionCancelled by sharedViewModel.sessionCancelled.collectAsStateWithLifecycle()
+            
+            // Determine if current user is the host
+            val isHost = remember(route.sessionId, currentUser, currentSession) {
+                currentSession?.let { session ->
+                    session.id == route.sessionId && session.createdBy == currentUser?.id
+                } ?: false
+            }
+            
+            // Navigate to SwipingScreen when session becomes active
+            LaunchedEffect(sessionBecameActive) {
+                if (sessionBecameActive) {
+                    navController.navigate(
+                        MatchRoutes.Swiping(sessionId = route.sessionId)
+                    ) {
+                        // Clear the back stack up to Main
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            
+            // Navigate non-host users back to main matcher screen when session is cancelled
+            LaunchedEffect(sessionCancelled) {
+                if (sessionCancelled && !isHost) {
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            
+            SessionWaitingScreen(
+                sessionCode = route.sessionCode,
+                isHost = isHost,
+                hasOtherUserJoined = hasOtherUserJoined,
+                onCancelSession = if (isHost) {
+                    {
+                        sharedViewModel.cancelSession(
+                            sessionId = route.sessionId,
+                            onSuccess = {
+                                navController.navigate(MatchRoutes.Main) {
+                                    popUpTo(MatchRoutes.Main) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
+                            },
+                            onError = { }
+                        )
+                    }
+                } else null,
+                onInitiateSession = if (isHost && hasOtherUserJoined) {
+                    {
+                        sharedViewModel.initiateSession(
+                            sessionId = route.sessionId,
+                            onSuccess = { },
+                            onError = { }
+                        )
+                    }
+                } else null,
+            )
+        }
+        composable<MatchRoutes.Swiping>(
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(300)
+                )
+            }
+        ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MainGraph.Match)
+            }
+            val sharedViewModel: MatcherViewModel = hiltViewModel(parentEntry)
+            // Scope SwipingViewModel to the Swiping route to preserve state
+            val swipingViewModel: SwipingViewModel =
+                hiltViewModel(backStackEntry)
+            val route = backStackEntry.toRoute<MatchRoutes.Swiping>()
+            val sessionCancelled by sharedViewModel.sessionCancelled.collectAsStateWithLifecycle()
+            val sessionFinished by sharedViewModel.sessionFinished.collectAsStateWithLifecycle()
+            val currentUser by sharedViewModel.currentUser.collectAsStateWithLifecycle()
+            val currentSession by sharedViewModel.currentSession.collectAsStateWithLifecycle()
+            
+            // Determine if current user is the host
+            val isHost = remember(route.sessionId, currentUser, currentSession) {
+                currentSession?.let { session ->
+                    session.id == route.sessionId && session.createdBy == currentUser?.id
+                } ?: false
+            }
+            
+            // Navigate non-host users back to main matcher screen when session is cancelled
+            LaunchedEffect(sessionCancelled) {
+                if (sessionCancelled && !isHost) {
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            
+            // Navigate non-host users back to main matcher screen when session is finished
+            LaunchedEffect(sessionFinished) {
+                if (sessionFinished && !isHost) {
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            
+            SwipingScreen(
+                sessionId = route.sessionId,
+                viewModel = swipingViewModel,
+                isHost = isHost,
+                onFilmInfoClick = { filmId, filmType ->
+                    navController.navigate(
+                        MainGraph.Detail(id = filmId, filmType = filmType)
+                    )
+                },
+                onFinishSession = {
+                    // Navigate back to main matcher screen
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                onLeaveSession = {
+                    // Navigate back to main matcher screen
+                    navController.navigate(MatchRoutes.Main) {
+                        popUpTo(MatchRoutes.Main) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        composable<MatchRoutes.SessionsHistory> {
+            SessionsHistoryScreen(
+                onSessionClick = { session ->
+                    navController.navigate(
+                        MatchRoutes.SessionDetail(sessionId = session.id)
+                    )
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MatchRoutes.SessionDetail> { backStackEntry ->
+            val route = backStackEntry.toRoute<MatchRoutes.SessionDetail>()
+            // Pass session with just ID - ViewModel will load full details
+            SessionDetailScreen(
+                session = MatcherSessionEntity(
+                    id = route.sessionId,
+                    code = "",
+                    createdBy = "",
+                    status = "",
+                    filters = emptyMap()
+                ),
+                onFilmClick = { filmId, filmType ->
+                    navController.navigate(
+                        MainGraph.Detail(id = filmId, filmType = filmType)
+                    )
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
             )
         }
     }
