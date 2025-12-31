@@ -1,5 +1,8 @@
 package com.darvi.filmhunter.presentation.core.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -18,7 +21,32 @@ import com.darvi.filmhunter.presentation.detail.SeasonDetailScreen
 
 fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation<AppGraph.Auth>(startDestination = AuthRoutes.Login) {
-        composable<AuthRoutes.Login> {
+        composable<AuthRoutes.Login>(
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> -fullWidth },
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> -fullWidth },
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> -fullWidth },
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> -fullWidth },
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             LoginScreen(
                 navigateToMain = dropUnlessResumed {
                     navController.navigate(AppGraph.Main) {
@@ -31,9 +59,34 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
             )
         }
 
-        composable<AuthRoutes.Register> {
+        composable<AuthRoutes.Register>(
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> fullWidth },
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             RegisterScreen(
-                navigateBack = { navController.popBackStack() }
+                navigateBack = dropUnlessResumed { navController.popBackStack() }
             )
         }
     }
