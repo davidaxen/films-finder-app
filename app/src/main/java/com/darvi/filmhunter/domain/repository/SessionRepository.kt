@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface SessionRepository {
     fun getCurrentUser(): StateFlow<UserEntity?>
-    fun setCurrentUser(user: UserEntity)
+    suspend fun setCurrentUser(user: UserEntity)
     fun observeSession(): Flow<SessionState>
     suspend fun signOut()
 }

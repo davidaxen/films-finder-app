@@ -53,8 +53,9 @@ class SessionRepositoryImpl @Inject constructor(
             .distinctUntilChanged()
     }
 
-    override fun setCurrentUser(user: UserEntity) {
-        _currentUser.value = user
+    override suspend fun setCurrentUser(user: UserEntity) {
+        val name = databaseDataSource.getUserNameById(user.id) ?: ""
+        _currentUser.value = user.copy(name = name)
     }
 
     override suspend fun signOut() {
