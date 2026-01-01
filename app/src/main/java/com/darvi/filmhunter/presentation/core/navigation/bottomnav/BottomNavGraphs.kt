@@ -34,6 +34,7 @@ import com.darvi.filmhunter.presentation.matcher.SwipingScreen
 import com.darvi.filmhunter.presentation.matcher.SwipingViewModel
 import com.darvi.filmhunter.presentation.matcher.sessions.SessionDetailScreen
 import com.darvi.filmhunter.presentation.matcher.sessions.SessionsHistoryScreen
+import com.darvi.filmhunter.presentation.profile.ProfileScreen
 import com.darvi.filmhunter.presentation.saved.SavedListScreen
 import com.darvi.filmhunter.presentation.search.FilmsByGenreListScreen
 import com.darvi.filmhunter.presentation.search.HomeFilmsListScreen
@@ -534,6 +535,7 @@ fun NavGraphBuilder.savedGraph(navController: NavController) {
 fun NavGraphBuilder.profileGraph(navController: NavController) {
     navigation<MainGraph.Profile>(startDestination = ProfileRoutes.Main) {
         composable<ProfileRoutes.Main> {
+            ProfileScreen()
         }
     }
 }

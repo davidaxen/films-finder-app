@@ -12,7 +12,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SessionViewModel @Inject constructor(
-//    private val getCurrentUser: GetCurrentUser,
     getCurrentSession: GetCurrentSession
 ) : ViewModel() {
 
