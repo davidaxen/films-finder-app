@@ -14,7 +14,7 @@
 ### 🏠 Home
 - Discover movies and series through various categories
 
-**Screenshots & Videos:**
+**Screenshots:**
 <p align="left">
   <img width="30%" alt="home_movies" src="https://github.com/user-attachments/assets/caed7347-391d-48b2-b026-f52b54cc65a3" />
   &nbsp;
@@ -26,14 +26,12 @@
 - Explore films by genre and platform
 - Find film details and related content
 
-**Screenshots & Videos:**
-
+**Demo:**
 <table border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td align="center">
       <video src="https://github.com/user-attachments/assets/79453443-65bb-4071-8a6f-610e042c644a"
              width="30%"
-        alt="Prueba"
              controls>
       </video>
     </td>
@@ -65,24 +63,27 @@
 - Save your favorite movies and series
 - Access your saved content anytime
 
-**Screenshots & Videos:**
-<!-- Add your Saved Films feature screenshots/videos here -->
-<!-- Example:
-![Saved Films](screenshots/saved.png)
-[![Saved Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+**Demo:**
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/bfe4c1b5-6f7e-4a1d-9c37-d196f18d65af"
+             width="30%"
+             controls>
+      </video>
+    </td>
+  </tr>
+</table>
 
 ### 👤 Profile
 - Manage your account settings
 - Edit profile information
 - Configure notifications and privacy settings
 
-**Screenshots & Videos:**
-<!-- Add your Profile feature screenshots/videos here -->
-<!-- Example:
-![Profile Screen](screenshots/profile.png)
-[![Profile Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+**Screenshot:**
+<p align="left">
+  <img width="30%" alt="Profile" src="https://github.com/user-attachments/assets/c6f220ec-1414-42ac-a29f-99d2c153f6ac" />
+</p>
 
 ## 🛠️ Tech Stack
 
