@@ -21,19 +21,31 @@
   <img width="30%" alt="home_series" src="https://github.com/user-attachments/assets/657cbf89-9e00-44c6-a655-d534f9bb0590" />
 </p>
 
-
-
 ### 🔍 Search
 - Search movies and series by title
 - Explore films by genre and platform
 - Find film details and related content
 
 **Screenshots & Videos:**
-<!-- Add your Search feature screenshots/videos here -->
-<!-- Example:
-![Search Screen](screenshots/search.png)
-[![Search Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/79453443-65bb-4071-8a6f-610e042c644a"
+             width="30%"
+        alt="Prueba"
+             controls>
+      </video>
+    </td>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/ce94cd24-d770-4fcd-b4d0-6c024d2c6258"
+             width="30%"
+             controls>
+      </video>
+    </td>
+  </tr>
+</table>
+
 
 ### 💫 Match Sessions
 - Create matching sessions with friends
