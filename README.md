@@ -15,11 +15,13 @@
 - Discover movies and series through various categories
 
 **Screenshots & Videos:**
-<!-- Add your Home feature screenshots/videos here -->
-<!-- Example:
-![Home Screen](screenshots/home.png)
-[![Home Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+<p align="left">
+  <img width="30%" alt="home_movies" src="https://github.com/user-attachments/assets/caed7347-391d-48b2-b026-f52b54cc65a3" />
+  &nbsp;
+  <img width="30%" alt="home_series" src="https://github.com/user-attachments/assets/657cbf89-9e00-44c6-a655-d534f9bb0590" />
+</p>
+
+
 
 ### 🔍 Search
 - Search movies and series by title
