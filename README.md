@@ -55,13 +55,17 @@
 - Get instant notifications when you find a match
 - View session history and matched films
 
-**Screenshots & Videos:**
-<!-- Add your Match Sessions feature screenshots/videos here -->
-<!-- Example:
-![Match Session](screenshots/match.png)
-![Match Found](screenshots/match_found.png)
-[![Match Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+**Demo:**
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/2b5e56a8-c391-4924-99ed-2f6bba68c7cd"
+             width="30%"
+             controls>
+      </video>
+    </td>
+  </tr>
+</table>
 
 ### 💾 Saved Films
 - Save your favorite movies and series
