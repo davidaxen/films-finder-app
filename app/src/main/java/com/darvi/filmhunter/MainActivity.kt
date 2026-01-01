@@ -9,7 +9,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.darvi.filmhunter.domain.entity.SessionState
 import com.darvi.filmhunter.presentation.core.SessionViewModel
 import com.darvi.filmhunter.presentation.core.navigation.NavigationWrapper
-import com.darvi.filmhunter.ui.theme.FilmHunterTheme
+import com.darvi.filmhunter.presentation.theme.FilmHunterTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

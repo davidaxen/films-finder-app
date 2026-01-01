@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.ui.theme
+package com.darvi.filmhunter.presentation.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes

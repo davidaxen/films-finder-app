@@ -1,4 +1,4 @@
-package com.darvi.filmhunter.ui.theme
+package com.darvi.filmhunter.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
