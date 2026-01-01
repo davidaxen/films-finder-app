@@ -12,7 +12,7 @@
 ## 📱 Features
 
 ### 🏠 Home
-- Discover trending movies and series
+- Discover movies and series through various categories
 
 **Screenshots & Videos:**
 <!-- Add your Home feature screenshots/videos here -->
