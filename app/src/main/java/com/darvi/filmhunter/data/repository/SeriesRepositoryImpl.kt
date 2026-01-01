@@ -1,0 +1,102 @@
+package com.darvi.filmhunter.data.repository
+
+import com.darvi.filmhunter.data.datasource.SupabaseDatabaseDataSource
+import com.darvi.filmhunter.data.datasource.api.SeriesApiService
+import com.darvi.filmhunter.data.model.series.toDomain
+import com.darvi.filmhunter.domain.entity.series.SeasonDetailEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesDetailEntity
+import com.darvi.filmhunter.domain.entity.series.SeriesEntity
+import com.darvi.filmhunter.domain.repository.SeriesRepository
+import com.darvi.filmhunter.presentation.core.model.FilmType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+
+class SeriesRepositoryImpl @Inject constructor(
+    private val api: SeriesApiService,
+    private val database: SupabaseDatabaseDataSource
+): SeriesRepository {
+    private val savedSeriesFlow = MutableStateFlow<List<SeriesDetailEntity>>(emptyList())
+    override fun getSavedSeriesFlow(): Flow<List<SeriesDetailEntity>> = savedSeriesFlow.asStateFlow()
+
+    init {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            fetchSavedSeries()
+        }
+    }
+
+    override suspend fun getSeriesList(path: String, page: Int): List<SeriesEntity> {
+        return api.getSeriesList(path = path, page = page).results.map {
+            it.toDomain()
+        }
+    }
+
+    override suspend fun getSeriesByTitle(query: String, page: Int): List<SeriesEntity> {
+        return api.getSeriesByTitle(q = query, page = page).results.map {
+            it.toDomain()
+        }
+    }
+
+    override suspend fun getSeriesByGenres(
+        genres: String,
+        platforms: String,
+        page: Int
+    ): List<SeriesEntity> {
+        return if (platforms.isNotEmpty()) {
+            api.getSeriesByPlatformAndGenres(genres = genres, platformsId = platforms, page = page).results.map {
+                it.toDomain()
+            }
+        } else {
+            api.getSeriesByGenres(genres = genres, page = page).results.map {
+                it.toDomain()
+            }
+        }
+    }
+
+    override suspend fun getSeriesById(id: Int): SeriesDetailEntity {
+        return api
+            .getSeriesById(id = id)
+            .toDomain()
+            .copy(
+                isSaved = database.isFilmSaved(id, FilmType.SERIES.name)
+            )
+    }
+
+    override suspend fun getSeriesSeasonDetail(
+        seriesId: Int,
+        seasonNumber: Int
+    ): SeasonDetailEntity {
+        return api.getSeriesSeasonDetail(seriesId = seriesId, seasonNumber = seasonNumber).toDomain()
+    }
+
+    override suspend fun saveFilm(filmId: Int) {
+        database.saveFilm(filmId, FilmType.SERIES.name)
+        fetchSavedSeries()
+    }
+
+    override suspend fun removeSavedFilm(filmId: Int) {
+        database.removeSavedFilm(filmId, FilmType.SERIES.name)
+        fetchSavedSeries()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    override suspend fun fetchSavedSeries() {
+        val filmsId = database.getSavedFilmsId(FilmType.SERIES.name)
+
+        val series = filmsId.map {
+            api.getSeriesById(id = it.filmId).toDomain().copy(
+                isSaved = true,
+                savedAt = Instant.parse(it.createdAt as String).toEpochMilliseconds()
+            )
+        }
+
+        savedSeriesFlow.value = series
+    }
+}

@@ -13,6 +13,13 @@ composeBom = "2025.10.01"
 materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.5"
 kotlinSerialization = "1.9.0"
+hilt = "2.57.2"
+ksp = "2.3.0"
+hilt-navigation = "1.3.0"
+retrofit = "3.0.0"
+coil = "3.3.0"
+splashVersion = "1.2.0"
+lottieComposeVer = "6.7.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,12 +39,25 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientAndroid" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"}
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt"}
+hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation"}
+retrofit = {module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit"}
+retrofit-adapter = {module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit"}
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
+supabase-realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil"}
+coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil"}
+splash-screen = { module = "androidx.core:core-splashscreen", version.ref = "splashVersion"}
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieComposeVer"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrainsKotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+hilt = {id = "com.google.dagger.hilt.android", version.ref = "hilt"}
+ksp = {id = "com.google.devtools.ksp", version.ref = "ksp"}

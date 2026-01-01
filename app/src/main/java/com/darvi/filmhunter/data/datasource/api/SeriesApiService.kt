@@ -1,0 +1,55 @@
+package com.darvi.filmhunter.data.datasource.api
+
+import com.darvi.filmhunter.data.model.series.SeasonDetailResponse
+import com.darvi.filmhunter.data.model.series.SeriesDetailResponse
+import com.darvi.filmhunter.data.model.series.SeriesResponse
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
+
+interface SeriesApiService {
+    @GET("tv/{path}")
+    suspend fun getSeriesList(
+        @Path("path") path: String,
+        @Query("page") page: Int = 1,
+        @Query("language") language: String = "es-ES"
+    ): SeriesResponse
+
+    @GET("search/tv")
+    suspend fun getSeriesByTitle(
+        @Query("query") q: String,
+        @Query("page") page: Int = 1,
+        @Query("language") language: String = "es-ES"
+    ): SeriesResponse
+
+    @GET("discover/tv")
+    suspend fun getSeriesByGenres(
+        @Query("with_genres") genres: String,
+        @Query("page") page: Int = 1,
+        @Query("language") language: String = "es-ES"
+    ): SeriesResponse
+
+    @GET("discover/tv")
+    suspend fun getSeriesByPlatformAndGenres(
+        @Query("with_genres") genres: String,
+        @Query("with_watch_providers") platformsId: String,
+        @Query("page") page: Int = 1,
+        @Query("language") language: String = "es-ES",
+        @Query("watch_region") region: String = "ES",
+    ): SeriesResponse
+
+    @GET("tv/{id}")
+    suspend fun getSeriesById(
+        @Path("id") id: Int,
+        @Query("append_to_response") appendToResponse: String = "watch/providers,recommendations",
+        @Query("language") language: String = "es-ES"
+    ): SeriesDetailResponse
+
+    @GET("tv/{series_id}/season/{season_number}")
+    suspend fun getSeriesSeasonDetail(
+        @Path("series_id") seriesId: Int,
+        @Path("season_number") seasonNumber: Int,
+        @Query("append_to_response") appendToResponse: String = "watch/providers",
+        @Query("language") language: String = "es-ES"
+    ): SeasonDetailResponse
+}

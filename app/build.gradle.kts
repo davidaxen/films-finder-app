@@ -1,8 +1,12 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrainsKotlinSerialization)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -21,6 +25,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val localProperties = Properties()
+    val localPropertiesFile = File(rootDir, "secret.properties")
+    if(localPropertiesFile.exists() && localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use {
+            localProperties.load(it)
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -28,6 +40,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "SUPABASE_KEY", localProperties.getProperty("SUPABASE_KEY"))
+            buildConfigField("String", "SUPABASE_URL", localProperties.getProperty("SUPABASE_URL"))
+            buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY"))
+        }
+        debug {
+            buildConfigField("String", "SUPABASE_KEY", localProperties.getProperty("SUPABASE_KEY"))
+            buildConfigField("String", "SUPABASE_URL", localProperties.getProperty("SUPABASE_URL"))
+            buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY"))
         }
     }
     compileOptions {
@@ -39,6 +59,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -54,14 +75,33 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.okhttp)
+
+    //Splash Screen
+    implementation(libs.splash.screen)
+    implementation(libs.lottie.compose)
+
+    //Images
+    implementation(libs.coil.compose)
+    implementation(libs.coil.okhttp)
 
     //Navigation
     implementation(libs.androidx.navigation.compose)
 
     //Supabase
     implementation(platform(libs.supabase.bom))
-    implementation(libs.postgrest.kt)
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.supabase.auth.kt)
+    implementation(libs.supabase.realtime.kt)
+
+    //DI
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation)
+    ksp(libs.hilt.compiler)
+
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.adapter)
 
     //Testing
     testImplementation(libs.junit)
