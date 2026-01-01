@@ -9,6 +9,10 @@
 
 **FilmHunter** is an Android application that helps you discover movies and TV series, and find perfect matches with your friends through an interactive swiping experience.
 
+> **Note:** This app is currently fully implemented in Spanish. Support for other languages will be added in the future.
+> 
+> **Note:** This app requires API keys for TMDB and Supabase. Make sure to set up your `secret.properties` file before building.
+
 ## 📱 Features
 
 ### 🏠 Home
@@ -149,8 +153,3 @@ This project is licensed under the GPL-3.0 License - see the (<a href="https://g
 ## 👨‍💻 Author
 
 David Bracamonte Martins
-
----
-
-**Note**: This app requires API keys for TMDB and Supabase. Make sure to set up your `secret.properties` file before building.
-
