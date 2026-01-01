@@ -9,29 +9,45 @@
 
 **FilmHunter** is an Android application that helps you discover movies and TV series, and find perfect matches with your friends through an interactive swiping experience.
 
+> **Note:** This app is currently fully implemented in Spanish. Support for other languages will be added in the future.
+> 
+> **Note:** This app requires API keys for TMDB and Supabase. Make sure to set up your `secret.properties` file before building.
+
 ## 📱 Features
 
 ### 🏠 Home
-- Discover trending movies and series
+- Discover movies and series through various categories
 
-**Screenshots & Videos:**
-<!-- Add your Home feature screenshots/videos here -->
-<!-- Example:
-![Home Screen](screenshots/home.png)
-[![Home Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+**Screenshots:**
+<p align="left">
+  <img width="30%" alt="home_movies" src="https://github.com/user-attachments/assets/caed7347-391d-48b2-b026-f52b54cc65a3" />
+  &nbsp;
+  <img width="30%" alt="home_series" src="https://github.com/user-attachments/assets/657cbf89-9e00-44c6-a655-d534f9bb0590" />
+</p>
 
 ### 🔍 Search
 - Search movies and series by title
 - Explore films by genre and platform
 - Find film details and related content
 
-**Screenshots & Videos:**
-<!-- Add your Search feature screenshots/videos here -->
-<!-- Example:
-![Search Screen](screenshots/search.png)
-[![Search Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+**Demo:**
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/79453443-65bb-4071-8a6f-610e042c644a"
+             width="30%"
+             controls>
+      </video>
+    </td>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/ce94cd24-d770-4fcd-b4d0-6c024d2c6258"
+             width="30%"
+             controls>
+      </video>
+    </td>
+  </tr>
+</table>
+
 
 ### 💫 Match Sessions
 - Create matching sessions with friends
@@ -39,36 +55,43 @@
 - Get instant notifications when you find a match
 - View session history and matched films
 
-**Screenshots & Videos:**
-<!-- Add your Match Sessions feature screenshots/videos here -->
-<!-- Example:
-![Match Session](screenshots/match.png)
-![Match Found](screenshots/match_found.png)
-[![Match Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+**Demo:**
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/2b5e56a8-c391-4924-99ed-2f6bba68c7cd"
+             width="30%"
+             controls>
+      </video>
+    </td>
+  </tr>
+</table>
 
 ### 💾 Saved Films
 - Save your favorite movies and series
 - Access your saved content anytime
 
-**Screenshots & Videos:**
-<!-- Add your Saved Films feature screenshots/videos here -->
-<!-- Example:
-![Saved Films](screenshots/saved.png)
-[![Saved Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+**Demo:**
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/bfe4c1b5-6f7e-4a1d-9c37-d196f18d65af"
+             width="30%"
+             controls>
+      </video>
+    </td>
+  </tr>
+</table>
 
 ### 👤 Profile
 - Manage your account settings
 - Edit profile information
 - Configure notifications and privacy settings
 
-**Screenshots & Videos:**
-<!-- Add your Profile feature screenshots/videos here -->
-<!-- Example:
-![Profile Screen](screenshots/profile.png)
-[![Profile Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+**Screenshot:**
+<p align="left">
+  <img width="30%" alt="Profile" src="https://github.com/user-attachments/assets/c6f220ec-1414-42ac-a29f-99d2c153f6ac" />
+</p>
 
 ## 🛠️ Tech Stack
 
@@ -129,13 +152,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the (<a href="https://github.com/davidaxen/films-finder-app/blob/main/LICENSE">LICENSE</a>) file for details.
+This project is licensed under the GPL-3.0 License - see the (<a href="https://github.com/davidaxen/films-finder-app/blob/main/LICENSE">LICENSE</a>) file for details.
 
 ## 👨‍💻 Author
 
 David Bracamonte Martins
-
----
-
-**Note**: This app requires API keys for TMDB and Supabase. Make sure to set up your `secret.properties` file before building.
-
