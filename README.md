@@ -13,6 +13,23 @@
 > 
 > **Note:** This app requires API keys for TMDB and Supabase. Make sure to set up your `secret.properties` file before building.
 
+
+<p align="center">
+  <img width="20%" alt="home_movies_main" src="https://github.com/user-attachments/assets/caed7347-391d-48b2-b026-f52b54cc65a3" />
+  &nbsp;
+  <img width="20%" alt="search_main" src="https://github.com/user-attachments/assets/e15bf3c4-71e9-4ee1-b702-dbe0da6fc590" />
+  &nbsp;
+  <img width="20%" alt="search_title" src="https://github.com/user-attachments/assets/9609435f-8b3c-40d1-bc17-987e37ee6958" />
+  &nbsp;
+  <img width="20%" alt="movie_detail" src="https://github.com/user-attachments/assets/c176d706-b81a-4a8a-bc23-59e4c4ae04e7" />
+  &nbsp;
+  <img width="20%" alt="saved_main" src="https://github.com/user-attachments/assets/6c545113-0bed-4d54-99d2-c76e76f22a66" />
+  &nbsp;
+  <img width="20%" alt="match_session" src="https://github.com/user-attachments/assets/12549c09-64f2-4452-9bc3-236581c04377" />
+  &nbsp;
+  <img width="20%" alt="user_main" src="https://github.com/user-attachments/assets/201d5556-2bad-437c-8f38-3c73a5edea08" />
+</p>
+
 ## 📱 Features
 
 ### 🏠 Home
